@@ -4,7 +4,7 @@ AUI.add(
 		var AArray = A.Array;
 
 		var FormBuilderTextField = A.FormBuilderTextField;
-		var FormBuilderTypes = A.FormBuilder.types;
+		var FormBuilderFieldTypes = A.namespace('FormBuilderField.types');
 
 		var Lang = A.Lang;
 
@@ -928,7 +928,7 @@ AUI.add(
 		AArray.each(
 			plugins,
 			function(item, index) {
-				FormBuilderTypes[item.NAME] = item;
+				FormBuilderFieldTypes[item.NAME] = item;
 			}
 		);
 	},
