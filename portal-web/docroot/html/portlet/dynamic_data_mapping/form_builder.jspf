@@ -20,7 +20,7 @@ String[] availableLanguageIds = LocalizationUtil.getAvailableLanguageIds(script)
 Locale[] availableLocales = new Locale[availableLanguageIds.length];
 
 for (int i = 0; i < availableLanguageIds.length; i++) {
-	availableLocales[i] = LocaleUtil.fromLanguageId(availableLanguageIds[i]);
+    availableLocales[i] = LocaleUtil.fromLanguageId(availableLanguageIds[i]);
 }
 
 String defaultLanguageId = LocalizationUtil.getDefaultLanguageId(script, LocaleUtil.getSiteDefault());
@@ -31,246 +31,230 @@ String defaultLanguageId = LocalizationUtil.getDefaultLanguageId(script, LocaleU
 <div class="alert alert-danger hide lfr-message-response" id="<portlet:namespace />messageContainer"></div>
 
 <liferay-ui:tabs
-	names='<%= LanguageUtil.get(request, "view[action]") + "," + LanguageUtil.get(request, "source") %>'
-	refresh="<%= false %>"
+    names='<%= LanguageUtil.get(request, "view[action]") + "," + LanguageUtil.get(request, "source") %>'
+    refresh="<%= false %>"
 >
-	<liferay-ui:section>
-		<div id="<portlet:namespace />formBuilderTab">
+    <liferay-ui:section>
+        <div id="<portlet:namespace />formBuilderTab">
 
-			<aui:translation-manager
-				availableLocales="<%= availableLocales %>"
-				defaultLanguageId="<%= defaultLanguageId %>"
-				id="translationManager"
-				initialize="<%= false %>"
-				readOnly="<%= false %>"
-			/>
+            <aui:translation-manager
+                availableLocales="<%= availableLocales %>"
+                defaultLanguageId="<%= defaultLanguageId %>"
+                id="translationManager"
+                initialize="<%= false %>"
+                readOnly="<%= false %>"
+            />
 
-			<div class="diagram-builder form-builder" id="<portlet:namespace />formBuilder">
-				<div class="diagram-builder-content" id="<portlet:namespace />formBuilderContent">
-					<div class="tabbable">
-						<div class="tabbable-content">
-							<ul class="lfr-nav nav nav-tabs">
-								<li class="active">
-									<a href="javascript:;">
-										<liferay-ui:message key="fields" />
-									</a>
-								</li>
-								<li class="disabled">
-									<a href="javascript:;">
-										<liferay-ui:message key="settings" />
-									</a>
-								</li>
-							</ul>
-							<div class="tab-content">
-								<div class="tab-pane"></div>
-								<div class="tab-pane"></div>
-							</div>
-						</div>
-					</div>
-					<div class="diagram-builder-content-container">
-						<div class="diagram-builder-canvas">
-							<div class="diagram-builder-drop-container"></div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</liferay-ui:section>
+            <div class="form-builder form-builder" id="<portlet:namespace />formBuilder">
+                <div class="form-builder-content" id="<portlet:namespace />formBuilderContent">
+                </div>
+            </div>
+        </div>
+    </liferay-ui:section>
 
-	<liferay-ui:section>
-		<div class="form-builder-source-wrapper" id="<portlet:namespace />formBuilderSourceWrapper">
-			<div class="form-builder-source" id="<portlet:namespace />formBuilderEditor"></div>
-		</div>
-	</liferay-ui:section>
+    <liferay-ui:section>
+        <div class="form-builder-source-wrapper" id="<portlet:namespace />formBuilderSourceWrapper">
+            <div class="form-builder-source" id="<portlet:namespace />formBuilderEditor"></div>
+        </div>
+    </liferay-ui:section>
 </liferay-ui:tabs>
 
 <%
 JSONArray availableLocalesJSONArray = JSONFactoryUtil.createJSONArray();
 
 for (int i = 0; i < availableLocales.length; i++) {
-	availableLocalesJSONArray.put(LanguageUtil.getLanguageId(availableLocales[i]));
+    availableLocalesJSONArray.put(LanguageUtil.getLanguageId(availableLocales[i]));
 }
 
 JSONObject localesMapJSONObject = JSONFactoryUtil.createJSONObject();
 
 for (Locale availableLocale : LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId())) {
-	localesMapJSONObject.put(LocaleUtil.toLanguageId(availableLocale), availableLocale.getDisplayName(locale));
+    localesMapJSONObject.put(LocaleUtil.toLanguageId(availableLocale), availableLocale.getDisplayName(locale));
 }
 %>
 
-<aui:script use="aui-datepicker-deprecated,event-custom-base,json,liferay-portlet-dynamic-data-lists,liferay-portlet-dynamic-data-mapping,liferay-portlet-dynamic-data-mapping-custom-fields,aui-tabview,aui-ace-editor,liferay-xml-formatter">
-	var Lang = A.Lang;
+<aui:script use="aui-datepicker-deprecated,event-custom-base,json,liferay-portlet-dynamic-data-lists,liferay-portlet-dynamic-data-mapping,liferay-portlet-dynamic-data-mapping-custom-fields,aui-tabview,aui-ace-editor,liferay-xml-formatter,aui-form-builder">
+    var Lang = A.Lang;
 
-	var MESSAGE_FAILURE = 0;
+    var MESSAGE_FAILURE = 0;
 
-	var MESSAGE_SUCCESS = 1;
+    var MESSAGE_SUCCESS = 1;
 
-	var CSS_MESSAGE_ERROR = 'alert alert-danger';
+    var CSS_MESSAGE_ERROR = 'alert alert-danger';
 
-	var CSS_MESSAGE_SUCCESS = 'alert alert-success';
+    var CSS_MESSAGE_SUCCESS = 'alert alert-success';
 
-	var STR_VALUE = 'value';
+    var STR_VALUE = 'value';
 
-	var availableFields;
-	var formEditor;
+    var availableFields;
+    var formEditor;
 
-	var displayMessage = function(type, message) {
-		var messageContainer = A.one('#<portlet:namespace />messageContainer');
+    var layout = new A.Layout({
+        rows: [
+            new A.LayoutRow({
+                cols: [
+                    new A.LayoutCol({
+                        size: 12
+                    })
+                ]
+            })
+        ]
+    });
 
-		messageContainer.removeClass(CSS_MESSAGE_SUCCESS).removeClass(CSS_MESSAGE_ERROR);
+    var displayMessage = function(type, message) {
+        var messageContainer = A.one('#<portlet:namespace />messageContainer');
 
-		var messageClass = CSS_MESSAGE_SUCCESS;
+        messageContainer.removeClass(CSS_MESSAGE_SUCCESS).removeClass(CSS_MESSAGE_ERROR);
 
-		if (type === MESSAGE_FAILURE) {
-			messageClass = CSS_MESSAGE_ERROR;
-		}
+        var messageClass = CSS_MESSAGE_SUCCESS;
 
-		messageContainer.addClass(messageClass);
-		messageContainer.html(message);
+        if (type === MESSAGE_FAILURE) {
+            messageClass = CSS_MESSAGE_ERROR;
+        }
 
-		messageContainer.show();
-	};
+        messageContainer.addClass(messageClass);
+        messageContainer.html(message);
 
-	var getContentValue = function() {
-		var content;
+        messageContainer.show();
+    };
 
-		if (formEditor && !isViewTabActive()) {
-			content = formEditor.get(STR_VALUE);
-		}
-		else {
-			content = formBuilder.getContent();
-		}
+    var getContentValue = function() {
+        var content;
 
-		return content;
-	};
+        if (formEditor && !isViewTabActive()) {
+            content = formEditor.get(STR_VALUE);
+        }
+        else {
+            content = formBuilder.getContent();
+        }
 
-	var getFormEditor = function() {
-		if (!formEditor) {
-			formEditor = new A.AceEditor(
-				{
-					boundingBox: '#<portlet:namespace />formBuilderEditor',
-					height: 600,
-					mode: 'xml',
-					tabSize: 4,
-					width: 600
-				}
-			).render();
-		}
+        return content;
+    };
 
-		return formEditor;
-	};
+    var getFormEditor = function() {
+        if (!formEditor) {
+            formEditor = new A.AceEditor(
+                {
+                    boundingBox: '#<portlet:namespace />formBuilderEditor',
+                    height: 600,
+                    mode: 'xml',
+                    tabSize: 4,
+                    width: 600
+                }
+            ).render();
+        }
 
-	var isViewTabActive = function() {
-		return !A.one('#<portlet:namespace />formBuilderTab').ancestor().hasClass('hide');
-	};
+        return formEditor;
+    };
 
-	var reloadFormBuilderData = function(content) {
-		if (!Lang.isValue(content)) {
-			content = window.<portlet:namespace />getContentDefinition();
-		}
+    var isViewTabActive = function() {
+        return !A.one('#<portlet:namespace />formBuilderTab').ancestor().hasClass('hide');
+    };
 
-		content = content.replace(/nestedFields/g, 'fields');
+    var reloadFormBuilderData = function(content) {
+        if (!Lang.isValue(content)) {
+            content = window.<portlet:namespace />getContentDefinition();
+        }
 
-		content = formBuilder.deserializeDefinitionFields(A.JSON.parse(content));
+        // deserialize here and set...
+        console.log(content); // formBuilder.set ...
+    };
 
-		formBuilder.set('fields', content);
-	};
+    var setEditorSize = function() {
+        if (!isViewTabActive()) {
+            getFormEditor().set('width', A.one('#<portlet:namespace />formBuilderSourceWrapper').get('clientWidth'));
+        }
+    };
 
-	var setEditorSize = function() {
-		if (!isViewTabActive()) {
-			getFormEditor().set('width', A.one('#<portlet:namespace />formBuilderSourceWrapper').get('clientWidth'));
-		}
-	};
+    var switchToSource = function() {
+        setEditorSize();
 
-	var switchToSource = function() {
-		setEditorSize();
+        var content = 'get form builder structure';
 
-		var content = formBuilder.getContent();
+        getFormEditor().set(STR_VALUE, content);
+    };
 
-		getFormEditor().set(STR_VALUE, content);
-	};
+    var switchToView = function() {
+        reloadFormBuilderData(formEditor.get(STR_VALUE));
+    };
 
-	var switchToView = function() {
-		reloadFormBuilderData(formEditor.get(STR_VALUE));
-	};
+    new A.FormBuilder({
+        fieldTypes: [{
+            fieldClass: A.FormBuilderFieldSentence,
+            icon:'glyphicon glyphicon-font',
+            label: 'Sentence'
+        },{
+            fieldClass: A.FormBuilderFieldChoice,
+            icon:'glyphicon glyphicon-font',
+            label: 'Choice',
+            unique: true
+        },{
+            fieldClass: A.FormBuilderFieldList,
+            icon:'glyphicon glyphicon-font',
+            label: 'List'
+        },{
+            fieldClass: A.FormBuilderFieldText,
+            icon:'glyphicon glyphicon-font',
+            label: 'Text'
+        },{
+            fieldClass: A.FormBuilderFieldText,
+            icon:'glyphicon glyphicon-font',
+            label: 'Text'
+        },{
+            fieldClass: A.FormBuilderFieldTime,
+            icon:'glyphicon glyphicon-font',
+            label: 'Time'
+        },{
+            fieldClass: A.FormBuilderFieldScale,
+            icon:'glyphicon glyphicon-font',
+            label: 'Scale'
+        },{
+            fieldClass: A.FormBuilderFieldDate,
+            icon:'glyphicon glyphicon-font',
+            label: 'Date'
+        },{
+            fieldClass: A.FormBuilderFieldGrid,
+            icon:'glyphicon glyphicon-font',
+            label: 'Grid'
+        },{
+            fieldClass: A.FormBuilderFieldGeolocation,
+            icon: 'glyphicon glyphicon-font',
+            label: 'Geolocation'
+        },{
+            fieldClass: A.FormBuilderFieldLinkToPage,
+            icon: 'glyphicon glyphicon-font',
+            label: 'Link to page'
+        },{
+            fieldClass: A.FormBuilderFieldHtmlText,
+            icon: 'glyphicon glyphicon-font',
+            label: 'HTML Text'
+        }],
+        layout: layout
+    }).render('#<portlet:namespace />formBuilder');
 
-	<c:if test="<%= Validator.isNotNull(scopeAvailableFields) %>">
-		availableFields = A.Object.getValue(window, '<%= HtmlUtil.escapeJS(scopeAvailableFields) %>'.split('.'));
+    var dialog = Liferay.Util.getWindow();
 
-		if (A.Lang.isFunction(availableFields)) {
-			availableFields = availableFields(A, Liferay.FormBuilder);
-		}
-	</c:if>
+    if (dialog) {
+        dialog.after('widthChange', setEditorSize);
+    }
 
-	var formBuilder = new Liferay.FormBuilder(
-		{
-			allowRemoveRequiredFields: true,
-			availableFields: availableFields,
-			boundingBox: '#<portlet:namespace />formBuilder',
-			enableEditing: false,
+    var afterShowTab = function(event) {
+        if (isViewTabActive()) {
+            switchToView();
+        }
+        else {
+            switchToSource();
+        }
+    };
 
-			<c:if test="<%= fieldsJSONArray != null %>">
-				fields: <%= fieldsJSONArray.toString() %>,
-			</c:if>
+    Liferay.after('showTab', afterShowTab);
 
-			portletNamespace: '<portlet:namespace />',
-			portletResourceNamespace: '<%= HtmlUtil.escapeJS(portletResourceNamespace) %>',
-			srcNode: '#<portlet:namespace />formBuilderContent',
-			translationManager: {
+    var clearShowTabHandle = function(event) {
+        if (event.portletId === '<%= portletDisplay.getRootPortletId() %>') {
+            Liferay.detach('showTab', afterShowTab);
+            Liferay.detach('destroyPortlet', clearShowTabHandle);
+        }
+    };
 
-				<c:if test="<%= availableLocalesJSONArray.length() > 0 %>">
-					availableLocales: <%= availableLocalesJSONArray.toString() %>,
-				</c:if>
-
-				boundingBox: '#<portlet:namespace />translationManager',
-				defaultLocale: '<%= HtmlUtil.escapeJS(defaultLanguageId) %>',
-				localesMap: <%= localesMapJSONObject.toString() %>,
-				srcNode: '#<portlet:namespace />translationManager .lfr-translation-manager-content'
-			}
-		}
-	).render();
-
-	var dialog = Liferay.Util.getWindow();
-
-	if (dialog) {
-		dialog.after('widthChange', setEditorSize);
-	}
-
-	var afterShowTab = function(event) {
-		if (isViewTabActive()) {
-			switchToView();
-		}
-		else {
-			switchToSource();
-		}
-	};
-
-	Liferay.after('showTab', afterShowTab);
-
-	var clearShowTabHandle = function(event) {
-		if (event.portletId === '<%= portletDisplay.getRootPortletId() %>') {
-			Liferay.detach('showTab', afterShowTab);
-			Liferay.detach('destroyPortlet', clearShowTabHandle);
-		}
-	};
-
-	Liferay.on('destroyPortlet', clearShowTabHandle);
-
-	window.<portlet:namespace />formBuilder = formBuilder;
-
-	window.<portlet:namespace />getContentValue = getContentValue;
-
-	Liferay.on(
-		'<portlet:namespace />saveTemplate',
-		function(event) {
-			A.one('#<portlet:namespace />scriptContent').val(getContentValue());
-		}
-	);
-
-	Liferay.fire(
-		'<portlet:namespace />formBuilderLoaded',
-		{
-			formBuilder: formBuilder
-		}
-	);
+    Liferay.on('destroyPortlet', clearShowTabHandle);
 </aui:script>
