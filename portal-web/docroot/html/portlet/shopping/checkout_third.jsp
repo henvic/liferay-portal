@@ -35,7 +35,28 @@ catch (Exception e) {
 </div>
 
 <%
-ShoppingOrder order = ShoppingOrderLocalServiceUtil.getOrder(ParamUtil.getLong(request, "orderId"));
+ShoppingOrder order = null;
+
+try {
+	order = ShoppingOrderLocalServiceUtil.getOrder(ParamUtil.getLong(request, "orderId"));
+}
+catch (NoSuchOrderException nsoe) {
+}
 %>
 
-<liferay-ui:message key="your-order-number-is" /> <strong><%= HtmlUtil.escape(order.getNumber()) %></strong>. <liferay-ui:message key="you-will-receive-an-email-shortly-with-your-order-summary-and-further-details" />
+<c:choose>
+	<c:when test="<%= order != null %>">
+		<liferay-ui:message key="your-order-number-is" /> <strong><%= HtmlUtil.escape(order.getNumber()) %></strong>. <liferay-ui:message key="you-will-receive-an-email-shortly-with-your-order-summary-and-further-details" />
+	</c:when>
+	<c:otherwise >
+		<liferay-ui:message key="your-order-was-already-processed.-please-check-your-email-for-your-order-summary-and-further-details" />
+	</c:otherwise>
+</c:choose>
+
+<portlet:renderURL var="continueShoppingURL">
+	<portlet:param name="struts_action" value="/shopping/view" />
+</portlet:renderURL>
+
+<aui:button-row>
+	<aui:button href="<%= continueShoppingURL.toString() %>" value="continue-shopping" />
+</aui:button-row>

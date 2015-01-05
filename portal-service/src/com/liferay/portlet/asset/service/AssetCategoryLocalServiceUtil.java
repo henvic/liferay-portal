@@ -52,6 +52,66 @@ public class AssetCategoryLocalServiceUtil {
 		return getService().addAssetCategory(assetCategory);
 	}
 
+	public static void addAssetEntryAssetCategories(long entryId,
+		java.util.List<com.liferay.portlet.asset.model.AssetCategory> AssetCategories) {
+		getService().addAssetEntryAssetCategories(entryId, AssetCategories);
+	}
+
+	public static void addAssetEntryAssetCategories(long entryId,
+		long[] categoryIds) {
+		getService().addAssetEntryAssetCategories(entryId, categoryIds);
+	}
+
+	public static void addAssetEntryAssetCategory(long entryId,
+		com.liferay.portlet.asset.model.AssetCategory assetCategory) {
+		getService().addAssetEntryAssetCategory(entryId, assetCategory);
+	}
+
+	public static void addAssetEntryAssetCategory(long entryId, long categoryId) {
+		getService().addAssetEntryAssetCategory(entryId, categoryId);
+	}
+
+	public static com.liferay.portlet.asset.model.AssetCategory addCategory(
+		long userId, long parentCategoryId,
+		java.util.Map<java.util.Locale, java.lang.String> titleMap,
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		long vocabularyId, java.lang.String[] categoryProperties,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .addCategory(userId, parentCategoryId, titleMap,
+			descriptionMap, vocabularyId, categoryProperties, serviceContext);
+	}
+
+	public static com.liferay.portlet.asset.model.AssetCategory addCategory(
+		long userId, java.lang.String title, long vocabularyId,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .addCategory(userId, title, vocabularyId, serviceContext);
+	}
+
+	public static void addCategoryResources(
+		com.liferay.portlet.asset.model.AssetCategory category,
+		boolean addGroupPermissions, boolean addGuestPermissions)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService()
+			.addCategoryResources(category, addGroupPermissions,
+			addGuestPermissions);
+	}
+
+	public static void addCategoryResources(
+		com.liferay.portlet.asset.model.AssetCategory category,
+		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService()
+			.addCategoryResources(category, groupPermissions, guestPermissions);
+	}
+
+	public static void clearAssetEntryAssetCategories(long entryId) {
+		getService().clearAssetEntryAssetCategories(entryId);
+	}
+
 	/**
 	* Creates a new asset category with the primary key. Does not add the asset category to the database.
 	*
@@ -61,6 +121,17 @@ public class AssetCategoryLocalServiceUtil {
 	public static com.liferay.portlet.asset.model.AssetCategory createAssetCategory(
 		long categoryId) {
 		return getService().createAssetCategory(categoryId);
+	}
+
+	/**
+	* Deletes the asset category from the database. Also notifies the appropriate model listeners.
+	*
+	* @param assetCategory the asset category
+	* @return the asset category that was removed
+	*/
+	public static com.liferay.portlet.asset.model.AssetCategory deleteAssetCategory(
+		com.liferay.portlet.asset.model.AssetCategory assetCategory) {
+		return getService().deleteAssetCategory(assetCategory);
 	}
 
 	/**
@@ -76,15 +147,68 @@ public class AssetCategoryLocalServiceUtil {
 		return getService().deleteAssetCategory(categoryId);
 	}
 
-	/**
-	* Deletes the asset category from the database. Also notifies the appropriate model listeners.
-	*
-	* @param assetCategory the asset category
-	* @return the asset category that was removed
-	*/
-	public static com.liferay.portlet.asset.model.AssetCategory deleteAssetCategory(
+	public static void deleteAssetEntryAssetCategories(long entryId,
+		java.util.List<com.liferay.portlet.asset.model.AssetCategory> AssetCategories) {
+		getService().deleteAssetEntryAssetCategories(entryId, AssetCategories);
+	}
+
+	public static void deleteAssetEntryAssetCategories(long entryId,
+		long[] categoryIds) {
+		getService().deleteAssetEntryAssetCategories(entryId, categoryIds);
+	}
+
+	public static void deleteAssetEntryAssetCategory(long entryId,
 		com.liferay.portlet.asset.model.AssetCategory assetCategory) {
-		return getService().deleteAssetCategory(assetCategory);
+		getService().deleteAssetEntryAssetCategory(entryId, assetCategory);
+	}
+
+	public static void deleteAssetEntryAssetCategory(long entryId,
+		long categoryId) {
+		getService().deleteAssetEntryAssetCategory(entryId, categoryId);
+	}
+
+	public static void deleteCategories(
+		java.util.List<com.liferay.portlet.asset.model.AssetCategory> categories)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService().deleteCategories(categories);
+	}
+
+	public static void deleteCategories(long[] categoryIds)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService().deleteCategories(categoryIds);
+	}
+
+	public static com.liferay.portlet.asset.model.AssetCategory deleteCategory(
+		com.liferay.portlet.asset.model.AssetCategory category)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().deleteCategory(category);
+	}
+
+	public static com.liferay.portlet.asset.model.AssetCategory deleteCategory(
+		com.liferay.portlet.asset.model.AssetCategory category,
+		boolean skipRebuildTree)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().deleteCategory(category, skipRebuildTree);
+	}
+
+	public static com.liferay.portlet.asset.model.AssetCategory deleteCategory(
+		long categoryId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().deleteCategory(categoryId);
+	}
+
+	/**
+	* @throws PortalException
+	*/
+	public static com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().deletePersistedModel(persistedModel);
+	}
+
+	public static void deleteVocabularyCategories(long vocabularyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService().deleteVocabularyCategories(vocabularyId);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
@@ -142,10 +266,10 @@ public class AssetCategoryLocalServiceUtil {
 	}
 
 	/**
-	* Returns the number of rows that match the dynamic query.
+	* Returns the number of rows matching the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
-	* @return the number of rows that match the dynamic query
+	* @return the number of rows matching the dynamic query
 	*/
 	public static long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
@@ -153,11 +277,11 @@ public class AssetCategoryLocalServiceUtil {
 	}
 
 	/**
-	* Returns the number of rows that match the dynamic query.
+	* Returns the number of rows matching the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
-	* @return the number of rows that match the dynamic query
+	* @return the number of rows matching the dynamic query
 	*/
 	public static long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
@@ -168,18 +292,6 @@ public class AssetCategoryLocalServiceUtil {
 	public static com.liferay.portlet.asset.model.AssetCategory fetchAssetCategory(
 		long categoryId) {
 		return getService().fetchAssetCategory(categoryId);
-	}
-
-	/**
-	* Returns the asset category with the matching UUID and company.
-	*
-	* @param uuid the asset category's UUID
-	* @param companyId the primary key of the company
-	* @return the matching asset category, or <code>null</code> if a matching asset category could not be found
-	*/
-	public static com.liferay.portlet.asset.model.AssetCategory fetchAssetCategoryByUuidAndCompanyId(
-		java.lang.String uuid, long companyId) {
-		return getService().fetchAssetCategoryByUuidAndCompanyId(uuid, companyId);
 	}
 
 	/**
@@ -194,69 +306,13 @@ public class AssetCategoryLocalServiceUtil {
 		return getService().fetchAssetCategoryByUuidAndGroupId(uuid, groupId);
 	}
 
-	/**
-	* Returns the asset category with the primary key.
-	*
-	* @param categoryId the primary key of the asset category
-	* @return the asset category
-	* @throws PortalException if a asset category with the primary key could not be found
-	*/
-	public static com.liferay.portlet.asset.model.AssetCategory getAssetCategory(
-		long categoryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getAssetCategory(categoryId);
+	public static com.liferay.portlet.asset.model.AssetCategory fetchCategory(
+		long categoryId) {
+		return getService().fetchCategory(categoryId);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
 		return getService().getActionableDynamicQuery();
-	}
-
-	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
-		return getService().getExportActionableDynamicQuery(portletDataContext);
-	}
-
-	/**
-	* @throws PortalException
-	*/
-	public static com.liferay.portal.model.PersistedModel deletePersistedModel(
-		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().deletePersistedModel(persistedModel);
-	}
-
-	public static com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getPersistedModel(primaryKeyObj);
-	}
-
-	/**
-	* Returns the asset category with the matching UUID and company.
-	*
-	* @param uuid the asset category's UUID
-	* @param companyId the primary key of the company
-	* @return the matching asset category
-	* @throws PortalException if a matching asset category could not be found
-	*/
-	public static com.liferay.portlet.asset.model.AssetCategory getAssetCategoryByUuidAndCompanyId(
-		java.lang.String uuid, long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getAssetCategoryByUuidAndCompanyId(uuid, companyId);
-	}
-
-	/**
-	* Returns the asset category matching the UUID and group.
-	*
-	* @param uuid the asset category's UUID
-	* @param groupId the primary key of the group
-	* @return the matching asset category
-	* @throws PortalException if a matching asset category could not be found
-	*/
-	public static com.liferay.portlet.asset.model.AssetCategory getAssetCategoryByUuidAndGroupId(
-		java.lang.String uuid, long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getAssetCategoryByUuidAndGroupId(uuid, groupId);
 	}
 
 	/**
@@ -276,6 +332,36 @@ public class AssetCategoryLocalServiceUtil {
 	}
 
 	/**
+	* Returns all the asset categories matching the UUID and company.
+	*
+	* @param uuid the UUID of the asset categories
+	* @param companyId the primary key of the company
+	* @return the matching asset categories, or an empty list if no matches were found
+	*/
+	public static java.util.List<com.liferay.portlet.asset.model.AssetCategory> getAssetCategoriesByUuidAndCompanyId(
+		java.lang.String uuid, long companyId) {
+		return getService().getAssetCategoriesByUuidAndCompanyId(uuid, companyId);
+	}
+
+	/**
+	* Returns a range of asset categories matching the UUID and company.
+	*
+	* @param uuid the UUID of the asset categories
+	* @param companyId the primary key of the company
+	* @param start the lower bound of the range of asset categories
+	* @param end the upper bound of the range of asset categories (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the range of matching asset categories, or an empty list if no matches were found
+	*/
+	public static java.util.List<com.liferay.portlet.asset.model.AssetCategory> getAssetCategoriesByUuidAndCompanyId(
+		java.lang.String uuid, long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.asset.model.AssetCategory> orderByComparator) {
+		return getService()
+				   .getAssetCategoriesByUuidAndCompanyId(uuid, companyId,
+			start, end, orderByComparator);
+	}
+
+	/**
 	* Returns the number of asset categories.
 	*
 	* @return the number of asset categories
@@ -285,67 +371,30 @@ public class AssetCategoryLocalServiceUtil {
 	}
 
 	/**
-	* Updates the asset category in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	* Returns the asset category with the primary key.
 	*
-	* @param assetCategory the asset category
-	* @return the asset category that was updated
+	* @param categoryId the primary key of the asset category
+	* @return the asset category
+	* @throws PortalException if a asset category with the primary key could not be found
 	*/
-	public static com.liferay.portlet.asset.model.AssetCategory updateAssetCategory(
-		com.liferay.portlet.asset.model.AssetCategory assetCategory) {
-		return getService().updateAssetCategory(assetCategory);
-	}
-
-	public static void addAssetEntryAssetCategory(long entryId, long categoryId) {
-		getService().addAssetEntryAssetCategory(entryId, categoryId);
-	}
-
-	public static void addAssetEntryAssetCategory(long entryId,
-		com.liferay.portlet.asset.model.AssetCategory assetCategory) {
-		getService().addAssetEntryAssetCategory(entryId, assetCategory);
-	}
-
-	public static void addAssetEntryAssetCategories(long entryId,
-		long[] categoryIds) {
-		getService().addAssetEntryAssetCategories(entryId, categoryIds);
-	}
-
-	public static void addAssetEntryAssetCategories(long entryId,
-		java.util.List<com.liferay.portlet.asset.model.AssetCategory> AssetCategories) {
-		getService().addAssetEntryAssetCategories(entryId, AssetCategories);
-	}
-
-	public static void clearAssetEntryAssetCategories(long entryId) {
-		getService().clearAssetEntryAssetCategories(entryId);
-	}
-
-	public static void deleteAssetEntryAssetCategory(long entryId,
-		long categoryId) {
-		getService().deleteAssetEntryAssetCategory(entryId, categoryId);
-	}
-
-	public static void deleteAssetEntryAssetCategory(long entryId,
-		com.liferay.portlet.asset.model.AssetCategory assetCategory) {
-		getService().deleteAssetEntryAssetCategory(entryId, assetCategory);
-	}
-
-	public static void deleteAssetEntryAssetCategories(long entryId,
-		long[] categoryIds) {
-		getService().deleteAssetEntryAssetCategories(entryId, categoryIds);
-	}
-
-	public static void deleteAssetEntryAssetCategories(long entryId,
-		java.util.List<com.liferay.portlet.asset.model.AssetCategory> AssetCategories) {
-		getService().deleteAssetEntryAssetCategories(entryId, AssetCategories);
+	public static com.liferay.portlet.asset.model.AssetCategory getAssetCategory(
+		long categoryId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getAssetCategory(categoryId);
 	}
 
 	/**
-	* Returns the entryIds of the asset entries associated with the asset category.
+	* Returns the asset category matching the UUID and group.
 	*
-	* @param categoryId the categoryId of the asset category
-	* @return long[] the entryIds of asset entries associated with the asset category
+	* @param uuid the asset category's UUID
+	* @param groupId the primary key of the group
+	* @return the matching asset category
+	* @throws PortalException if a matching asset category could not be found
 	*/
-	public static long[] getAssetEntryPrimaryKeys(long categoryId) {
-		return getService().getAssetEntryPrimaryKeys(categoryId);
+	public static com.liferay.portlet.asset.model.AssetCategory getAssetCategoryByUuidAndGroupId(
+		java.lang.String uuid, long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getAssetCategoryByUuidAndGroupId(uuid, groupId);
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetCategory> getAssetEntryAssetCategories(
@@ -370,18 +419,14 @@ public class AssetCategoryLocalServiceUtil {
 		return getService().getAssetEntryAssetCategoriesCount(entryId);
 	}
 
-	public static boolean hasAssetEntryAssetCategory(long entryId,
-		long categoryId) {
-		return getService().hasAssetEntryAssetCategory(entryId, categoryId);
-	}
-
-	public static boolean hasAssetEntryAssetCategories(long entryId) {
-		return getService().hasAssetEntryAssetCategories(entryId);
-	}
-
-	public static void setAssetEntryAssetCategories(long entryId,
-		long[] categoryIds) {
-		getService().setAssetEntryAssetCategories(entryId, categoryIds);
+	/**
+	* Returns the entryIds of the asset entries associated with the asset category.
+	*
+	* @param categoryId the categoryId of the asset category
+	* @return long[] the entryIds of asset entries associated with the asset category
+	*/
+	public static long[] getAssetEntryPrimaryKeys(long categoryId) {
+		return getService().getAssetEntryPrimaryKeys(categoryId);
 	}
 
 	/**
@@ -393,93 +438,18 @@ public class AssetCategoryLocalServiceUtil {
 		return getService().getBeanIdentifier();
 	}
 
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
-		getService().setBeanIdentifier(beanIdentifier);
-	}
-
-	public static com.liferay.portlet.asset.model.AssetCategory addCategory(
-		long userId, long parentCategoryId,
-		java.util.Map<java.util.Locale, java.lang.String> titleMap,
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
-		long vocabularyId, java.lang.String[] categoryProperties,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService()
-				   .addCategory(userId, parentCategoryId, titleMap,
-			descriptionMap, vocabularyId, categoryProperties, serviceContext);
-	}
-
-	public static com.liferay.portlet.asset.model.AssetCategory addCategory(
-		long userId, java.lang.String title, long vocabularyId,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService()
-				   .addCategory(userId, title, vocabularyId, serviceContext);
-	}
-
-	public static void addCategoryResources(
-		com.liferay.portlet.asset.model.AssetCategory category,
-		boolean addGroupPermissions, boolean addGuestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		getService()
-			.addCategoryResources(category, addGroupPermissions,
-			addGuestPermissions);
-	}
-
-	public static void addCategoryResources(
-		com.liferay.portlet.asset.model.AssetCategory category,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		getService()
-			.addCategoryResources(category, groupPermissions, guestPermissions);
-	}
-
-	public static com.liferay.portlet.asset.model.AssetCategory deleteCategory(
-		com.liferay.portlet.asset.model.AssetCategory category)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().deleteCategory(category);
-	}
-
-	public static com.liferay.portlet.asset.model.AssetCategory deleteCategory(
-		com.liferay.portlet.asset.model.AssetCategory category,
-		boolean childCategory)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().deleteCategory(category, childCategory);
-	}
-
-	public static com.liferay.portlet.asset.model.AssetCategory deleteCategory(
-		long categoryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().deleteCategory(categoryId);
-	}
-
-	public static void deleteVocabularyCategories(long vocabularyId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		getService().deleteVocabularyCategories(vocabularyId);
-	}
-
-	public static com.liferay.portlet.asset.model.AssetCategory fetchCategory(
-		long categoryId) {
-		return getService().fetchCategory(categoryId);
-	}
-
 	public static java.util.List<com.liferay.portlet.asset.model.AssetCategory> getCategories() {
 		return getService().getCategories();
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetCategory> getCategories(
-		long classNameId, long classPK) {
-		return getService().getCategories(classNameId, classPK);
+		java.lang.String className, long classPK) {
+		return getService().getCategories(className, classPK);
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetCategory> getCategories(
-		java.lang.String className, long classPK) {
-		return getService().getCategories(className, classPK);
+		long classNameId, long classPK) {
+		return getService().getCategories(classNameId, classPK);
 	}
 
 	public static com.liferay.portlet.asset.model.AssetCategory getCategory(
@@ -502,14 +472,14 @@ public class AssetCategoryLocalServiceUtil {
 		return getService().getCategoryNames();
 	}
 
-	public static java.lang.String[] getCategoryNames(long classNameId,
-		long classPK) {
-		return getService().getCategoryNames(classNameId, classPK);
-	}
-
 	public static java.lang.String[] getCategoryNames(
 		java.lang.String className, long classPK) {
 		return getService().getCategoryNames(className, classPK);
+	}
+
+	public static java.lang.String[] getCategoryNames(long classNameId,
+		long classPK) {
+		return getService().getCategoryNames(classNameId, classPK);
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetCategory> getChildCategories(
@@ -532,16 +502,20 @@ public class AssetCategoryLocalServiceUtil {
 		return getService().getEntryCategories(entryId);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		return getService().getExportActionableDynamicQuery(portletDataContext);
+	}
+
+	public static com.liferay.portal.model.PersistedModel getPersistedModel(
+		java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getPersistedModel(primaryKeyObj);
+	}
+
 	public static java.util.List<java.lang.Long> getSubcategoryIds(
 		long parentCategoryId) {
 		return getService().getSubcategoryIds(parentCategoryId);
-	}
-
-	public static java.util.List<com.liferay.portlet.asset.model.AssetCategory> getVocabularyCategories(
-		long vocabularyId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.asset.model.AssetCategory> obc) {
-		return getService()
-				   .getVocabularyCategories(vocabularyId, start, end, obc);
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetCategory> getVocabularyCategories(
@@ -550,6 +524,13 @@ public class AssetCategoryLocalServiceUtil {
 		return getService()
 				   .getVocabularyCategories(parentCategoryId, vocabularyId,
 			start, end, obc);
+	}
+
+	public static java.util.List<com.liferay.portlet.asset.model.AssetCategory> getVocabularyCategories(
+		long vocabularyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.asset.model.AssetCategory> obc) {
+		return getService()
+				   .getVocabularyCategories(vocabularyId, start, end, obc);
 	}
 
 	public static int getVocabularyCategoriesCount(long vocabularyId) {
@@ -565,6 +546,15 @@ public class AssetCategoryLocalServiceUtil {
 
 	public static int getVocabularyRootCategoriesCount(long vocabularyId) {
 		return getService().getVocabularyRootCategoriesCount(vocabularyId);
+	}
+
+	public static boolean hasAssetEntryAssetCategories(long entryId) {
+		return getService().hasAssetEntryAssetCategories(entryId);
+	}
+
+	public static boolean hasAssetEntryAssetCategory(long entryId,
+		long categoryId) {
+		return getService().hasAssetEntryAssetCategory(entryId, categoryId);
 	}
 
 	public static com.liferay.portlet.asset.model.AssetCategory mergeCategories(
@@ -593,6 +583,15 @@ public class AssetCategoryLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.kernel.search.BaseModelSearchResult<com.liferay.portlet.asset.model.AssetCategory> searchCategories(
+		long companyId, long[] groupIds, java.lang.String title,
+		long[] parentCategoryIds, long[] vocabularyIds, int start, int end)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .searchCategories(companyId, groupIds, title,
+			parentCategoryIds, vocabularyIds, start, end);
+	}
+
+	public static com.liferay.portal.kernel.search.BaseModelSearchResult<com.liferay.portlet.asset.model.AssetCategory> searchCategories(
 		long companyId, long groupIds, java.lang.String title,
 		long vocabularyId, int start, int end)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -608,6 +607,31 @@ public class AssetCategoryLocalServiceUtil {
 		return getService()
 				   .searchCategories(companyId, groupIds, title, vocabularyIds,
 			start, end);
+	}
+
+	public static void setAssetEntryAssetCategories(long entryId,
+		long[] categoryIds) {
+		getService().setAssetEntryAssetCategories(entryId, categoryIds);
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
+		getService().setBeanIdentifier(beanIdentifier);
+	}
+
+	/**
+	* Updates the asset category in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	*
+	* @param assetCategory the asset category
+	* @return the asset category that was updated
+	*/
+	public static com.liferay.portlet.asset.model.AssetCategory updateAssetCategory(
+		com.liferay.portlet.asset.model.AssetCategory assetCategory) {
+		return getService().updateAssetCategory(assetCategory);
 	}
 
 	public static com.liferay.portlet.asset.model.AssetCategory updateCategory(

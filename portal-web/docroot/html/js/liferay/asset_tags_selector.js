@@ -5,6 +5,8 @@ AUI.add(
 
 		var AArray = A.Array;
 
+		var LString = Lang.String;
+
 		var NAME = 'tagselector';
 
 		var CSS_INPUT_NODE = 'lfr-tag-selector-input';
@@ -213,7 +215,7 @@ AUI.add(
 					_addEntries: function() {
 						var instance = this;
 
-						var text = Liferay.Util.escapeHTML(instance.inputNode.val());
+						var text = LString.escapeHTML(instance.inputNode.val());
 
 						if (text) {
 							if (text.indexOf(',') > -1) {
@@ -419,13 +421,15 @@ AUI.add(
 
 						var charCode = event.charCode;
 
-						if (charCode == '44') {
-							event.preventDefault();
+						if (!A.UA.gecko || event._event.charCode) {
+							if (charCode == '44') {
+								event.preventDefault();
 
-							instance._addEntries();
-						}
-						else if (MAP_INVALID_CHARACTERS[String.fromCharCode(charCode)]) {
-							event.halt();
+								instance._addEntries();
+							}
+							else if (MAP_INVALID_CHARACTERS[String.fromCharCode(charCode)]) {
+								event.halt();
+							}
 						}
 					},
 
@@ -546,8 +550,8 @@ AUI.add(
 							context = String(context);
 						}
 
-						context = Lang.String.stripTags(context);
-						context = Liferay.Util.escapeHTML(context);
+						context = LString.stripTags(context);
+						context = LString.escapeHTML(context);
 
 						var query = Lang.sub(TPL_SUGGESTIONS_QUERY, [context]);
 

@@ -154,7 +154,7 @@ String title = ddmDisplay.getViewTemplatesTitle(structure, controlPanel, templat
 				<liferay-ui:search-container-column-text
 					href="<%= rowHREF %>"
 					name="name"
-					value="<%= HtmlUtil.escape(LanguageUtil.get(request, template.getName(locale))) %>"
+					value="<%= HtmlUtil.escape(template.getName(locale)) %>"
 				/>
 			</c:if>
 
@@ -261,18 +261,15 @@ String title = ddmDisplay.getViewTemplatesTitle(structure, controlPanel, templat
 		);
 	}
 
-	Liferay.provide(
-		window,
-		'<portlet:namespace />deleteTemplates',
-		function() {
-			if (confirm('<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-this") %>')) {
-				document.<portlet:namespace />fm.method = 'post';
-				document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = '<%= Constants.DELETE %>';
-				document.<portlet:namespace />fm.<portlet:namespace />deleteTemplateIds.value = Liferay.Util.listCheckedExcept(document.<portlet:namespace />fm, '<portlet:namespace />allRowIds');
+	function <portlet:namespace />deleteTemplates() {
+		if (confirm('<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-this") %>')) {
+			var form = AUI.$(document.<portlet:namespace />fm);
 
-				submitForm(document.<portlet:namespace />fm, '<portlet:actionURL><portlet:param name="struts_action" value="/dynamic_data_mapping/edit_template" /></portlet:actionURL>');
-			}
-		},
-		['liferay-util-list-fields']
-	);
+			form.attr('method', 'post');
+			form.fm('<%= Constants.CMD %>').val('<%= Constants.DELETE %>');
+			form.fm('deleteTemplateIds').val(Liferay.Util.listCheckedExcept(form, '<portlet:namespace />allRowIds'));
+
+			submitForm(form, '<portlet:actionURL><portlet:param name="struts_action" value="/dynamic_data_mapping/edit_template" /></portlet:actionURL>');
+		}
+	}
 </aui:script>

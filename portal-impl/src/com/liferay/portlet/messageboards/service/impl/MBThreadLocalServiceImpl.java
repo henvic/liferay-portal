@@ -150,8 +150,6 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 		Indexer messageIndexer = IndexerRegistryUtil.nullSafeGetIndexer(
 			MBMessage.class);
 
-		messageIndexer.delete(thread);
-
 		// Attachments
 
 		long folderId = thread.getAttachmentsFolderId();
@@ -198,6 +196,10 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 			// Message
 
 			mbMessagePersistence.remove(message);
+
+			// Indexer
+
+			messageIndexer.delete(message);
 
 			// Statistics
 
@@ -805,12 +807,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 			// Thread
 
-			TrashEntry trashEntry = thread.getTrashEntry();
-
-			TrashVersion trashVersion =
-				trashVersionLocalService.fetchVersion(
-					trashEntry.getEntryId(), MBThread.class.getName(),
-					thread.getThreadId());
+			TrashVersion trashVersion = trashVersionLocalService.fetchVersion(
+				MBThread.class.getName(), thread.getThreadId());
 
 			int status = WorkflowConstants.STATUS_APPROVED;
 
@@ -828,8 +826,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 			// Messages
 
-			restoreDependentsFromTrash(
-				thread.getGroupId(), threadId, trashEntry.getEntryId());
+			restoreDependentsFromTrash(thread.getGroupId(), threadId);
 		}
 
 		return moveThread(thread.getGroupId(), categoryId, threadId);
@@ -909,8 +906,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	}
 
 	@Override
-	public void restoreDependentsFromTrash(
-			long groupId, long threadId, long trashEntryId)
+	public void restoreDependentsFromTrash(long groupId, long threadId)
 		throws PortalException {
 
 		Set<Long> userIds = new HashSet<Long>();
@@ -927,8 +923,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 			}
 
 			TrashVersion trashVersion = trashVersionLocalService.fetchVersion(
-				trashEntryId, MBMessage.class.getName(),
-				message.getMessageId());
+				MBMessage.class.getName(), message.getMessageId());
 
 			int oldStatus = WorkflowConstants.STATUS_APPROVED;
 
@@ -970,6 +965,19 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 		}
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #restoreDependentsFromTrash(long, long)}
+	 */
+	@Deprecated
+	@Override
+	public void restoreDependentsFromTrash(
+			long groupId, long threadId, long trashEntryId)
+		throws PortalException {
+
+		restoreDependentsFromTrash(groupId, threadId);
+	}
+
 	@Override
 	public void restoreThreadFromTrash(long userId, long threadId)
 		throws PortalException {
@@ -991,8 +999,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 		// Messages
 
-		restoreDependentsFromTrash(
-			thread.getGroupId(), threadId, trashEntry.getEntryId());
+		restoreDependentsFromTrash(thread.getGroupId(), threadId);
 
 		// Trash
 

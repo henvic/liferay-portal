@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.softwarecatalog.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -26,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -35,7 +35,6 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.service.persistence.impl.TableMapper;
@@ -50,7 +49,6 @@ import com.liferay.portlet.softwarecatalog.service.persistence.SCProductEntryPer
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -71,6 +69,7 @@ import java.util.Set;
  * @see SCProductEntryUtil
  * @generated
  */
+@ProviderType
 public class SCProductEntryPersistenceImpl extends BasePersistenceImpl<SCProductEntry>
 	implements SCProductEntryPersistence {
 	/*
@@ -3637,26 +3636,6 @@ public class SCProductEntryPersistenceImpl extends BasePersistenceImpl<SCProduct
 	 * Initializes the s c product entry persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portlet.softwarecatalog.model.SCProductEntry")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<SCProductEntry>> listenersList = new ArrayList<ModelListener<SCProductEntry>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<SCProductEntry>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
-
 		scProductEntryToSCLicenseTableMapper = TableMapperFactory.getTableMapper("SCLicenses_SCProductEntries",
 				"productEntryId", "licenseId", this, scLicensePersistence);
 	}
@@ -3692,11 +3671,11 @@ public class SCProductEntryPersistenceImpl extends BasePersistenceImpl<SCProduct
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No SCProductEntry exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No SCProductEntry exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(SCProductEntryPersistenceImpl.class);
-	private static Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+	private static final Log _log = LogFactoryUtil.getLog(SCProductEntryPersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"type"
 			});
-	private static SCProductEntry _nullSCProductEntry = new SCProductEntryImpl() {
+	private static final SCProductEntry _nullSCProductEntry = new SCProductEntryImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -3708,7 +3687,8 @@ public class SCProductEntryPersistenceImpl extends BasePersistenceImpl<SCProduct
 			}
 		};
 
-	private static CacheModel<SCProductEntry> _nullSCProductEntryCacheModel = new CacheModel<SCProductEntry>() {
+	private static final CacheModel<SCProductEntry> _nullSCProductEntryCacheModel =
+		new CacheModel<SCProductEntry>() {
 			@Override
 			public SCProductEntry toEntityModel() {
 				return _nullSCProductEntry;

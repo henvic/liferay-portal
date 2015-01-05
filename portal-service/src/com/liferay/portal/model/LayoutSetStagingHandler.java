@@ -132,22 +132,20 @@ public class LayoutSetStagingHandler
 		long layoutSetBranchId = ParamUtil.getLong(
 			serviceContext, "layoutSetBranchId");
 
-		LayoutSetBranch layoutSetBranch = null;
+		if (layoutSetBranchId > 0) {
+			return LayoutSetBranchLocalServiceUtil.getLayoutSetBranch(
+				layoutSetBranchId);
+		}
 
 		if (serviceContext.isSignedIn()) {
-			layoutSetBranch =
-				LayoutSetBranchLocalServiceUtil.getUserLayoutSetBranch(
-					serviceContext.getUserId(), layoutSet.getGroupId(),
-					layoutSet.isPrivateLayout(), layoutSet.getLayoutSetId(),
-					layoutSetBranchId);
-		}
-		else if (layoutSetBranchId > 0) {
-			layoutSetBranch =
-				LayoutSetBranchLocalServiceUtil.getLayoutSetBranch(
-					layoutSetBranchId);
+			return LayoutSetBranchLocalServiceUtil.getUserLayoutSetBranch(
+				serviceContext.getUserId(), layoutSet.getGroupId(),
+				layoutSet.isPrivateLayout(), layoutSet.getLayoutSetId(),
+				layoutSetBranchId);
 		}
 
-		return layoutSetBranch;
+		return LayoutSetBranchLocalServiceUtil.getMasterLayoutSetBranch(
+			layoutSet.getGroupId(), layoutSet.isPrivateLayout());
 	}
 
 	private Object _toEscapedModel() {
@@ -156,10 +154,10 @@ public class LayoutSetStagingHandler
 			new LayoutSetStagingHandler(_layoutSet.toEscapedModel()));
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutSetStagingHandler.class);
 
-	private static Set<String> _layoutSetBranchMethodNames =
+	private static final Set<String> _layoutSetBranchMethodNames =
 		new HashSet<String>();
 
 	static {
@@ -199,7 +197,7 @@ public class LayoutSetStagingHandler
 		_layoutSetBranchMethodNames.add("setWapThemeId");
 	}
 
-	private LayoutSet _layoutSet;
+	private final LayoutSet _layoutSet;
 	private LayoutSetBranch _layoutSetBranch;
 
 }

@@ -42,7 +42,7 @@ public class CaptureHandler extends Handler {
 	}
 
 	@Override
-	public void close() throws SecurityException {
+	public void close() {
 		_logRecords.clear();
 
 		_logger.removeHandler(this);
@@ -82,10 +82,11 @@ public class CaptureHandler extends Handler {
 		return _logRecords;
 	}
 
-	private Handler[] _handlers;
-	private Level _level;
-	private Logger _logger;
-	private List<LogRecord> _logRecords = new CopyOnWriteArrayList<LogRecord>();
-	private boolean _useParentHandlers;
+	private final Handler[] _handlers;
+	private final Level _level;
+	private final Logger _logger;
+	private final List<LogRecord> _logRecords =
+		new CopyOnWriteArrayList<LogRecord>();
+	private final boolean _useParentHandlers;
 
 }

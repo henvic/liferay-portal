@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.documentlibrary.model;
 
+import aQute.bnd.annotation.ProviderType;
+
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ import java.util.List;
  * @see com.liferay.portlet.documentlibrary.service.http.DLFolderServiceSoap
  * @generated
  */
+@ProviderType
 public class DLFolderSoap implements Serializable {
 	public static DLFolderSoap toSoapModel(DLFolder model) {
 		DLFolderSoap soapModel = new DLFolderSoap();
@@ -48,7 +51,7 @@ public class DLFolderSoap implements Serializable {
 		soapModel.setLastPostDate(model.getLastPostDate());
 		soapModel.setDefaultFileEntryTypeId(model.getDefaultFileEntryTypeId());
 		soapModel.setHidden(model.getHidden());
-		soapModel.setOverrideFileEntryTypes(model.getOverrideFileEntryTypes());
+		soapModel.setRestrictionType(model.getRestrictionType());
 		soapModel.setStatus(model.getStatus());
 		soapModel.setStatusByUserId(model.getStatusByUserId());
 		soapModel.setStatusByUserName(model.getStatusByUserName());
@@ -249,16 +252,12 @@ public class DLFolderSoap implements Serializable {
 		_hidden = hidden;
 	}
 
-	public boolean getOverrideFileEntryTypes() {
-		return _overrideFileEntryTypes;
+	public int getRestrictionType() {
+		return _restrictionType;
 	}
 
-	public boolean isOverrideFileEntryTypes() {
-		return _overrideFileEntryTypes;
-	}
-
-	public void setOverrideFileEntryTypes(boolean overrideFileEntryTypes) {
-		_overrideFileEntryTypes = overrideFileEntryTypes;
+	public void setRestrictionType(int restrictionType) {
+		_restrictionType = restrictionType;
 	}
 
 	public int getStatus() {
@@ -310,7 +309,7 @@ public class DLFolderSoap implements Serializable {
 	private Date _lastPostDate;
 	private long _defaultFileEntryTypeId;
 	private boolean _hidden;
-	private boolean _overrideFileEntryTypes;
+	private int _restrictionType;
 	private int _status;
 	private long _statusByUserId;
 	private String _statusByUserName;

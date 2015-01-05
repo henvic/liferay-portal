@@ -186,7 +186,7 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(them
 																	<aui:input data-name='<%= LanguageUtil.get(locale, "delete-portlet-data") %>' label="delete-portlet-data-before-importing" name="<%= PortletDataHandlerKeys.DELETE_PORTLET_DATA %>" type="checkbox" />
 
 																	<div id="<portlet:namespace />showDeleteContentWarning">
-																		<div class="alert alert-block">
+																		<div class="alert alert-warning">
 																			<liferay-ui:message key="delete-content-before-importing-warning" />
 
 																			<liferay-ui:message key="delete-content-before-importing-suggestion" />
@@ -353,28 +353,30 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(them
 	Liferay.Util.toggleBoxes('<portlet:namespace /><%= PortletDataHandlerKeys.PERMISSIONS %>', '<portlet:namespace />permissionsUl');
 </aui:script>
 
-<aui:script use="aui-base">
-	A.one('#<portlet:namespace />continue').on(
+<aui:script sandbox="<%= true %>">
+	var importConfiguration = $('#<portlet:namespace />importConfiguration');
+	var importStrategy = $('#<portlet:namespace />importStrategy');
+
+	$('#<portlet:namespace />continue').on(
 		'click',
 		function() {
-			A.one('#<portlet:namespace />importConfiguration').hide();
+			importConfiguration.addClass('hide');
 
-			A.one('#<portlet:namespace />importStrategy').show();
+			importStrategy.removeClass('hide');
 		}
 	);
 
-	A.one('#<portlet:namespace />back').on(
+	$('#<portlet:namespace />back').on(
 		'click',
 		function() {
-			A.one('#<portlet:namespace />importStrategy').hide();
+			importStrategy.addClass('hide');
 
-			A.one('#<portlet:namespace />importConfiguration').show();
+			importConfiguration.removeClass('hide');
 		}
 	);
 </aui:script>
 
 <aui:script use="liferay-export-import">
-debugger;
 	new Liferay.ExportImport(
 		{
 			commentsNode: '#<%= PortletDataHandlerKeys.COMMENTS %>',

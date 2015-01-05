@@ -34,9 +34,9 @@ import com.liferay.portal.util.PropsValues;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -329,7 +329,7 @@ public class ChannelImpl extends BaseChannelImpl {
 		try {
 			long currentTime = System.currentTimeMillis();
 
-			storeNotificationEvent(notificationEvent, currentTime);
+			doStoreNotificationEvent(notificationEvent, currentTime);
 
 			if (PropsValues.USER_NOTIFICATION_EVENT_CONFIRMATION_ENABLED &&
 				notificationEvent.isDeliveryRequired()) {
@@ -362,7 +362,7 @@ public class ChannelImpl extends BaseChannelImpl {
 				new ArrayList<NotificationEvent>(notificationEvents.size());
 
 			for (NotificationEvent notificationEvent : notificationEvents) {
-				storeNotificationEvent(notificationEvent, currentTime);
+				doStoreNotificationEvent(notificationEvent, currentTime);
 
 				if (PropsValues.USER_NOTIFICATION_EVENT_CONFIRMATION_ENABLED &&
 					notificationEvent.isDeliveryRequired()) {
@@ -386,6 +386,20 @@ public class ChannelImpl extends BaseChannelImpl {
 		}
 
 		notifyChannelListeners();
+	}
+
+	@Override
+	public void storeNotificationEvent(
+		NotificationEvent notificationEvent, long currentTime) {
+
+		_reentrantLock.lock();
+
+		try {
+			doStoreNotificationEvent(notificationEvent, currentTime);
+		}
+		finally {
+			_reentrantLock.unlock();
+		}
 	}
 
 	@Override
@@ -577,20 +591,7 @@ public class ChannelImpl extends BaseChannelImpl {
 		}
 	}
 
-	protected boolean isRemoveNotificationEvent(
-		NotificationEvent notificationEvent, long currentTime) {
-
-		if ((notificationEvent.getDeliverBy() != 0) &&
-			(notificationEvent.getDeliverBy() <= currentTime)) {
-
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-
-	protected void storeNotificationEvent(
+	protected void doStoreNotificationEvent(
 		NotificationEvent notificationEvent, long currentTime) {
 
 		if (isRemoveNotificationEvent(notificationEvent, currentTime)) {
@@ -623,6 +624,19 @@ public class ChannelImpl extends BaseChannelImpl {
 		}
 	}
 
+	protected boolean isRemoveNotificationEvent(
+		NotificationEvent notificationEvent, long currentTime) {
+
+		if ((notificationEvent.getDeliverBy() != 0) &&
+			(notificationEvent.getDeliverBy() <= currentTime)) {
+
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
 	private TreeSet<NotificationEvent> _getNotificationEvents() {
 		if (_notificationEvents == null) {
 			_notificationEvents = new TreeSet<NotificationEvent>(_comparator);
@@ -634,19 +648,19 @@ public class ChannelImpl extends BaseChannelImpl {
 	private Map<String, NotificationEvent> _getUnconfirmedNotificationEvents() {
 		if (_unconfirmedNotificationEvents == null) {
 			_unconfirmedNotificationEvents =
-				new HashMap<String, NotificationEvent>();
+				new LinkedHashMap<String, NotificationEvent>();
 		}
 
 		return _unconfirmedNotificationEvents;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(ChannelImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(ChannelImpl.class);
 
-	private static Comparator<NotificationEvent> _comparator =
+	private static final Comparator<NotificationEvent> _comparator =
 		new NotificationEventComparator();
 
 	private TreeSet<NotificationEvent> _notificationEvents;
-	private ReentrantLock _reentrantLock = new ReentrantLock();
+	private final ReentrantLock _reentrantLock = new ReentrantLock();
 	private Map<String, NotificationEvent> _unconfirmedNotificationEvents;
 
 }

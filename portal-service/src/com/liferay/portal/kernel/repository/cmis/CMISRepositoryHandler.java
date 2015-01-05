@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.BaseRepository;
 import com.liferay.portal.kernel.repository.BaseRepositoryImpl;
 import com.liferay.portal.kernel.repository.RepositoryException;
+import com.liferay.portal.kernel.repository.capabilities.Capability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -44,28 +45,29 @@ import java.util.Map;
 /**
  * @author Alexander Chow
  */
-public abstract class CMISRepositoryHandler extends BaseRepositoryImpl {
+public abstract class CMISRepositoryHandler
+	extends BaseRepositoryImpl implements Capability {
 
 	@Override
 	public FileEntry addFileEntry(
-			long folderId, String sourceFileName, String mimeType, String title,
-			String description, String changeLog, InputStream is, long size,
-			ServiceContext serviceContext)
+			long userId, long folderId, String sourceFileName, String mimeType,
+			String title, String description, String changeLog, InputStream is,
+			long size, ServiceContext serviceContext)
 		throws PortalException {
 
 		return _baseCmisRepository.addFileEntry(
-			folderId, sourceFileName, mimeType, title, description, changeLog,
-			is, size, serviceContext);
+			userId, folderId, sourceFileName, mimeType, title, description,
+			changeLog, is, size, serviceContext);
 	}
 
 	@Override
 	public Folder addFolder(
-			long parentFolderId, String title, String description,
+			long userId, long parentFolderId, String name, String description,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		return _baseCmisRepository.addFolder(
-			parentFolderId, title, description, serviceContext);
+			userId, parentFolderId, name, description, serviceContext);
 	}
 
 	@Override
@@ -75,21 +77,22 @@ public abstract class CMISRepositoryHandler extends BaseRepositoryImpl {
 
 	@Override
 	public void checkInFileEntry(
-			long fileEntryId, boolean major, String changeLog,
+			long userId, long fileEntryId, boolean major, String changeLog,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		_baseCmisRepository.checkInFileEntry(
-			fileEntryId, major, changeLog, serviceContext);
+			userId, fileEntryId, major, changeLog, serviceContext);
 	}
 
 	@Override
 	public void checkInFileEntry(
-			long fileEntryId, String lockUuid, ServiceContext serviceContext)
+			long userId, long fileEntryId, String lockUuid,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		_baseCmisRepository.checkInFileEntry(
-			fileEntryId, lockUuid, serviceContext);
+			userId, fileEntryId, lockUuid, serviceContext);
 	}
 
 	@Override
@@ -113,12 +116,12 @@ public abstract class CMISRepositoryHandler extends BaseRepositoryImpl {
 
 	@Override
 	public FileEntry copyFileEntry(
-			long groupId, long fileEntryId, long destFolderId,
+			long userId, long groupId, long fileEntryId, long destFolderId,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		return _baseCmisRepository.copyFileEntry(
-			groupId, fileEntryId, destFolderId, serviceContext);
+			userId, groupId, fileEntryId, destFolderId, serviceContext);
 	}
 
 	@Override
@@ -213,10 +216,10 @@ public abstract class CMISRepositoryHandler extends BaseRepositoryImpl {
 	}
 
 	@Override
-	public Folder getFolder(long parentFolderId, String title)
+	public Folder getFolder(long parentFolderId, String name)
 		throws PortalException {
 
-		return _baseCmisRepository.getFolder(parentFolderId, title);
+		return _baseCmisRepository.getFolder(parentFolderId, name);
 	}
 
 	@Override
@@ -409,21 +412,22 @@ public abstract class CMISRepositoryHandler extends BaseRepositoryImpl {
 
 	@Override
 	public FileEntry moveFileEntry(
-			long fileEntryId, long newFolderId, ServiceContext serviceContext)
+			long userId, long fileEntryId, long newFolderId,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		return _baseCmisRepository.moveFileEntry(
-			fileEntryId, newFolderId, serviceContext);
+			userId, fileEntryId, newFolderId, serviceContext);
 	}
 
 	@Override
 	public Folder moveFolder(
-			long folderId, long newParentFolderId,
+			long userId, long folderId, long newParentFolderId,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		return _baseCmisRepository.moveFolder(
-			folderId, newParentFolderId, serviceContext);
+			userId, folderId, newParentFolderId, serviceContext);
 	}
 
 	@Override
@@ -446,11 +450,12 @@ public abstract class CMISRepositoryHandler extends BaseRepositoryImpl {
 
 	@Override
 	public void revertFileEntry(
-			long fileEntryId, String version, ServiceContext serviceContext)
+			long userId, long fileEntryId, String version,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		_baseCmisRepository.revertFileEntry(
-			fileEntryId, version, serviceContext);
+			userId, fileEntryId, version, serviceContext);
 	}
 
 	@Override
@@ -503,14 +508,14 @@ public abstract class CMISRepositoryHandler extends BaseRepositoryImpl {
 
 	@Override
 	public FileEntry updateFileEntry(
-			long fileEntryId, String sourceFileName, String mimeType,
-			String title, String description, String changeLog,
+			long userId, long fileEntryId, String sourceFileName,
+			String mimeType, String title, String description, String changeLog,
 			boolean majorVersion, InputStream is, long size,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		return _baseCmisRepository.updateFileEntry(
-			fileEntryId, sourceFileName, mimeType, title, description,
+			userId, fileEntryId, sourceFileName, mimeType, title, description,
 			changeLog, majorVersion, is, size, serviceContext);
 	}
 
@@ -527,12 +532,12 @@ public abstract class CMISRepositoryHandler extends BaseRepositoryImpl {
 
 	@Override
 	public Folder updateFolder(
-			long folderId, String title, String description,
+			long folderId, String name, String description,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		return _baseCmisRepository.updateFolder(
-			folderId, title, description, serviceContext);
+			folderId, name, description, serviceContext);
 	}
 
 	@Override

@@ -95,8 +95,22 @@ public interface JournalArticle extends JournalArticleModel, PersistedModel,
 	public com.liferay.portlet.journal.model.JournalFolder getFolder()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
+	public com.liferay.portal.model.Layout getLayout();
+
 	public java.lang.String getSmallImageType()
 		throws com.liferay.portal.kernel.exception.PortalException;
+
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link #getDDMStructureKey()}
+	*/
+	@java.lang.Deprecated()
+	public java.lang.String getStructureId();
+
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link #getDDMTemplateKey()}
+	*/
+	@java.lang.Deprecated()
+	public java.lang.String getTemplateId();
 
 	public boolean hasApprovedVersion();
 
@@ -111,4 +125,16 @@ public interface JournalArticle extends JournalArticleModel, PersistedModel,
 	public void setDocument(com.liferay.portal.kernel.xml.Document document);
 
 	public void setSmallImageType(java.lang.String smallImageType);
+
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link #setDDMStructureKey(String)}
+	*/
+	@java.lang.Deprecated()
+	public void setStructureId(java.lang.String ddmStructureKey);
+
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link #setDDMTemplateKey(String)}
+	*/
+	@java.lang.Deprecated()
+	public void setTemplateId(java.lang.String ddmTemplateKey);
 }

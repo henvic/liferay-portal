@@ -14,6 +14,8 @@
 
 package com.liferay.portal.tools.sourceformatter;
 
+import com.liferay.portal.kernel.util.StringUtil;
+
 import java.io.File;
 
 import java.util.List;
@@ -22,6 +24,16 @@ import java.util.List;
  * @author Hugo Huijser
  */
 public class TLDSourceProcessor extends BaseSourceProcessor {
+
+	@Override
+	protected String doFormat(
+			File file, String fileName, String absolutePath, String content)
+		throws Exception {
+
+		content = trimContent(content, false);
+
+		return StringUtil.replace(content, "\n\n\n", "\n\n");
+	}
 
 	@Override
 	protected void format() throws Exception {
@@ -33,19 +45,6 @@ public class TLDSourceProcessor extends BaseSourceProcessor {
 		for (String fileName : fileNames) {
 			format(fileName);
 		}
-	}
-
-	@Override
-	protected String format(String fileName) throws Exception {
-		File file = new File(BASEDIR + fileName);
-
-		String content = fileUtil.read(file);
-
-		String newContent = trimContent(content, false);
-
-		compareAndAutoFixContent(file, fileName, content, newContent);
-
-		return newContent;
 	}
 
 }

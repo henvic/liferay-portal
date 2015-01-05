@@ -27,8 +27,8 @@ import org.junit.Test;
 public class OverrideIncrementTest {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	public static final CodeCoverageAssertor codeCoverageAssertor =
+		CodeCoverageAssertor.INSTANCE;
 
 	@Test
 	public void testConstructorAndFactory() {
@@ -49,7 +49,7 @@ public class OverrideIncrementTest {
 	}
 
 	@Test
-	public void testGetterAndSetter() throws Exception {
+	public void testGetterAndSetter() {
 		IntegerOverrideIncrement integerOverrideIncrement =
 			new IntegerOverrideIncrement(1);
 

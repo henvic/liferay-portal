@@ -14,14 +14,18 @@
 
 package com.liferay.portal.tools;
 
+import com.liferay.portal.kernel.util.FileComparator;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UniqueList;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.util.FileImpl;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.xml.SAXReaderImpl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -154,6 +159,149 @@ public class PluginsEnvironmentBuilder {
 		sb.append("\t\t</attributes>\n\t</classpathentry>\n");
 	}
 
+	protected void addIvyCacheJar(
+			StringBundler sb, String ivyDirName, String dependencyName,
+			String version)
+		throws Exception {
+
+		System.out.println("Adding " + dependencyName + " " + version);
+
+		if (version.equals("latest.integration")) {
+			File dir = new File(ivyDirName + "/cache/" + dependencyName);
+
+			File[] files = dir.listFiles();
+
+			Arrays.sort(files, new FileComparator());
+
+			for (int i = files.length - 1; i >= 0; i--) {
+				File file = files[i];
+
+				if (!file.isFile()) {
+					continue;
+				}
+
+				String fileName = file.getName();
+
+				if (!fileName.endsWith(".xml")) {
+					continue;
+				}
+
+				version = fileName.substring(4, fileName.length() - 4);
+
+				System.out.println(
+					"Substituting " + version + " for latest.integration");
+			}
+		}
+
+		String ivyFileName =
+			ivyDirName + "/cache/" + dependencyName + "/ivy-" + version +
+				".xml";
+
+		if (_fileUtil.exists(ivyFileName)) {
+			Document document = _saxReaderUtil.read(new File(ivyFileName));
+
+			Element rootElement = document.getRootElement();
+
+			Element dependenciesElement = rootElement.element("dependencies");
+
+			if (dependenciesElement != null) {
+				List<Element> dependencyElements = dependenciesElement.elements(
+					"dependency");
+
+				for (Element dependencyElement : dependencyElements) {
+					String conf = GetterUtil.getString(
+						dependencyElement.attributeValue("conf"));
+
+					if (!conf.startsWith("compile")) {
+						continue;
+					}
+
+					String name = GetterUtil.getString(
+						dependencyElement.attributeValue("name"));
+					String org = GetterUtil.getString(
+						dependencyElement.attributeValue("org"));
+					String rev = GetterUtil.getString(
+						dependencyElement.attributeValue("rev"));
+
+					String string = sb.toString();
+
+					if (string.contains(name)) {
+						continue;
+					}
+
+					addIvyCacheJar(sb, ivyDirName, org + "/" + name, rev);
+				}
+			}
+		}
+
+		String dirName = ivyDirName + "/cache/" + dependencyName + "/bundles";
+
+		if (!_fileUtil.exists(dirName)) {
+			dirName = ivyDirName + "/cache/" + dependencyName + "/jars";
+
+			if (!_fileUtil.exists(dirName)) {
+				System.out.println("Unable to find jars in " + dirName);
+
+				return;
+			}
+		}
+
+		File dir = new File(dirName);
+
+		File[] files = dir.listFiles();
+
+		for (File file : files) {
+			if (!file.isFile()) {
+				continue;
+			}
+
+			String fileName = file.getName();
+
+			if (!fileName.endsWith("-" + version + ".jar")) {
+				continue;
+			}
+
+			addClasspathEntry(sb, dirName + "/" + fileName);
+
+			return;
+		}
+
+		System.out.println(
+			"Unable to find jars in " + dirName + " for " + version);
+	}
+
+	protected void addIvyCacheJars(
+			StringBundler sb, String content, String ivyDirName)
+		throws Exception {
+
+		Document document = _saxReaderUtil.read(content);
+
+		Element rootElement = document.getRootElement();
+
+		Element dependenciesElement = rootElement.element("dependencies");
+
+		List<Element> dependencyElements = dependenciesElement.elements(
+			"dependency");
+
+		for (Element dependencyElement : dependencyElements) {
+			String conf = GetterUtil.getString(
+				dependencyElement.attributeValue("conf"));
+
+			if (!conf.equals("test->default")) {
+				continue;
+			}
+
+			String name = GetterUtil.getString(
+				dependencyElement.attributeValue("name"));
+			String org = GetterUtil.getString(
+				dependencyElement.attributeValue("org"));
+			String rev = GetterUtil.getString(
+				dependencyElement.attributeValue("rev"));
+
+			addIvyCacheJar(sb, ivyDirName, org + "/" + name, rev);
+		}
+	}
+
 	protected List<String> getCommonJars() {
 		List<String> jars = new ArrayList<String>();
 
@@ -200,7 +348,7 @@ public class PluginsEnvironmentBuilder {
 			jars.add(currentImportShared + ".jar");
 
 			File currentImportSharedLibDir = new File(
-				projectDir, "/../../shared/" + currentImportShared + "/lib");
+				projectDir, "../../shared/" + currentImportShared + "/lib");
 
 			if (!currentImportSharedLibDir.exists()) {
 				continue;
@@ -254,6 +402,10 @@ public class PluginsEnvironmentBuilder {
 		File projectDir = new File(buildFile.getParent());
 
 		File libDir = new File(projectDir, "lib");
+
+		if (!libDir.exists()) {
+			libDir = new File(projectDir, "docroot/WEB-INF/lib");
+		}
 
 		writeEclipseFiles(libDir, projectDir, dependencyJars);
 
@@ -354,11 +506,11 @@ public class PluginsEnvironmentBuilder {
 			return;
 		}
 
-		List<String> globalJars = new UniqueList<String>();
-		List<String> portalJars = new UniqueList<String>();
+		Set<String> globalJars = new LinkedHashSet<String>();
+		List<String> portalJars = new ArrayList<String>();
 
-		List<String> extGlobalJars = new UniqueList<String>();
-		List<String> extPortalJars = new UniqueList<String>();
+		Set<String> extGlobalJars = new LinkedHashSet<String>();
+		Set<String> extPortalJars = new LinkedHashSet<String>();
 
 		String libDirPath = StringUtil.replace(
 			libDir.getPath(), StringPool.BACK_SLASH, StringPool.SLASH);
@@ -399,8 +551,11 @@ public class PluginsEnvironmentBuilder {
 			globalJars.add("portlet.jar");
 
 			portalJars.addAll(dependencyJars);
+			portalJars.add("bnd.jar");
 			portalJars.add("commons-logging.jar");
 			portalJars.add("log4j.jar");
+
+			portalJars = ListUtil.unique(portalJars);
 
 			Collections.sort(portalJars);
 		}
@@ -464,7 +619,14 @@ public class PluginsEnvironmentBuilder {
 			addClasspathEntry(sb, "/portal/lib/development/junit.jar");
 			addClasspathEntry(sb, "/portal/lib/development/mockito.jar");
 			addClasspathEntry(
-				sb, "/portal/lib/development/powermock-mockito.jar");
+				sb, "/portal/lib/development/powermock-api-mockito.jar");
+			addClasspathEntry(
+				sb, "/portal/lib/development/powermock-api-support.jar");
+			addClasspathEntry(
+				sb, "/portal/lib/development/powermock-module-junit4.jar");
+			addClasspathEntry(
+				sb,
+				"/portal/lib/development/powermock-module-junit4-common.jar");
 			addClasspathEntry(sb, "/portal/lib/development/spring-test.jar");
 
 			portalJars.add("commons-io.jar");
@@ -486,6 +648,8 @@ public class PluginsEnvironmentBuilder {
 		for (String jar : globalJars) {
 			addClasspathEntry(sb, "/portal/lib/global/" + jar, attributes);
 		}
+
+		portalJars = ListUtil.unique(portalJars);
 
 		Collections.sort(portalJars);
 
@@ -522,6 +686,26 @@ public class PluginsEnvironmentBuilder {
 			}
 			else {
 				addClasspathEntry(sb, "lib/" + jar);
+			}
+		}
+
+		File ivyXmlFile = new File(projectDirName, "ivy.xml");
+
+		if (ivyXmlFile.exists()) {
+			String content = _fileUtil.read(ivyXmlFile);
+
+			if (content.contains("test->default")) {
+				String ivyDirName = ".ivy";
+
+				for (int i = 0; i < 10; i++) {
+					if (_fileUtil.exists(ivyDirName)) {
+						break;
+					}
+
+					ivyDirName = "../" + ivyDirName;
+				}
+
+				addIvyCacheJars(sb, content, ivyDirName);
 			}
 		}
 
@@ -671,5 +855,6 @@ public class PluginsEnvironmentBuilder {
 	private static final String[] _TEST_TYPES = {"integration", "unit"};
 
 	private static FileImpl _fileUtil = FileImpl.getInstance();
+	private static SAXReaderImpl _saxReaderUtil = SAXReaderImpl.getInstance();
 
 }

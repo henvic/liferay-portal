@@ -14,6 +14,9 @@
 
 package com.liferay.portlet.dynamicdatamapping.model.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.model.CacheModel;
 
@@ -31,8 +34,33 @@ import java.io.ObjectOutput;
  * @see DDMStructureLink
  * @generated
  */
+@ProviderType
 public class DDMStructureLinkCacheModel implements CacheModel<DDMStructureLink>,
 	Externalizable {
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof DDMStructureLinkCacheModel)) {
+			return false;
+		}
+
+		DDMStructureLinkCacheModel ddmStructureLinkCacheModel = (DDMStructureLinkCacheModel)obj;
+
+		if (structureLinkId == ddmStructureLinkCacheModel.structureLinkId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, structureLinkId);
+	}
+
 	@Override
 	public String toString() {
 		StringBundler sb = new StringBundler(9);

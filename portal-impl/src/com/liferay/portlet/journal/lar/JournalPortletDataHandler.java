@@ -16,9 +16,12 @@ package com.liferay.portlet.journal.lar;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.BasePortletDataHandler;
@@ -28,7 +31,8 @@ import com.liferay.portal.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.portal.kernel.lar.StagedModelType;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.kernel.lar.xstream.XStreamAliasRegistryUtil;
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
@@ -39,6 +43,9 @@ import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalServiceUti
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalFeed;
 import com.liferay.portlet.journal.model.JournalFolder;
+import com.liferay.portlet.journal.model.impl.JournalArticleImpl;
+import com.liferay.portlet.journal.model.impl.JournalFeedImpl;
+import com.liferay.portlet.journal.model.impl.JournalFolderImpl;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.portlet.journal.service.JournalFeedLocalServiceUtil;
 import com.liferay.portlet.journal.service.JournalFolderLocalServiceUtil;
@@ -76,6 +83,7 @@ import javax.portlet.PortletPreferences;
  * @author Wesley Gong
  * @author Hugo Huijser
  * @author Daniel Kocsis
+ * @author László Csontos
  * @see    com.liferay.portal.kernel.lar.PortletDataHandler
  * @see    com.liferay.portlet.journal.lar.JournalContentPortletDataHandler
  * @see    com.liferay.portlet.journal.lar.JournalCreationStrategy
@@ -111,6 +119,12 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 				JournalFeed.class.getName()));
 		setPublishToLiveByDefault(
 			PropsValues.JOURNAL_PUBLISH_TO_LIVE_BY_DEFAULT);
+
+		XStreamAliasRegistryUtil.register(
+			JournalArticleImpl.class, "JournalArticle");
+		XStreamAliasRegistryUtil.register(JournalFeedImpl.class, "JournalFeed");
+		XStreamAliasRegistryUtil.register(
+			JournalFolderImpl.class, "JournalFolder");
 	}
 
 	@Override
@@ -132,10 +146,12 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 			portletDataContext.getGroupId());
 
 		DDMTemplateLocalServiceUtil.deleteTemplates(
-			portletDataContext.getScopeGroupId());
+			portletDataContext.getScopeGroupId(),
+			PortalUtil.getClassNameId(DDMStructure.class));
 
 		DDMStructureLocalServiceUtil.deleteStructures(
-			portletDataContext.getScopeGroupId());
+			portletDataContext.getScopeGroupId(),
+			PortalUtil.getClassNameId(JournalArticle.class));
 
 		return portletPreferences;
 	}
@@ -326,34 +342,46 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 			JournalArticleLocalServiceUtil.getExportActionableDynamicQuery(
 				portletDataContext);
 
-		actionableDynamicQuery.setPerformActionMethod(
-			new ActionableDynamicQuery.PerformActionMethod() {
+		final ActionableDynamicQuery.AddCriteriaMethod addCriteriaMethod =
+			actionableDynamicQuery.getAddCriteriaMethod();
+
+		actionableDynamicQuery.setAddCriteriaMethod(
+			new ActionableDynamicQuery.AddCriteriaMethod() {
 
 				@Override
-				public void performAction(Object object)
-					throws PortalException {
-
-					JournalArticle article = (JournalArticle)object;
-
-					boolean latestVersion = false;
-
-					try {
-						latestVersion =
-							JournalArticleLocalServiceUtil.isLatestVersion(
-								article.getGroupId(), article.getArticleId(),
-								article.getVersion(),
-								WorkflowConstants.STATUS_APPROVED);
-					}
-					catch (Exception e) {
-					}
+				public void addCriteria(DynamicQuery dynamicQuery) {
+					addCriteriaMethod.addCriteria(dynamicQuery);
 
 					if (portletDataContext.getBooleanParameter(
-							NAMESPACE, "version-history") ||
-						latestVersion) {
+							NAMESPACE, "version-history")) {
 
-						StagedModelDataHandlerUtil.exportStagedModel(
-							portletDataContext, article);
+						return;
 					}
+
+					DynamicQuery versionArticleDynamicQuery =
+						DynamicQueryFactoryUtil.forClass(
+							JournalArticle.class, "versionArticle",
+							PortalClassLoaderUtil.getClassLoader());
+
+					versionArticleDynamicQuery.setProjection(
+						ProjectionFactoryUtil.alias(
+							ProjectionFactoryUtil.max("versionArticle.version"),
+							"versionArticle.version"));
+
+					// We need to use the "this" default alias to make sure the
+					// database engine handles this subquery as a correlated
+					// subquery
+
+					versionArticleDynamicQuery.add(
+						RestrictionsFactoryUtil.eqProperty(
+							"this.resourcePrimKey",
+							"versionArticle.resourcePrimKey"));
+
+					Property versionProperty = PropertyFactoryUtil.forName(
+						"version");
+
+					dynamicQuery.add(
+						versionProperty.eq(versionArticleDynamicQuery));
 				}
 
 			});
@@ -404,7 +432,12 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 					}
 
 					try {
-						ddmTemplates.addAll(ddmStructure.getTemplates());
+						List<DDMTemplate> ddmStructureDDMTemplates =
+							DDMTemplateLocalServiceUtil.getTemplatesByClassPK(
+								ddmStructure.getGroupId(),
+								ddmStructure.getStructureId());
+
+						ddmTemplates.addAll(ddmStructureDDMTemplates);
 					}
 					catch (SystemException se) {
 					}

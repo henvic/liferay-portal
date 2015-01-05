@@ -28,11 +28,13 @@ import com.liferay.portal.kernel.nio.intraband.rpc.RPCResponse;
 import com.liferay.portal.kernel.nio.intraband.test.MockIntraband;
 import com.liferay.portal.kernel.nio.intraband.test.MockRegistrationReference;
 import com.liferay.portal.kernel.process.ProcessCallable;
+import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.NewEnv;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJMockingNewClassLoaderJUnitTestRunner;
+import com.liferay.portal.test.AspectJNewEnvTestRule;
 import com.liferay.portal.util.FileImpl;
 
 import java.io.Serializable;
@@ -43,18 +45,20 @@ import java.util.concurrent.Future;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @author Shuyang Zhou
  */
-@RunWith(AspectJMockingNewClassLoaderJUnitTestRunner.class)
+@NewEnv(type = NewEnv.Type.CLASSLOADER)
 public class IntrabandProxyInstallationUtilTest {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			CodeCoverageAssertor.INSTANCE, AspectJNewEnvTestRule.INSTANCE);
 
 	@Before
 	public void setUp() {
@@ -99,6 +103,7 @@ public class IntrabandProxyInstallationUtilTest {
 				IntrabandProxyUtil.getStubClass(TestClass.class, "skeletonId"));
 	}
 
+	@NewEnv(type = NewEnv.Type.NONE)
 	@Test
 	public void testConstructor() {
 		new IntrabandProxyInstallationUtil();
@@ -106,7 +111,7 @@ public class IntrabandProxyInstallationUtilTest {
 
 	@AdviseWith(adviceClasses = {PortalExecutorManagerUtilAdvice.class})
 	@Test
-	public void testInstallSkeletonLocally() throws Exception {
+	public void testInstallSkeletonLocally() {
 		IntrabandProxyInstallationUtil.checkProxyMethodSignatures(
 			IntrabandProxyInstallationUtil.installSkeleton(
 				TestClass.class, _targetLocator),
@@ -119,9 +124,8 @@ public class IntrabandProxyInstallationUtilTest {
 			AsyncIntrabandProxySkeleton.class,
 			intrabandProxySkeleton.getClass());
 
-		intrabandProxySkeleton =
-			(IntrabandProxySkeleton)ReflectionTestUtil.getFieldValue(
-				intrabandProxySkeleton, "_intrabandProxySkeleton");
+		intrabandProxySkeleton = ReflectionTestUtil.getFieldValue(
+			intrabandProxySkeleton, "_intrabandProxySkeleton");
 
 		Assert.assertEquals(
 			_targetLocator,
@@ -181,9 +185,8 @@ public class IntrabandProxyInstallationUtilTest {
 			AsyncIntrabandProxySkeleton.class,
 			intrabandProxySkeleton.getClass());
 
-		intrabandProxySkeleton =
-			(IntrabandProxySkeleton)ReflectionTestUtil.getFieldValue(
-				intrabandProxySkeleton, "_intrabandProxySkeleton");
+		intrabandProxySkeleton = ReflectionTestUtil.getFieldValue(
+			intrabandProxySkeleton, "_intrabandProxySkeleton");
 
 		Assert.assertEquals(
 			_targetLocator,
@@ -269,15 +272,15 @@ public class IntrabandProxyInstallationUtilTest {
 
 	private abstract class TestClass {
 
-		@Id
-		public abstract String getId();
+		@SuppressWarnings("unused")
+		public void copyMethod() {
+		}
 
 		@Proxy
 		public abstract Object doStuff();
 
-		@SuppressWarnings("unused")
-		public void copyMethod() {
-		}
+		@Id
+		public abstract String getId();
 
 	}
 

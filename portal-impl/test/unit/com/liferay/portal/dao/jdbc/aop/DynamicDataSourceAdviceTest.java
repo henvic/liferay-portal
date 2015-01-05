@@ -49,8 +49,8 @@ import org.junit.Test;
 public class DynamicDataSourceAdviceTest {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	public static final CodeCoverageAssertor codeCoverageAssertor =
+		CodeCoverageAssertor.INSTANCE;
 
 	@Before
 	public void setUp() {
@@ -114,10 +114,9 @@ public class DynamicDataSourceAdviceTest {
 	}
 
 	@Test
-	public void testAnnotationType() throws Exception {
-		MasterDataSource masterDataSource =
-			(MasterDataSource)ReflectionTestUtil.getFieldValue(
-				DynamicDataSourceAdvice.class, "_nullMasterDataSource");
+	public void testAnnotationType() {
+		MasterDataSource masterDataSource = ReflectionTestUtil.getFieldValue(
+			DynamicDataSourceAdvice.class, "_nullMasterDataSource");
 
 		Assert.assertSame(
 			MasterDataSource.class, masterDataSource.annotationType());

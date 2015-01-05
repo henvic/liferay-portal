@@ -17,6 +17,8 @@
 <%@ include file="/html/portlet/asset_tag_admin/init.jsp" %>
 
 <aui:form name="fm">
+	<aui:input name="deleteTagIds" type="hidden" />
+
 	<liferay-ui:search-container
 		emptyResultsMessage="there-are-no-tags"
 		rowChecker="<%= new RowChecker(renderResponse) %>"
@@ -25,7 +27,7 @@
 			<aui:nav cssClass="navbar-nav">
 				<c:if test="<%= AssetPermission.contains(permissionChecker, themeDisplay.getSiteGroupId(), ActionKeys.ADD_TAG) %>">
 					<portlet:renderURL var="editTagURL">
-						<portlet:param name="struts_action" value="/asset_tag_admin/edit_tag" />
+						<portlet:param name="mvcPath" value="/html/portlet/asset_tag_admin/edit_tag.jsp" />
 						<portlet:param name="redirect" value="<%= currentURL %>" />
 					</portlet:renderURL>
 
@@ -41,7 +43,7 @@
 						windowState="<%= LiferayWindowState.POP_UP.toString() %>"
 					/>
 
-					<aui:nav-item data-url="<%= permissionsURL %>" id="tagsPermissionsButton" label="permissions" />
+					<aui:nav-item href="<%= permissionsURL %>" iconCssClass="icon-lock" id="tagsPermissionsButton" label="permissions" useDialog="<%= true %>" />
 				</c:if>
 
 				<aui:nav-item cssClass="hide" dropdown="<%= true %>" id="tagsActionsButton" label="actions">
@@ -51,8 +53,8 @@
 				</aui:nav-item>
 			</aui:nav>
 
-			<aui:nav-bar-search cssClass="pull-right">
-				<div class="col-xs-12 form-search">
+			<aui:nav-bar-search>
+				<div class="form-search">
 					<liferay-ui:input-search />
 				</div>
 			</aui:nav-bar-search>
@@ -138,39 +140,46 @@
 	</liferay-ui:search-container>
 </aui:form>
 
-<aui:script use="aui-base,liferay-util-list-fields">
-	A.one('#<portlet:namespace /><%= searchContainerReference.getId() %>SearchContainer').delegate(
-		'click',
-		function() {
-			var hide = (Liferay.Util.listCheckedExcept(document.<portlet:namespace />fm, '<portlet:namespace /><%= RowChecker.ALL_ROW_IDS %>').length == 0);
+<aui:script sandbox="<%= true %>">
+	var Util = Liferay.Util;
 
-			A.one('#<portlet:namespace />tagsActionsButton').toggle(!hide);
-		},
-		'input[type=checkbox]'
+	var form = $(document.<portlet:namespace />fm);
+
+	$('#<portlet:namespace /><%= searchContainerReference.getId() %>SearchContainer').on(
+		'click',
+		'input[type=checkbox]',
+		function() {
+			var hide = (Util.listCheckedExcept(form, '<portlet:namespace /><%= RowChecker.ALL_ROW_IDS %>').length == 0);
+
+			$('#<portlet:namespace />tagsActionsButton').toggleClass('hide', hide);
+		}
 	);
 
-	A.one('#<portlet:namespace />deleteSelectedTags').on(
+	$('#<portlet:namespace />deleteSelectedTags').on(
 		'click',
 		function() {
 			if (confirm('<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />')) {
-				document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = '<%= Constants.DELETE %>';
-				document.<portlet:namespace />fm.<portlet:namespace />deleteTagIds.value = Liferay.Util.listCheckedExcept(document.<portlet:namespace />fm, '<portlet:namespace />allRowIds');
+				<portlet:actionURL name="deleteTag" var="deleteURL">
+					<portlet:param name="redirect" value="<%= currentURL %>" />
+				</portlet:actionURL>
 
-				submitForm(document.<portlet:namespace />fm);
+				form.fm('deleteTagIds').val(Util.listCheckedExcept(form, '<portlet:namespace />allRowIds'));
+
+				submitForm(form, '<%= deleteURL %>');
 			}
 		}
 	);
 
-	A.one('#<portlet:namespace />mergeSelectedTags').on(
+	$('#<portlet:namespace />mergeSelectedTags').on(
 		'click',
 		function() {
-			if (A.all('input[name=<portlet:namespace />rowIds]:checked').size() > 1) {
+			if (form.fm('rowIds').filter(':checked').length > 1) {
 				<portlet:renderURL var="mergeURL">
-					<portlet:param name="struts_action" value="/asset_tag_admin/merge_tag" />
+					<portlet:param name="mvcPath" value="/html/portlet/asset_tag_admin/merge_tag.jsp" />
 					<portlet:param name="redirect" value="<%= currentURL %>" />
 				</portlet:renderURL>
 
-				location.href = '<%= mergeURL %>' + '&<portlet:namespace />mergeTagIds=' + Liferay.Util.listCheckedExcept(document.<portlet:namespace />fm, '<portlet:namespace />allRowIds');
+				location.href = '<%= mergeURL %>' + '&<portlet:namespace />mergeTagIds=' + Util.listCheckedExcept(form, '<portlet:namespace />allRowIds');
 			}
 			else {
 				alert('<liferay-ui:message arguments="<%= 2 %>" key="please-choose-at-least-x-tags" />');

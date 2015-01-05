@@ -22,6 +22,7 @@
 
 	<%
 	String redirect = ParamUtil.getString(request, "redirect");
+	String backURL = ParamUtil.getString(request, "backURL", redirect);
 
 	long trashEntryId = ParamUtil.getLong(request, "trashEntryId");
 
@@ -51,9 +52,9 @@
 	PortletURL containerModelURL = renderResponse.createRenderURL();
 
 	containerModelURL.setParameter("redirect", redirect);
-	containerModelURL.setParameter("className", trashHandler.getContainerModelClassName());
+	containerModelURL.setParameter("className", trashHandler.getContainerModelClassName(classPK));
 
-	TrashUtil.addBaseModelBreadcrumbEntries(request, className, classPK, containerModelURL);
+	TrashUtil.addBaseModelBreadcrumbEntries(request, liferayPortletResponse, className, classPK, containerModelURL);
 	%>
 
 	<liferay-ui:breadcrumb
@@ -64,7 +65,7 @@
 	/>
 
 	<liferay-ui:header
-		backURL="<%= redirect %>"
+		backURL="<%= backURL %>"
 		localizeTitle="<%= false %>"
 		title="<%= trashRenderer.getTitle(locale) %>"
 	/>
@@ -78,36 +79,63 @@
 				<div class="btn-group">
 					<c:choose>
 						<c:when test="<%= entry != null %>">
-							<aui:button icon="icon-undo" name="restoreEntryButton" value="restore" />
+							<c:choose>
+								<c:when test="<%= trashHandler.isRestorable(entry.getClassPK()) && !trashHandler.isInTrashContainer(entry.getClassPK()) %>">
+									<aui:button icon="icon-undo" name="restoreEntryButton" value="restore" />
 
-							<aui:script use="aui-base">
-								<portlet:actionURL var="restoreEntryURL">
-									<portlet:param name="struts_action" value="/trash/edit_entry" />
-									<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RESTORE %>" />
-									<portlet:param name="redirect" value="<%= redirect %>" />
-									<portlet:param name="trashEntryId" value="<%= String.valueOf(entry.getEntryId()) %>" />
-								</portlet:actionURL>
+									<aui:script>
+										<portlet:actionURL var="restoreEntryURL">
+											<portlet:param name="struts_action" value="/trash/edit_entry" />
+											<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RESTORE %>" />
+											<portlet:param name="redirect" value="<%= backURL %>" />
+											<portlet:param name="trashEntryId" value="<%= String.valueOf(entry.getEntryId()) %>" />
+										</portlet:actionURL>
 
-								A.one('#<portlet:namespace />restoreEntryButton').on(
-									'click',
-									function(event) {
-										Liferay.fire('<portlet:namespace />checkEntry', {trashEntryId: <%= entry.getEntryId() %>, uri: '<%= restoreEntryURL.toString() %>'});
-									}
-								);
-							</aui:script>
+										AUI.$('#<portlet:namespace />restoreEntryButton').on(
+											'click',
+											function(event) {
+												Liferay.fire(
+													'<portlet:namespace />checkEntry',
+													{
+														trashEntryId: <%= entry.getEntryId() %>,
+														uri: '<%= restoreEntryURL.toString() %>'
+													}
+												);
+											}
+										);
+									</aui:script>
+								</c:when>
+								<c:when test="<%= !trashHandler.isRestorable(entry.getClassPK()) && trashHandler.isMovable() %>">
+									<portlet:renderURL var="moveURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+										<portlet:param name="struts_action" value="/trash/view_container_model" />
+										<portlet:param name="redirect" value="<%= backURL %>" />
+										<portlet:param name="className" value="<%= entry.getClassName() %>" />
+										<portlet:param name="classPK" value="<%= String.valueOf(entry.getClassPK()) %>" />
+										<portlet:param name="containerModelClassName" value="<%= trashHandler.getContainerModelClassName(entry.getClassPK()) %>" />
+										<portlet:param name="containerModelId" value="<%= String.valueOf(trashHandler.getRootContainerModelId(entry.getClassPK())) %>" />
+										<portlet:param name="rootContainerModelMovable" value="<%= String.valueOf(trashHandler.isRootContainerModelMovable()) %>" />
+									</portlet:renderURL>
+
+									<%
+									String taglibOnClick = renderResponse.getNamespace() + "restoreDialog('" + moveURL + "')";
+									%>
+
+									<aui:button icon="icon-undo" name="restoreEntryButton" onClick="<%= taglibOnClick %>" value="restore" />
+								</c:when>
+							</c:choose>
 
 							<c:if test="<%= trashHandler.isDeletable() %>">
 								<aui:button icon="icon-remove" name="removeEntryButton" value="delete" />
 
-								<aui:script use="aui-base">
+								<aui:script>
 									<portlet:actionURL var="deleteEntryURL">
 										<portlet:param name="struts_action" value="/trash/edit_entry" />
 										<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE %>" />
-										<portlet:param name="redirect" value="<%= redirect %>" />
+										<portlet:param name="redirect" value="<%= backURL %>" />
 										<portlet:param name="trashEntryId" value="<%= String.valueOf(entry.getEntryId()) %>" />
 									</portlet:actionURL>
 
-									A.one('#<portlet:namespace />removeEntryButton').on(
+									AUI.$('#<portlet:namespace />removeEntryButton').on(
 										'click',
 										function(event) {
 											if (confirm('<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-this") %>')) {
@@ -120,39 +148,34 @@
 						</c:when>
 						<c:otherwise>
 							<c:if test="<%= trashHandler.isMovable() %>">
-								<aui:button icon="icon-undo" name="moveEntryButton" value="restore" />
+								<portlet:renderURL var="moveURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+									<portlet:param name="struts_action" value="/trash/view_container_model" />
+									<portlet:param name="redirect" value="<%= backURL %>" />
+									<portlet:param name="className" value="<%= trashRenderer.getClassName() %>" />
+									<portlet:param name="classPK" value="<%= String.valueOf(trashRenderer.getClassPK()) %>" />
+									<portlet:param name="containerModelClassName" value="<%= trashHandler.getContainerModelClassName(classPK) %>" />
+								</portlet:renderURL>
 
-								<aui:script use="aui-base">
-									<portlet:renderURL var="moveURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-										<portlet:param name="struts_action" value="/trash/view_container_model" />
-										<portlet:param name="redirect" value="<%= redirect %>" />
-										<portlet:param name="className" value="<%= trashRenderer.getClassName() %>" />
-										<portlet:param name="classPK" value="<%= String.valueOf(trashRenderer.getClassPK()) %>" />
-										<portlet:param name="containerModelClassName" value="<%= trashHandler.getContainerModelClassName() %>" />
-									</portlet:renderURL>
+								<%
+								String taglibOnClick = renderResponse.getNamespace() + "restoreDialog('" + moveURL + "')";
+								%>
 
-									A.one('#<portlet:namespace />moveEntryButton').on(
-										'click',
-										function(event) {
-											<portlet:namespace />restoreDialog('<%= moveURL %>');
-										}
-									);
-								</aui:script>
+								<aui:button icon="icon-undo" name="moveEntryButton" onClick="<%= taglibOnClick %>" value="restore" />
 							</c:if>
 
 							<c:if test="<%= trashHandler.isDeletable() %>">
 								<aui:button icon="icon-remove" name="removeEntryButton" value="delete" />
 
-								<aui:script use="aui-base">
+								<aui:script>
 									<portlet:actionURL var="deleteEntryURL">
 										<portlet:param name="struts_action" value="/trash/edit_entry" />
 										<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE %>" />
-										<portlet:param name="redirect" value="<%= redirect %>" />
+										<portlet:param name="redirect" value="<%= backURL %>" />
 										<portlet:param name="className" value="<%= trashRenderer.getClassName() %>" />
 										<portlet:param name="classPK" value="<%= String.valueOf(trashRenderer.getClassPK()) %>" />
 									</portlet:actionURL>
 
-									A.one('#<portlet:namespace />removeEntryButton').on(
+									AUI.$('#<portlet:namespace />removeEntryButton').on(
 										'click',
 										function(event) {
 											if (confirm('<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-this") %>')) {
@@ -211,7 +234,8 @@
 								PortletURL rowURL = renderResponse.createRenderURL();
 
 								rowURL.setParameter("struts_action", "/trash/view_content");
-								rowURL.setParameter("redirect", currentURL);
+								rowURL.setParameter("redirect", redirect);
+								rowURL.setParameter("backURL", currentURL);
 								rowURL.setParameter("className", (curTrashRenderer.getClassName()));
 								rowURL.setParameter("classPK", String.valueOf(curTrashRenderer.getClassPK()));
 								%>
@@ -271,7 +295,8 @@
 								PortletURL rowURL = renderResponse.createRenderURL();
 
 								rowURL.setParameter("struts_action", "/trash/view_content");
-								rowURL.setParameter("redirect", currentURL);
+								rowURL.setParameter("redirect", redirect);
+								rowURL.setParameter("backURL", currentURL);
 								rowURL.setParameter("className", curTrashRenderer.getClassName());
 								rowURL.setParameter("classPK", String.valueOf(curTrashRenderer.getClassPK()));
 								%>

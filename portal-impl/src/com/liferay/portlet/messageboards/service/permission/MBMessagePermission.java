@@ -15,6 +15,7 @@
 package com.liferay.portlet.messageboards.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.staging.permission.StagingPermissionUtil;
 import com.liferay.portal.kernel.workflow.permission.WorkflowPermissionUtil;
 import com.liferay.portal.security.auth.PrincipalException;
@@ -27,13 +28,20 @@ import com.liferay.portlet.messageboards.NoSuchCategoryException;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBCategoryConstants;
 import com.liferay.portlet.messageboards.model.MBMessage;
+import com.liferay.portlet.messageboards.model.MBThread;
 import com.liferay.portlet.messageboards.service.MBBanLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
+import com.liferay.portlet.messageboards.service.MBThreadLocalServiceUtil;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@OSGiBeanProperties(
+	property = {
+		"model.class.name=com.liferay.portlet.messageboards.model.MBMessage"
+	}
+)
 public class MBMessagePermission implements BaseModelPermissionChecker {
 
 	public static void check(
@@ -57,11 +65,20 @@ public class MBMessagePermission implements BaseModelPermissionChecker {
 	}
 
 	public static boolean contains(
-			PermissionChecker permissionChecker, long messageId,
-			String actionId)
+			PermissionChecker permissionChecker, long classPK, String actionId)
 		throws PortalException {
 
-		MBMessage message = MBMessageLocalServiceUtil.getMessage(messageId);
+		MBThread mbThread = MBThreadLocalServiceUtil.fetchThread(classPK);
+
+		MBMessage message = null;
+
+		if (mbThread == null) {
+			message = MBMessageLocalServiceUtil.getMessage(classPK);
+		}
+		else {
+			message = MBMessageLocalServiceUtil.getMessage(
+				mbThread.getRootMessageId());
+		}
 
 		return contains(permissionChecker, message, actionId);
 	}

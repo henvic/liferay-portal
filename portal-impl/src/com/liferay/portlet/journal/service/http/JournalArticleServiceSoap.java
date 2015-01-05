@@ -92,9 +92,6 @@ public class JournalArticleServiceSoap {
 	* @param content the HTML content wrapped in XML. For more information,
 	see the content example in the class description for {@link
 	JournalArticleLocalServiceImpl}.
-	* @param type the structure's type, if the web content article is related
-	to a DDM structure. For more information, see {@link
-	com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants}.
 	* @param ddmStructureKey the primary key of the web content article's DDM
 	structure, if the article is related to a DDM structure, or
 	<code>null</code> otherwise
@@ -152,15 +149,14 @@ public class JournalArticleServiceSoap {
 		java.lang.String[] titleMapValues,
 		java.lang.String[] descriptionMapLanguageIds,
 		java.lang.String[] descriptionMapValues, java.lang.String content,
-		java.lang.String type, java.lang.String ddmStructureKey,
-		java.lang.String ddmTemplateKey, java.lang.String layoutUuid,
-		int displayDateMonth, int displayDateDay, int displayDateYear,
-		int displayDateHour, int displayDateMinute, int expirationDateMonth,
-		int expirationDateDay, int expirationDateYear, int expirationDateHour,
-		int expirationDateMinute, boolean neverExpire, int reviewDateMonth,
-		int reviewDateDay, int reviewDateYear, int reviewDateHour,
-		int reviewDateMinute, boolean neverReview, boolean indexable,
-		java.lang.String articleURL,
+		java.lang.String ddmStructureKey, java.lang.String ddmTemplateKey,
+		java.lang.String layoutUuid, int displayDateMonth, int displayDateDay,
+		int displayDateYear, int displayDateHour, int displayDateMinute,
+		int expirationDateMonth, int expirationDateDay, int expirationDateYear,
+		int expirationDateHour, int expirationDateMinute, boolean neverExpire,
+		int reviewDateMonth, int reviewDateDay, int reviewDateYear,
+		int reviewDateHour, int reviewDateMinute, boolean neverReview,
+		boolean indexable, java.lang.String articleURL,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
@@ -171,7 +167,7 @@ public class JournalArticleServiceSoap {
 
 			com.liferay.portlet.journal.model.JournalArticle returnValue = JournalArticleServiceUtil.addArticle(groupId,
 					folderId, classNameId, classPK, articleId, autoArticleId,
-					titleMap, descriptionMap, content, type, ddmStructureKey,
+					titleMap, descriptionMap, content, ddmStructureKey,
 					ddmTemplateKey, layoutUuid, displayDateMonth,
 					displayDateDay, displayDateYear, displayDateHour,
 					displayDateMinute, expirationDateMonth, expirationDateDay,
@@ -740,6 +736,17 @@ public class JournalArticleServiceSoap {
 		}
 	}
 
+	/**
+	* Returns the number of web content articles matching the group, folder,
+	* and status.
+	*
+	* @param groupId the primary key of the web content article's group
+	* @param folderId the primary key of the web content article's folder
+	* @param status the web content article's workflow status. For more
+	information see {@link WorkflowConstants} for constants starting
+	with the "STATUS_" prefix.
+	* @return the number of matching web content articles
+	*/
 	public static int getArticlesCount(long groupId, long folderId, int status)
 		throws RemoteException {
 		try {
@@ -886,6 +893,37 @@ public class JournalArticleServiceSoap {
 		}
 	}
 
+	/**
+	* Returns an ordered range of all the web content articles matching the
+	* group, user, the root folder or any of its subfolders.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end -
+	* start</code> instances. <code>start</code> and <code>end</code> are not
+	* primary keys, they are indexes in the result set. Thus, <code>0</code>
+	* refers to the first result in the set. Setting both <code>start</code>
+	* and <code>end</code> to {@link
+	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* result set.
+	* </p>
+	*
+	* @param groupId the primary key of the web content article's group
+	* @param userId the primary key of the user (optionally <code>0</code>)
+	* @param rootFolderId the primary key of the root folder to begin the
+	search
+	* @param status the web content article's workflow status. For more
+	information see {@link WorkflowConstants} for constants starting
+	with the "STATUS_" prefix.
+	* @param start the lower bound of the range of web content articles to
+	return
+	* @param end the upper bound of the range of web content articles to
+	return (not inclusive)
+	* @param orderByComparator the comparator to order the web content
+	articles
+	* @return the range of matching web content articles ordered by the
+	comparator
+	* @throws PortalException if a portal exception occurred
+	*/
 	public static com.liferay.portlet.journal.model.JournalArticleSoap[] getGroupArticles(
 		long groupId, long userId, long rootFolderId, int status, int start,
 		int end,
@@ -908,6 +946,16 @@ public class JournalArticleServiceSoap {
 	/**
 	* Returns an ordered range of all the web content articles matching the
 	* group, user, the root folder or any of its subfolders.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end -
+	* start</code> instances. <code>start</code> and <code>end</code> are not
+	* primary keys, they are indexes in the result set. Thus, <code>0</code>
+	* refers to the first result in the set. Setting both <code>start</code>
+	* and <code>end</code> to {@link
+	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* result set.
+	* </p>
 	*
 	* @param groupId the primary key of the web content article's group
 	* @param userId the primary key of the user (optionally <code>0</code>)
@@ -971,6 +1019,20 @@ public class JournalArticleServiceSoap {
 		}
 	}
 
+	/**
+	* Returns the number of web content articles matching the group, user, and
+	* the root folder or any of its subfolders.
+	*
+	* @param groupId the primary key of the web content article's group
+	* @param userId the primary key of the user (optionally <code>0</code>)
+	* @param rootFolderId the primary key of the root folder to begin the
+	search
+	* @param status the web content article's workflow status. For more
+	information see {@link WorkflowConstants} for constants starting
+	with the "STATUS_" prefix.
+	* @return the number of matching web content articles
+	* @throws PortalException if a portal exception occurred
+	*/
 	public static int getGroupArticlesCount(long groupId, long userId,
 		long rootFolderId, int status) throws RemoteException {
 		try {
@@ -1329,8 +1391,6 @@ public class JournalArticleServiceSoap {
 	query criteria; otherwise it uses the AND operator.
 	* @param version the web content article's version (optionally
 	<code>null</code>)
-	* @param type the web content article's type (optionally
-	<code>null</code>)
 	* @param ddmStructureKey the primary key of the web content article's DDM
 	structure, if the article is related to a DDM structure, or
 	<code>null</code> otherwise
@@ -1358,17 +1418,16 @@ public class JournalArticleServiceSoap {
 	public static com.liferay.portlet.journal.model.JournalArticleSoap[] search(
 		long companyId, long groupId, Long[] folderIds, long classNameId,
 		java.lang.String keywords, java.lang.Double version,
-		java.lang.String type, java.lang.String ddmStructureKey,
-		java.lang.String ddmTemplateKey, java.util.Date displayDateGT,
-		java.util.Date displayDateLT, int status, java.util.Date reviewDate,
-		int start, int end,
+		java.lang.String ddmStructureKey, java.lang.String ddmTemplateKey,
+		java.util.Date displayDateGT, java.util.Date displayDateLT, int status,
+		java.util.Date reviewDate, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.journal.model.JournalArticle> obc)
 		throws RemoteException {
 		try {
 			java.util.List<com.liferay.portlet.journal.model.JournalArticle> returnValue =
 				JournalArticleServiceUtil.search(companyId, groupId,
 					ListUtil.toList(folderIds), classNameId, keywords, version,
-					type, ddmStructureKey, ddmTemplateKey, displayDateGT,
+					ddmStructureKey, ddmTemplateKey, displayDateGT,
 					displayDateLT, status, reviewDate, start, end, obc);
 
 			return com.liferay.portlet.journal.model.JournalArticleSoap.toSoapModels(returnValue);
@@ -1414,8 +1473,6 @@ public class JournalArticleServiceSoap {
 	<code>null</code>)
 	* @param content the content keywords (space separated, optionally
 	<code>null</code>)
-	* @param type the web content article's type (optionally
-	<code>null</code>)
 	* @param ddmStructureKey the primary key of the web content article's DDM
 	structure, if the article is related to a DDM structure, or
 	<code>null</code> otherwise
@@ -1447,20 +1504,19 @@ public class JournalArticleServiceSoap {
 		long companyId, long groupId, Long[] folderIds, long classNameId,
 		java.lang.String articleId, java.lang.Double version,
 		java.lang.String title, java.lang.String description,
-		java.lang.String content, java.lang.String type,
-		java.lang.String ddmStructureKey, java.lang.String ddmTemplateKey,
-		java.util.Date displayDateGT, java.util.Date displayDateLT, int status,
-		java.util.Date reviewDate, boolean andOperator, int start, int end,
+		java.lang.String content, java.lang.String ddmStructureKey,
+		java.lang.String ddmTemplateKey, java.util.Date displayDateGT,
+		java.util.Date displayDateLT, int status, java.util.Date reviewDate,
+		boolean andOperator, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.journal.model.JournalArticle> obc)
 		throws RemoteException {
 		try {
 			java.util.List<com.liferay.portlet.journal.model.JournalArticle> returnValue =
 				JournalArticleServiceUtil.search(companyId, groupId,
 					ListUtil.toList(folderIds), classNameId, articleId,
-					version, title, description, content, type,
-					ddmStructureKey, ddmTemplateKey, displayDateGT,
-					displayDateLT, status, reviewDate, andOperator, start, end,
-					obc);
+					version, title, description, content, ddmStructureKey,
+					ddmTemplateKey, displayDateGT, displayDateLT, status,
+					reviewDate, andOperator, start, end, obc);
 
 			return com.liferay.portlet.journal.model.JournalArticleSoap.toSoapModels(returnValue);
 		}
@@ -1505,8 +1561,6 @@ public class JournalArticleServiceSoap {
 	<code>null</code>)
 	* @param content the content keywords (space separated, optionally
 	<code>null</code>)
-	* @param type the web content article's type (optionally
-	<code>null</code>)
 	* @param ddmStructureKeys the primary keys of the web content article's
 	DDM structures, if the article is related to a DDM structure, or
 	<code>null</code> otherwise
@@ -1540,8 +1594,7 @@ public class JournalArticleServiceSoap {
 		long companyId, long groupId, Long[] folderIds, long classNameId,
 		java.lang.String articleId, java.lang.Double version,
 		java.lang.String title, java.lang.String description,
-		java.lang.String content, java.lang.String type,
-		java.lang.String[] ddmStructureKeys,
+		java.lang.String content, java.lang.String[] ddmStructureKeys,
 		java.lang.String[] ddmTemplateKeys, java.util.Date displayDateGT,
 		java.util.Date displayDateLT, int status, java.util.Date reviewDate,
 		boolean andOperator, int start, int end,
@@ -1551,10 +1604,9 @@ public class JournalArticleServiceSoap {
 			java.util.List<com.liferay.portlet.journal.model.JournalArticle> returnValue =
 				JournalArticleServiceUtil.search(companyId, groupId,
 					ListUtil.toList(folderIds), classNameId, articleId,
-					version, title, description, content, type,
-					ddmStructureKeys, ddmTemplateKeys, displayDateGT,
-					displayDateLT, status, reviewDate, andOperator, start, end,
-					obc);
+					version, title, description, content, ddmStructureKeys,
+					ddmTemplateKeys, displayDateGT, displayDateLT, status,
+					reviewDate, andOperator, start, end, obc);
 
 			return com.liferay.portlet.journal.model.JournalArticleSoap.toSoapModels(returnValue);
 		}
@@ -1586,8 +1638,6 @@ public class JournalArticleServiceSoap {
 	query criteria; otherwise it uses the AND operator.
 	* @param version the web content article's version (optionally
 	<code>null</code>)
-	* @param type the web content article's type (optionally
-	<code>null</code>)
 	* @param ddmStructureKey the primary key of the web content article's DDM
 	structure, if the article is related to a DDM structure, or
 	<code>null</code> otherwise
@@ -1608,15 +1658,15 @@ public class JournalArticleServiceSoap {
 	*/
 	public static int searchCount(long companyId, long groupId,
 		Long[] folderIds, long classNameId, java.lang.String keywords,
-		java.lang.Double version, java.lang.String type,
-		java.lang.String ddmStructureKey, java.lang.String ddmTemplateKey,
-		java.util.Date displayDateGT, java.util.Date displayDateLT, int status,
-		java.util.Date reviewDate) throws RemoteException {
+		java.lang.Double version, java.lang.String ddmStructureKey,
+		java.lang.String ddmTemplateKey, java.util.Date displayDateGT,
+		java.util.Date displayDateLT, int status, java.util.Date reviewDate)
+		throws RemoteException {
 		try {
 			int returnValue = JournalArticleServiceUtil.searchCount(companyId,
 					groupId, ListUtil.toList(folderIds), classNameId, keywords,
-					version, type, ddmStructureKey, ddmTemplateKey,
-					displayDateGT, displayDateLT, status, reviewDate);
+					version, ddmStructureKey, ddmTemplateKey, displayDateGT,
+					displayDateLT, status, reviewDate);
 
 			return returnValue;
 		}
@@ -1651,8 +1701,6 @@ public class JournalArticleServiceSoap {
 	<code>null</code>)
 	* @param content the content keywords (space separated, optionally
 	<code>null</code>)
-	* @param type the web content article's type (optionally
-	<code>null</code>)
 	* @param ddmStructureKey the primary key of the web content article's DDM
 	structure, if the article is related to a DDM structure, or
 	<code>null</code> otherwise
@@ -1678,14 +1726,14 @@ public class JournalArticleServiceSoap {
 		Long[] folderIds, long classNameId, java.lang.String articleId,
 		java.lang.Double version, java.lang.String title,
 		java.lang.String description, java.lang.String content,
-		java.lang.String type, java.lang.String ddmStructureKey,
-		java.lang.String ddmTemplateKey, java.util.Date displayDateGT,
-		java.util.Date displayDateLT, int status, java.util.Date reviewDate,
-		boolean andOperator) throws RemoteException {
+		java.lang.String ddmStructureKey, java.lang.String ddmTemplateKey,
+		java.util.Date displayDateGT, java.util.Date displayDateLT, int status,
+		java.util.Date reviewDate, boolean andOperator)
+		throws RemoteException {
 		try {
 			int returnValue = JournalArticleServiceUtil.searchCount(companyId,
 					groupId, ListUtil.toList(folderIds), classNameId,
-					articleId, version, title, description, content, type,
+					articleId, version, title, description, content,
 					ddmStructureKey, ddmTemplateKey, displayDateGT,
 					displayDateLT, status, reviewDate, andOperator);
 
@@ -1722,8 +1770,6 @@ public class JournalArticleServiceSoap {
 	<code>null</code>)
 	* @param content the content keywords (space separated, optionally
 	<code>null</code>)
-	* @param type the web content article's type (optionally
-	<code>null</code>)
 	* @param ddmStructureKeys the primary keys of the web content article's
 	DDM structures, if the article is related to a DDM structure, or
 	<code>null</code> otherwise
@@ -1751,14 +1797,14 @@ public class JournalArticleServiceSoap {
 		Long[] folderIds, long classNameId, java.lang.String articleId,
 		java.lang.Double version, java.lang.String title,
 		java.lang.String description, java.lang.String content,
-		java.lang.String type, java.lang.String[] ddmStructureKeys,
+		java.lang.String[] ddmStructureKeys,
 		java.lang.String[] ddmTemplateKeys, java.util.Date displayDateGT,
 		java.util.Date displayDateLT, int status, java.util.Date reviewDate,
 		boolean andOperator) throws RemoteException {
 		try {
 			int returnValue = JournalArticleServiceUtil.searchCount(companyId,
 					groupId, ListUtil.toList(folderIds), classNameId,
-					articleId, version, title, description, content, type,
+					articleId, version, title, description, content,
 					ddmStructureKeys, ddmTemplateKeys, displayDateGT,
 					displayDateLT, status, reviewDate, andOperator);
 
@@ -1771,6 +1817,15 @@ public class JournalArticleServiceSoap {
 		}
 	}
 
+	/**
+	* Subscribes the user to changes in elements that belong to the web content
+	* article's DDM structure.
+	*
+	* @param groupId the primary key of the folder's group
+	* @param userId the primary key of the user to be subscribed
+	* @param ddmStructureId the primary key of the structure to subscribe to
+	* @throws PortalException if a matching user or group could not be found
+	*/
 	public static void subscribeStructure(long groupId, long userId,
 		long ddmStructureId) throws RemoteException {
 		try {
@@ -1784,6 +1839,16 @@ public class JournalArticleServiceSoap {
 		}
 	}
 
+	/**
+	* Unsubscribes the user from changes in elements that belong to the web
+	* content article's DDM structure.
+	*
+	* @param groupId the primary key of the folder's group
+	* @param userId the primary key of the user to be subscribed
+	* @param ddmStructureId the primary key of the structure to subscribe to
+	* @throws PortalException if a matching user or subscription could not be
+	found
+	*/
 	public static void unsubscribeStructure(long groupId, long userId,
 		long ddmStructureId) throws RemoteException {
 		try {
@@ -1817,14 +1882,13 @@ public class JournalArticleServiceSoap {
 	article's display page
 	* @param serviceContext the service context to be applied. Can set the
 	modification date, expando bridge attributes, asset category IDs,
-	asset tag names, asset link entry IDs, workflow actions, the
-	"defaultLanguageId" and "urlTitle" attributes, and can set
-	whether to add the default command update for the web content
-	article. With respect to social activities, by setting the
-	service context's command to {@link
-	com.liferay.portal.kernel.util.Constants#UPDATE}, the invocation
-	is considered a web content update activity; otherwise it is
-	considered a web content add activity.
+	asset tag names, asset link entry IDs, workflow actions, the and
+	"urlTitle" attributes, and can set whether to add the default
+	command update for the web content article. With respect to
+	social activities, by setting the service context's command to
+	{@link com.liferay.portal.kernel.util.Constants#UPDATE}, the
+	invocation is considered a web content update activity; otherwise
+	it is considered a web content add activity.
 	* @return the updated web content article
 	* @throws PortalException if a user with the primary key or a matching web
 	content article could not be found, or if a portal exception
@@ -1871,14 +1935,13 @@ public class JournalArticleServiceSoap {
 	JournalArticleLocalServiceImpl}.
 	* @param serviceContext the service context to be applied. Can set the
 	modification date, expando bridge attributes, asset category IDs,
-	asset tag names, asset link entry IDs, workflow actions, the
-	"defaultLanguageId" and "urlTitle" attributes, and can set
-	whether to add the default command update for the web content
-	article. With respect to social activities, by setting the
-	service context's command to {@link
-	com.liferay.portal.kernel.util.Constants#UPDATE}, the invocation
-	is considered a web content update activity; otherwise it is
-	considered a web content add activity.
+	asset tag names, asset link entry IDs, workflow actions, the and
+	"urlTitle" attributes, and can set whether to add the default
+	command update for the web content article. With respect to
+	social activities, by setting the service context's command to
+	{@link com.liferay.portal.kernel.util.Constants#UPDATE}, the
+	invocation is considered a web content update activity; otherwise
+	it is considered a web content add activity.
 	* @return the updated web content article
 	* @throws PortalException if the user did not have permission to update the
 	web content article, if a user with the primary key or a matching

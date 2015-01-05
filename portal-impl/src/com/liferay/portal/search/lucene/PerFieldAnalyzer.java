@@ -98,7 +98,8 @@ public class PerFieldAnalyzer extends Analyzer implements Tokenizer {
 	}
 
 	@Override
-	public TokenStream reusableTokenStream(String fieldName, Reader reader)
+	public final TokenStream reusableTokenStream(
+			String fieldName, Reader reader)
 		throws IOException {
 
 		Analyzer analyzer = getAnalyzer(fieldName);
@@ -154,16 +155,17 @@ public class PerFieldAnalyzer extends Analyzer implements Tokenizer {
 	}
 
 	@Override
-	public TokenStream tokenStream(String fieldName, Reader reader) {
+	public final TokenStream tokenStream(String fieldName, Reader reader) {
 		Analyzer analyzer = getAnalyzer(fieldName);
 
 		return analyzer.tokenStream(fieldName, reader);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(PerFieldAnalyzer.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		PerFieldAnalyzer.class);
 
-	private Analyzer _analyzer;
-	private Map<String, ObjectValuePair<Pattern, Analyzer>> _analyzers =
+	private final Analyzer _analyzer;
+	private final Map<String, ObjectValuePair<Pattern, Analyzer>> _analyzers =
 		new LinkedHashMap<String, ObjectValuePair<Pattern, Analyzer>>();
 
 }

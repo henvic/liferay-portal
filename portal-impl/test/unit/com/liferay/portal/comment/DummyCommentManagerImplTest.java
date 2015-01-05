@@ -36,6 +36,9 @@ public class DummyCommentManagerImplTest {
 		String subject = RandomTestUtil.randomString();
 		String body = RandomTestUtil.randomString();
 
+		_commentManager.addComment(
+			userId, groupId, className, classPK, body, null);
+
 		Assert.assertEquals(
 			0,
 			_commentManager.addComment(
@@ -50,8 +53,12 @@ public class DummyCommentManagerImplTest {
 		_commentManager.deleteComment(commentId);
 
 		_commentManager.deleteDiscussion(className, classPK);
+
+		Assert.assertEquals(
+			0, _commentManager.getCommentsCount(className, classPK));
 	}
 
-	private CommentManager _commentManager = new DummyCommentManagerImpl();
+	private final CommentManager _commentManager =
+		new DummyCommentManagerImpl();
 
 }

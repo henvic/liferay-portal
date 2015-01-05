@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.dynamicdatalists.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -25,17 +27,13 @@ import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
@@ -47,7 +45,6 @@ import com.liferay.portlet.dynamicdatalists.service.persistence.DDLRecordSetPers
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -68,6 +65,7 @@ import java.util.Set;
  * @see DDLRecordSetUtil
  * @generated
  */
+@ProviderType
 public class DDLRecordSetPersistenceImpl extends BasePersistenceImpl<DDLRecordSet>
 	implements DDLRecordSetPersistence {
 	/*
@@ -3308,25 +3306,6 @@ public class DDLRecordSetPersistenceImpl extends BasePersistenceImpl<DDLRecordSe
 	 * Initializes the d d l record set persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portlet.dynamicdatalists.model.DDLRecordSet")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<DDLRecordSet>> listenersList = new ArrayList<ModelListener<DDLRecordSet>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<DDLRecordSet>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
 	}
 
 	public void destroy() {
@@ -3355,11 +3334,11 @@ public class DDLRecordSetPersistenceImpl extends BasePersistenceImpl<DDLRecordSe
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No DDLRecordSet exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No DDLRecordSet exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(DDLRecordSetPersistenceImpl.class);
-	private static Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+	private static final Log _log = LogFactoryUtil.getLog(DDLRecordSetPersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"uuid"
 			});
-	private static DDLRecordSet _nullDDLRecordSet = new DDLRecordSetImpl() {
+	private static final DDLRecordSet _nullDDLRecordSet = new DDLRecordSetImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -3371,7 +3350,7 @@ public class DDLRecordSetPersistenceImpl extends BasePersistenceImpl<DDLRecordSe
 			}
 		};
 
-	private static CacheModel<DDLRecordSet> _nullDDLRecordSetCacheModel = new CacheModel<DDLRecordSet>() {
+	private static final CacheModel<DDLRecordSet> _nullDDLRecordSetCacheModel = new CacheModel<DDLRecordSet>() {
 			@Override
 			public DDLRecordSet toEntityModel() {
 				return _nullDDLRecordSet;

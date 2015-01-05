@@ -53,7 +53,7 @@ if (row == null) {
 }
 %>
 
-<liferay-ui:icon-menu direction="down" extended="<%= false %>" icon="<%= StringPool.BLANK %>" message="<%= StringPool.BLANK %>" showExpanded="<%= view %>" showWhenSingleIcon="<%= true %>" triggerCssClass="btn btn-default">
+<liferay-ui:icon-menu direction="down" icon="<%= StringPool.BLANK %>" message="<%= StringPool.BLANK %>" showExpanded="<%= view %>" showWhenSingleIcon="<%= true %>">
 
 	<%
 	ThemeDisplay siteThemeDisplay = (ThemeDisplay)themeDisplay.clone();
@@ -219,7 +219,7 @@ if (row == null) {
 		</c:choose>
 	</c:if>
 
-	<c:if test="<%= !group.isCompany() && GroupPermissionUtil.contains(permissionChecker, group, ActionKeys.DELETE) && !PortalUtil.isSystemGroup(group.getName()) %>">
+	<c:if test="<%= !group.isCompany() && GroupPermissionUtil.contains(permissionChecker, group, ActionKeys.DELETE) && !PortalUtil.isSystemGroup(group.getGroupKey()) %>">
 		<portlet:actionURL var="deleteURL">
 			<portlet:param name="struts_action" value="/sites_admin/edit_site" />
 			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE %>" />

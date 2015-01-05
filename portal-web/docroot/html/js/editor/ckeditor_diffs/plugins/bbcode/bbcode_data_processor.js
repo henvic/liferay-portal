@@ -39,6 +39,19 @@
 		strong: '_handleStrong'
 	};
 
+	var MAP_IMAGE_ATTRIBUTES = [
+		'alt',
+		'class',
+		'dir',
+		'height',
+		'id',
+		'lang',
+		'longdesc',
+		'style',
+		'title',
+		'width'
+	];
+
 	var MAP_LINK_HANDLERS = {
 		0: 'email'
 	};
@@ -56,8 +69,6 @@
 	var REGEX_LIST_ALPHA = /(upper|lower)-alpha/i;
 
 	var REGEX_NEWLINE = /\r?\n/g;
-
-	var REGEX_NOT_WHITESPACE = /[^\t\n\r ]/;
 
 	var REGEX_PERCENT = /%$/i;
 
@@ -95,8 +106,6 @@
 
 	var tplImage = new CKEDITOR.template('<img src="{image}" />');
 
-	var tplImageOpenTag = new CKEDITOR.template('[img={width}x{height}]');
-
 	var emoticonImages;
 	var emoticonPath;
 	var emoticonSymbols;
@@ -117,27 +126,40 @@
 			return data;
 		},
 
-		toHtml: function(data, fixForBody) {
+		toHtml: function(data, config) {
 			var instance = this;
 
 			if (!instance._bbcodeConverter) {
 				instance._bbcodeConverter = new CKEDITOR.BBCode2HTML();
 			}
 
-			data = instance._bbcodeConverter.convert(data);
+			if (config) {
+				var fragment = CKEDITOR.htmlParser.fragment.fromHtml(data);
 
-			var length = emoticonSymbols.length;
+				var writer = new CKEDITOR.htmlParser.basicWriter();
 
-			for (var i = 0; i < length; i++) {
-				var image = tplImage.output(
-					{
-						image: emoticonPath + emoticonImages[i]
-					}
-				);
+				config.filter.applyTo(fragment);
 
-				var escapedSymbol = emoticonSymbols[i].replace(REGEX_ESCAPE_REGEX, '\\$&');
+				fragment.writeHtml(writer);
 
-				data = data.replace(new RegExp(escapedSymbol, 'g'), image);
+				data = writer.getHtml();
+			}
+			else {
+				data = instance._bbcodeConverter.convert(data);
+
+				var length = emoticonSymbols.length;
+
+				for (var i = 0; i < length; i++) {
+					var image = tplImage.output(
+						{
+							image: emoticonPath + emoticonImages[i]
+						}
+					);
+
+					var escapedSymbol = emoticonSymbols[i].replace(REGEX_ESCAPE_REGEX, '\\$&');
+
+					data = data.replace(new RegExp(escapedSymbol, 'g'), image);
+				}
 			}
 
 			return data;
@@ -495,27 +517,31 @@
 			else {
 				var attrSrc = element.getAttribute('src');
 
-				var domElement = new CKEDITOR.dom.element(element);
-
-				var height = domElement.getStyle('height').replace('px', '') || 'auto';
-				var width = domElement.getStyle('width').replace('px', '') || 'auto';
-
-				var openTag = '[img]';
-
-				if ((height !== 'auto') || (width !== 'auto')) {
-					openTag = tplImageOpenTag.output(
-						{
-							height: height,
-							width: width
-						}
-					);
-				}
+				var openTag = '[img' + instance._handleImageAttributes(element) + ']';
 
 				listTagsIn.push(openTag);
 				listTagsIn.push(attrSrc);
 
 				listTagsOut.push('[/img]');
 			}
+		},
+
+		_handleImageAttributes: function(element) {
+			var attrs = '';
+
+			var length = MAP_IMAGE_ATTRIBUTES.length;
+
+			for (var i = 0; i < length; i++) {
+				var attrName = MAP_IMAGE_ATTRIBUTES[i];
+
+				var attrValue = element.getAttribute(attrName);
+
+				if (attrValue) {
+					attrs += ' ' + attrName + '="' + attrValue + '"';
+				}
+			}
+
+			return attrs;
 		},
 
 		_handleLineThrough: function(element, listTagsIn, listTagsOut) {
@@ -715,23 +741,6 @@
 			}
 		},
 
-		_handleStyleTextDecoration: function(element, stylesTagsIn, stylesTagsOut) {
-			var style = element.style;
-
-			var textDecoration = style.textDecoration.toLowerCase();
-
-			if (textDecoration == 'line-through') {
-				stylesTagsIn.push('[s]');
-
-				stylesTagsOut.push('[/s]');
-			}
-			else if (textDecoration == 'underline') {
-				stylesTagsIn.push('[u]');
-
-				stylesTagsOut.push('[/u]');
-			}
-		},
-
 		_handleStyles: function(element, stylesTagsIn, stylesTagsOut) {
 			var instance = this;
 
@@ -748,6 +757,23 @@
 				instance._handleStyleFontSize(element, stylesTagsIn, stylesTagsOut);
 				instance._handleStyleItalic(element, stylesTagsIn, stylesTagsOut);
 				instance._handleStyleTextDecoration(element, stylesTagsIn, stylesTagsOut);
+			}
+		},
+
+		_handleStyleTextDecoration: function(element, stylesTagsIn, stylesTagsOut) {
+			var style = element.style;
+
+			var textDecoration = style.textDecoration.toLowerCase();
+
+			if (textDecoration == 'line-through') {
+				stylesTagsIn.push('[s]');
+
+				stylesTagsOut.push('[/s]');
+			}
+			else if (textDecoration == 'underline') {
+				stylesTagsIn.push('[u]');
+
+				stylesTagsOut.push('[/u]');
 			}
 		},
 
@@ -850,20 +876,6 @@
 				newThreadURL = editorConfig.newThreadURL;
 
 				editor.dataProcessor = new BBCodeDataProcessor(editor);
-
-				editor.on(
-					'paste',
-					function(event) {
-						var data = event.data;
-
-						var htmlData = data.dataValue;
-
-						htmlData = editor.dataProcessor.toDataFormat(htmlData);
-
-						data.dataValue = htmlData;
-					},
-					editor.element.$
-				);
 
 				editor.fire('customDataProcessorLoaded');
 			}

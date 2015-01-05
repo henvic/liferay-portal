@@ -32,9 +32,6 @@ import java.util.Locale;
  */
 public class AssetCategoryImpl extends AssetCategoryBaseImpl {
 
-	public AssetCategoryImpl() {
-	}
-
 	@Override
 	public List<AssetCategory> getAncestors() throws PortalException {
 		List<AssetCategory> categories = new ArrayList<AssetCategory>();
@@ -49,6 +46,12 @@ public class AssetCategoryImpl extends AssetCategoryBaseImpl {
 		}
 
 		return categories;
+	}
+
+	@Override
+	public AssetCategory getParentCategory() {
+		return AssetCategoryLocalServiceUtil.fetchCategory(
+			getParentCategoryId());
 	}
 
 	@Override

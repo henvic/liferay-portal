@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.calendar.service.base;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -83,6 +85,7 @@ import javax.sql.DataSource;
  * @see com.liferay.portlet.calendar.service.CalEventLocalServiceUtil
  * @generated
  */
+@ProviderType
 public abstract class CalEventLocalServiceBaseImpl extends BaseLocalServiceImpl
 	implements CalEventLocalService, IdentifiableBean {
 	/*
@@ -199,10 +202,10 @@ public abstract class CalEventLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
@@ -210,11 +213,11 @@ public abstract class CalEventLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
@@ -226,18 +229,6 @@ public abstract class CalEventLocalServiceBaseImpl extends BaseLocalServiceImpl
 	@Override
 	public CalEvent fetchCalEvent(long eventId) {
 		return calEventPersistence.fetchByPrimaryKey(eventId);
-	}
-
-	/**
-	 * Returns the cal event with the matching UUID and company.
-	 *
-	 * @param uuid the cal event's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching cal event, or <code>null</code> if a matching cal event could not be found
-	 */
-	@Override
-	public CalEvent fetchCalEventByUuidAndCompanyId(String uuid, long companyId) {
-		return calEventPersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
 	/**
@@ -357,17 +348,34 @@ public abstract class CalEventLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the cal event with the matching UUID and company.
+	 * Returns all the cal events matching the UUID and company.
 	 *
-	 * @param uuid the cal event's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching cal event
-	 * @throws PortalException if a matching cal event could not be found
+	 * @param uuid the UUID of the cal events
+	 * @param companyId the primary key of the company
+	 * @return the matching cal events, or an empty list if no matches were found
 	 */
 	@Override
-	public CalEvent getCalEventByUuidAndCompanyId(String uuid, long companyId)
-		throws PortalException {
-		return calEventPersistence.findByUuid_C_First(uuid, companyId, null);
+	public List<CalEvent> getCalEventsByUuidAndCompanyId(String uuid,
+		long companyId) {
+		return calEventPersistence.findByUuid_C(uuid, companyId);
+	}
+
+	/**
+	 * Returns a range of cal events matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the cal events
+	 * @param companyId the primary key of the company
+	 * @param start the lower bound of the range of cal events
+	 * @param end the upper bound of the range of cal events (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the range of matching cal events, or an empty list if no matches were found
+	 */
+	@Override
+	public List<CalEvent> getCalEventsByUuidAndCompanyId(String uuid,
+		long companyId, int start, int end,
+		OrderByComparator<CalEvent> orderByComparator) {
+		return calEventPersistence.findByUuid_C(uuid, companyId, start, end,
+			orderByComparator);
 	}
 
 	/**

@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.dynamicdatamapping.service.base;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -56,6 +58,7 @@ import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalService;
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMStructureFinder;
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMStructureLinkPersistence;
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMStructurePersistence;
+import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMStructureVersionPersistence;
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMTemplateFinder;
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMTemplatePersistence;
 import com.liferay.portlet.journal.service.persistence.JournalFolderFinder;
@@ -79,6 +82,7 @@ import javax.sql.DataSource;
  * @see com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil
  * @generated
  */
+@ProviderType
 public abstract class DDMStructureLocalServiceBaseImpl
 	extends BaseLocalServiceImpl implements DDMStructureLocalService,
 		IdentifiableBean {
@@ -198,10 +202,10 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
@@ -209,11 +213,11 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
@@ -225,19 +229,6 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	@Override
 	public DDMStructure fetchDDMStructure(long structureId) {
 		return ddmStructurePersistence.fetchByPrimaryKey(structureId);
-	}
-
-	/**
-	 * Returns the d d m structure with the matching UUID and company.
-	 *
-	 * @param uuid the d d m structure's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching d d m structure, or <code>null</code> if a matching d d m structure could not be found
-	 */
-	@Override
-	public DDMStructure fetchDDMStructureByUuidAndCompanyId(String uuid,
-		long companyId) {
-		return ddmStructurePersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
 	/**
@@ -369,17 +360,34 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the d d m structure with the matching UUID and company.
+	 * Returns all the d d m structures matching the UUID and company.
 	 *
-	 * @param uuid the d d m structure's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching d d m structure
-	 * @throws PortalException if a matching d d m structure could not be found
+	 * @param uuid the UUID of the d d m structures
+	 * @param companyId the primary key of the company
+	 * @return the matching d d m structures, or an empty list if no matches were found
 	 */
 	@Override
-	public DDMStructure getDDMStructureByUuidAndCompanyId(String uuid,
-		long companyId) throws PortalException {
-		return ddmStructurePersistence.findByUuid_C_First(uuid, companyId, null);
+	public List<DDMStructure> getDDMStructuresByUuidAndCompanyId(String uuid,
+		long companyId) {
+		return ddmStructurePersistence.findByUuid_C(uuid, companyId);
+	}
+
+	/**
+	 * Returns a range of d d m structures matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the d d m structures
+	 * @param companyId the primary key of the company
+	 * @param start the lower bound of the range of d d m structures
+	 * @param end the upper bound of the range of d d m structures (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the range of matching d d m structures, or an empty list if no matches were found
+	 */
+	@Override
+	public List<DDMStructure> getDDMStructuresByUuidAndCompanyId(String uuid,
+		long companyId, int start, int end,
+		OrderByComparator<DDMStructure> orderByComparator) {
+		return ddmStructurePersistence.findByUuid_C(uuid, companyId, start,
+			end, orderByComparator);
 	}
 
 	/**
@@ -1259,6 +1267,63 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the d d m structure version local service.
+	 *
+	 * @return the d d m structure version local service
+	 */
+	public com.liferay.portlet.dynamicdatamapping.service.DDMStructureVersionLocalService getDDMStructureVersionLocalService() {
+		return ddmStructureVersionLocalService;
+	}
+
+	/**
+	 * Sets the d d m structure version local service.
+	 *
+	 * @param ddmStructureVersionLocalService the d d m structure version local service
+	 */
+	public void setDDMStructureVersionLocalService(
+		com.liferay.portlet.dynamicdatamapping.service.DDMStructureVersionLocalService ddmStructureVersionLocalService) {
+		this.ddmStructureVersionLocalService = ddmStructureVersionLocalService;
+	}
+
+	/**
+	 * Returns the d d m structure version remote service.
+	 *
+	 * @return the d d m structure version remote service
+	 */
+	public com.liferay.portlet.dynamicdatamapping.service.DDMStructureVersionService getDDMStructureVersionService() {
+		return ddmStructureVersionService;
+	}
+
+	/**
+	 * Sets the d d m structure version remote service.
+	 *
+	 * @param ddmStructureVersionService the d d m structure version remote service
+	 */
+	public void setDDMStructureVersionService(
+		com.liferay.portlet.dynamicdatamapping.service.DDMStructureVersionService ddmStructureVersionService) {
+		this.ddmStructureVersionService = ddmStructureVersionService;
+	}
+
+	/**
+	 * Returns the d d m structure version persistence.
+	 *
+	 * @return the d d m structure version persistence
+	 */
+	public DDMStructureVersionPersistence getDDMStructureVersionPersistence() {
+		return ddmStructureVersionPersistence;
+	}
+
+	/**
+	 * Sets the d d m structure version persistence.
+	 *
+	 * @param ddmStructureVersionPersistence the d d m structure version persistence
+	 */
+	public void setDDMStructureVersionPersistence(
+		DDMStructureVersionPersistence ddmStructureVersionPersistence) {
+		this.ddmStructureVersionPersistence = ddmStructureVersionPersistence;
+	}
+
+	/**
 	 * Returns the d d m template local service.
 	 *
 	 * @return the d d m template local service
@@ -1453,6 +1518,12 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	protected com.liferay.portlet.dynamicdatamapping.service.DDMStructureLinkLocalService ddmStructureLinkLocalService;
 	@BeanReference(type = DDMStructureLinkPersistence.class)
 	protected DDMStructureLinkPersistence ddmStructureLinkPersistence;
+	@BeanReference(type = com.liferay.portlet.dynamicdatamapping.service.DDMStructureVersionLocalService.class)
+	protected com.liferay.portlet.dynamicdatamapping.service.DDMStructureVersionLocalService ddmStructureVersionLocalService;
+	@BeanReference(type = com.liferay.portlet.dynamicdatamapping.service.DDMStructureVersionService.class)
+	protected com.liferay.portlet.dynamicdatamapping.service.DDMStructureVersionService ddmStructureVersionService;
+	@BeanReference(type = DDMStructureVersionPersistence.class)
+	protected DDMStructureVersionPersistence ddmStructureVersionPersistence;
 	@BeanReference(type = com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalService.class)
 	protected com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalService ddmTemplateLocalService;
 	@BeanReference(type = com.liferay.portlet.dynamicdatamapping.service.DDMTemplateService.class)

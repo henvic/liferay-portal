@@ -29,6 +29,16 @@ import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 @DoPrivileged
 public class BaseSearchEngine implements SearchEngine {
 
+	/**
+	 * @throws SearchException
+	 */
+	@Override
+	public String backup(long companyId, String backupName)
+		throws SearchException {
+
+		return null;
+	}
+
 	@Override
 	public BooleanClauseFactory getBooleanClauseFactory() {
 		if (_booleanClauseFactory == null) {
@@ -111,9 +121,8 @@ public class BaseSearchEngine implements SearchEngine {
 		}
 
 		try {
-			_termQueryFactory =
-				(TermQueryFactory)InstanceFactory.newInstance(
-					classLoader, className);
+			_termQueryFactory = (TermQueryFactory)InstanceFactory.newInstance(
+				classLoader, className);
 		}
 		catch (Exception e) {
 			_log.fatal("Unable to locate appropriate BooleanQueryFactory", e);
@@ -170,8 +179,24 @@ public class BaseSearchEngine implements SearchEngine {
 		return _luceneBased;
 	}
 
+	/**
+	 * @throws SearchException
+	 */
+	@Override
+	public void removeBackup(long companyId, String backupName)
+		throws SearchException {
+	}
+
 	@Override
 	public void removeCompany(long companyId) {
+	}
+
+	/**
+	 * @throws SearchException
+	 */
+	@Override
+	public void restore(long companyId, String backupName)
+		throws SearchException {
 	}
 
 	public void setBooleanClauseFactory(
@@ -220,7 +245,8 @@ public class BaseSearchEngine implements SearchEngine {
 		_vendor = vendor;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(BaseSearchEngine.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		BaseSearchEngine.class);
 
 	private BooleanClauseFactory _booleanClauseFactory;
 	private BooleanQueryFactory _booleanQueryFactory;

@@ -180,9 +180,9 @@ public interface Staging {
 	public JSONObject getExceptionMessagesJSONObject(
 		Locale locale, Exception e, Map<String, Serializable> contextMap);
 
-	public Group getLiveGroup(long groupId) throws PortalException;
+	public Group getLiveGroup(long groupId);
 
-	public long getLiveGroupId(long groupId) throws PortalException;
+	public long getLiveGroupId(long groupId);
 
 	/**
 	 * @deprecated As of 7.0.0, moved to {@link
@@ -209,6 +209,8 @@ public interface Staging {
 	public String getSchedulerGroupName(String destinationName, long groupId);
 
 	public String getStagedPortletId(String portletId);
+
+	public Group getStagingGroup(long groupId);
 
 	public Map<String, String[]> getStagingParameters();
 
@@ -320,10 +322,24 @@ public interface Staging {
 			PortletDataContext portletDataContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             com.liferay.portal.kernel.lar.ExportImportDateUtil#updateLastPublishDate(
+	 *             long, boolean, com.liferay.portal.kernel.util.DateRange,
+	 *             Date)}
+	 */
+	@Deprecated
 	public void updateLastPublishDate(
 			long sourceGroupId, boolean privateLayout, Date lastPublishDate)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             com.liferay.portal.kernel.lar.ExportImportDateUtil#updateLastPublishDate(
+	 *             String, PortletPreferences,
+	 *             com.liferay.portal.kernel.util.DateRange, Date)}
+	 */
+	@Deprecated
 	public void updateLastPublishDate(
 			String portletId, PortletPreferences portletPreferences,
 			Date lastPublishDate)

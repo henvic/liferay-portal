@@ -55,10 +55,6 @@ public class TransactionalCallableUtil {
 
 	private static class CallableMethodInvocation implements MethodInvocation {
 
-		private CallableMethodInvocation(Callable<?> callable) {
-			_callable = callable;
-		}
-
 		@Override
 		public Object[] getArguments() {
 			throw new UnsupportedOperationException();
@@ -84,7 +80,11 @@ public class TransactionalCallableUtil {
 			return _callable.call();
 		}
 
-		private Callable<?> _callable;
+		private CallableMethodInvocation(Callable<?> callable) {
+			_callable = callable;
+		}
+
+		private final Callable<?> _callable;
 
 	}
 

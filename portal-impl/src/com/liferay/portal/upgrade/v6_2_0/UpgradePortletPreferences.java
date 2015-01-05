@@ -68,7 +68,8 @@ public class UpgradePortletPreferences extends UpgradeProcess {
 
 			while (rs.next()) {
 				long portletPreferencesId = rs.getLong("portletPreferencesId");
-				String portletId = rs.getString("portletId");
+				String portletId = GetterUtil.getString(
+					rs.getString("portletId"));
 				String typeSettings = GetterUtil.getString(
 					rs.getString("typeSettings"));
 
@@ -84,7 +85,7 @@ public class UpgradePortletPreferences extends UpgradeProcess {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		UpgradePortletPreferences.class);
 
 }

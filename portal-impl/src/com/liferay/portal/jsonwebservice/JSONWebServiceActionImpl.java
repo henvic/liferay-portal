@@ -108,6 +108,10 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 	}
 
 	private Object _convertType(Object inputObject, Class<?> targetType) {
+		if (targetType == null) {
+			return inputObject;
+		}
+
 		Object outputObject = null;
 
 		try {
@@ -171,7 +175,7 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 						valueString).concat(StringPool.CLOSE_BRACKET);
 				}
 
-				list = JSONFactoryUtil.looseDeserializeSafe(
+				list = JSONFactoryUtil.looseDeserialize(
 					valueString, ArrayList.class);
 			}
 
@@ -208,7 +212,7 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 						valueString).concat(StringPool.CLOSE_BRACKET);
 				}
 
-				list = JSONFactoryUtil.looseDeserializeSafe(
+				list = JSONFactoryUtil.looseDeserialize(
 					valueString, ArrayList.class);
 			}
 
@@ -232,7 +236,7 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 
 				valueString = valueString.trim();
 
-				map = JSONFactoryUtil.looseDeserializeSafe(
+				map = JSONFactoryUtil.looseDeserialize(
 					valueString, HashMap.class);
 			}
 
@@ -267,7 +271,7 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 						throw new ClassCastException(e1.getMessage());
 					}
 
-					parameterValue = JSONFactoryUtil.looseDeserializeSafe(
+					parameterValue = JSONFactoryUtil.looseDeserialize(
 						valueString, parameterType);
 				}
 			}
@@ -283,7 +287,14 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 		if ((parameterName != null) && parameterName.equals("serviceContext") &&
 			parameterType.equals(ServiceContext.class)) {
 
-			return new ServiceContext();
+			ServiceContext serviceContext =
+				_jsonWebServiceActionParameters.getServiceContext();
+
+			if (serviceContext == null) {
+				serviceContext = new ServiceContext();
+			}
+
+			return serviceContext;
 		}
 
 		String className = parameterType.getName();
@@ -421,7 +432,7 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 
 					parameterType = classLoader.loadClass(parameterTypeName);
 
-					if (!ReflectUtil.isSubclass(
+					if (!ReflectUtil.isTypeOf(
 							parameterType, methodParameters[i].getType())) {
 
 						throw new IllegalArgumentException(
@@ -447,8 +458,7 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 						parameterName.equals("serviceContext")) {
 
 						if ((parameterValue != null) &&
-							ServiceContext.class.isAssignableFrom(
-								parameterValue.getClass())) {
+							(parameterValue instanceof ServiceContext)) {
 
 							serviceContext.merge(
 								(ServiceContext)parameterValue);

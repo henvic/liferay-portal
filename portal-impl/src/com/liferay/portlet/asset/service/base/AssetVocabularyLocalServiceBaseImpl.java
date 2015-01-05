@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.asset.service.base;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -71,6 +73,7 @@ import javax.sql.DataSource;
  * @see com.liferay.portlet.asset.service.AssetVocabularyLocalServiceUtil
  * @generated
  */
+@ProviderType
 public abstract class AssetVocabularyLocalServiceBaseImpl
 	extends BaseLocalServiceImpl implements AssetVocabularyLocalService,
 		IdentifiableBean {
@@ -191,10 +194,10 @@ public abstract class AssetVocabularyLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
@@ -202,11 +205,11 @@ public abstract class AssetVocabularyLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
@@ -218,20 +221,6 @@ public abstract class AssetVocabularyLocalServiceBaseImpl
 	@Override
 	public AssetVocabulary fetchAssetVocabulary(long vocabularyId) {
 		return assetVocabularyPersistence.fetchByPrimaryKey(vocabularyId);
-	}
-
-	/**
-	 * Returns the asset vocabulary with the matching UUID and company.
-	 *
-	 * @param uuid the asset vocabulary's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching asset vocabulary, or <code>null</code> if a matching asset vocabulary could not be found
-	 */
-	@Override
-	public AssetVocabulary fetchAssetVocabularyByUuidAndCompanyId(String uuid,
-		long companyId) {
-		return assetVocabularyPersistence.fetchByUuid_C_First(uuid, companyId,
-			null);
 	}
 
 	/**
@@ -353,18 +342,34 @@ public abstract class AssetVocabularyLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the asset vocabulary with the matching UUID and company.
+	 * Returns all the asset vocabularies matching the UUID and company.
 	 *
-	 * @param uuid the asset vocabulary's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching asset vocabulary
-	 * @throws PortalException if a matching asset vocabulary could not be found
+	 * @param uuid the UUID of the asset vocabularies
+	 * @param companyId the primary key of the company
+	 * @return the matching asset vocabularies, or an empty list if no matches were found
 	 */
 	@Override
-	public AssetVocabulary getAssetVocabularyByUuidAndCompanyId(String uuid,
-		long companyId) throws PortalException {
-		return assetVocabularyPersistence.findByUuid_C_First(uuid, companyId,
-			null);
+	public List<AssetVocabulary> getAssetVocabulariesByUuidAndCompanyId(
+		String uuid, long companyId) {
+		return assetVocabularyPersistence.findByUuid_C(uuid, companyId);
+	}
+
+	/**
+	 * Returns a range of asset vocabularies matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the asset vocabularies
+	 * @param companyId the primary key of the company
+	 * @param start the lower bound of the range of asset vocabularies
+	 * @param end the upper bound of the range of asset vocabularies (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the range of matching asset vocabularies, or an empty list if no matches were found
+	 */
+	@Override
+	public List<AssetVocabulary> getAssetVocabulariesByUuidAndCompanyId(
+		String uuid, long companyId, int start, int end,
+		OrderByComparator<AssetVocabulary> orderByComparator) {
+		return assetVocabularyPersistence.findByUuid_C(uuid, companyId, start,
+			end, orderByComparator);
 	}
 
 	/**

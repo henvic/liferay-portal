@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.social.service.base;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -60,6 +62,7 @@ import javax.sql.DataSource;
  * @see com.liferay.portlet.social.service.SocialRequestLocalServiceUtil
  * @generated
  */
+@ProviderType
 public abstract class SocialRequestLocalServiceBaseImpl
 	extends BaseLocalServiceImpl implements SocialRequestLocalService,
 		IdentifiableBean {
@@ -179,10 +182,10 @@ public abstract class SocialRequestLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
@@ -190,11 +193,11 @@ public abstract class SocialRequestLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
@@ -206,20 +209,6 @@ public abstract class SocialRequestLocalServiceBaseImpl
 	@Override
 	public SocialRequest fetchSocialRequest(long requestId) {
 		return socialRequestPersistence.fetchByPrimaryKey(requestId);
-	}
-
-	/**
-	 * Returns the social request with the matching UUID and company.
-	 *
-	 * @param uuid the social request's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching social request, or <code>null</code> if a matching social request could not be found
-	 */
-	@Override
-	public SocialRequest fetchSocialRequestByUuidAndCompanyId(String uuid,
-		long companyId) {
-		return socialRequestPersistence.fetchByUuid_C_First(uuid, companyId,
-			null);
 	}
 
 	/**
@@ -286,17 +275,34 @@ public abstract class SocialRequestLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the social request with the matching UUID and company.
+	 * Returns all the social requests matching the UUID and company.
 	 *
-	 * @param uuid the social request's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching social request
-	 * @throws PortalException if a matching social request could not be found
+	 * @param uuid the UUID of the social requests
+	 * @param companyId the primary key of the company
+	 * @return the matching social requests, or an empty list if no matches were found
 	 */
 	@Override
-	public SocialRequest getSocialRequestByUuidAndCompanyId(String uuid,
-		long companyId) throws PortalException {
-		return socialRequestPersistence.findByUuid_C_First(uuid, companyId, null);
+	public List<SocialRequest> getSocialRequestsByUuidAndCompanyId(
+		String uuid, long companyId) {
+		return socialRequestPersistence.findByUuid_C(uuid, companyId);
+	}
+
+	/**
+	 * Returns a range of social requests matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the social requests
+	 * @param companyId the primary key of the company
+	 * @param start the lower bound of the range of social requests
+	 * @param end the upper bound of the range of social requests (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the range of matching social requests, or an empty list if no matches were found
+	 */
+	@Override
+	public List<SocialRequest> getSocialRequestsByUuidAndCompanyId(
+		String uuid, long companyId, int start, int end,
+		OrderByComparator<SocialRequest> orderByComparator) {
+		return socialRequestPersistence.findByUuid_C(uuid, companyId, start,
+			end, orderByComparator);
 	}
 
 	/**

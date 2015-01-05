@@ -23,6 +23,8 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -300,6 +302,23 @@ public class HtmlImpl implements Html {
 		return escape(js, ESCAPE_MODE_JS);
 	}
 
+	@Override
+	public String escapeJSLink(String link) {
+		if (Validator.isNull(link)) {
+			return StringPool.BLANK;
+		}
+
+		if (link.indexOf(StringPool.COLON) == 10) {
+			String protocol = StringUtil.toLowerCase(link.substring(0, 10));
+
+			if (protocol.equals("javascript")) {
+				link = StringUtil.replaceFirst(link, StringPool.COLON, "%3a");
+			}
+		}
+
+		return link;
+	}
+
 	/**
 	 * Escapes the URL value so that it is safe to use as a URL.
 	 *
@@ -504,7 +523,9 @@ public class HtmlImpl implements Html {
 			return null;
 		}
 
-		return html.replaceAll("\r?\n", "<br />");
+		html = StringUtil.replace(html, StringPool.RETURN_NEW_LINE, "<br />");
+
+		return StringUtil.replace(html, StringPool.NEW_LINE, "<br />");
 	}
 
 	/**
@@ -613,32 +634,7 @@ public class HtmlImpl implements Html {
 
 	@Override
 	public String unescape(String text) {
-		if (text == null) {
-			return null;
-		}
-
-		if (text.length() == 0) {
-			return StringPool.BLANK;
-		}
-
-		// Optimize this
-
-		text = StringUtil.replace(text, "&lt;", "<");
-		text = StringUtil.replace(text, "&gt;", ">");
-		text = StringUtil.replace(text, "&amp;", "&");
-		text = StringUtil.replace(text, "&#034;", "\"");
-		text = StringUtil.replace(text, "&#039;", "'");
-		text = StringUtil.replace(text, "&#040;", "(");
-		text = StringUtil.replace(text, "&#041;", ")");
-		text = StringUtil.replace(text, "&#044;", ",");
-		text = StringUtil.replace(text, "&#035;", "#");
-		text = StringUtil.replace(text, "&#037;", "%");
-		text = StringUtil.replace(text, "&#059;", ";");
-		text = StringUtil.replace(text, "&#061;", "=");
-		text = StringUtil.replace(text, "&#043;", "+");
-		text = StringUtil.replace(text, "&#045;", "-");
-
-		return text;
+		return StringUtil.replace(text, "&", ";", _unescapeMap);
 	}
 
 	@Override
@@ -803,6 +799,27 @@ public class HtmlImpl implements Html {
 	private static final char[] _XPATH_TOKENS = {
 		'(', ')', '[', ']', '.', '@', ',', ':', '/', '|', '+', '-', '=', '!',
 		'<', '>', '*', '$', '"', '"', ' ', 9, 10, 13, 133, 8232};
+
+	private static final Map<String, String> _unescapeMap =
+		new HashMap<String, String>();
+
+	static {
+		_unescapeMap.put("lt", "<");
+		_unescapeMap.put("gt", ">");
+		_unescapeMap.put("amp", "&");
+		_unescapeMap.put("rsquo", "\u2019");
+		_unescapeMap.put("#034", "\"");
+		_unescapeMap.put("#039", "'");
+		_unescapeMap.put("#040", "(");
+		_unescapeMap.put("#041", ")");
+		_unescapeMap.put("#044", ",");
+		_unescapeMap.put("#035", "#");
+		_unescapeMap.put("#037", "%");
+		_unescapeMap.put("#059", ";");
+		_unescapeMap.put("#061", "=");
+		_unescapeMap.put("#043", "+");
+		_unescapeMap.put("#045", "-");
+	}
 
 	private Pattern _pattern = Pattern.compile("([\\s<&]|$)");
 

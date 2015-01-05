@@ -15,6 +15,7 @@
 package com.liferay.portlet.messageboards.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.staging.permission.StagingPermissionUtil;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
@@ -32,6 +33,11 @@ import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
  * @author Brian Wing Shun Chan
  * @author Mate Thurzo
  */
+@OSGiBeanProperties(
+	property = {
+		"model.class.name=com.liferay.portlet.messageboards.model.MBCategory"
+	}
+)
 public class MBCategoryPermission implements BaseModelPermissionChecker {
 
 	public static void check(
@@ -68,6 +74,12 @@ public class MBCategoryPermission implements BaseModelPermissionChecker {
 			PermissionChecker permissionChecker, long groupId, long categoryId,
 			String actionId)
 		throws PortalException {
+
+		if (MBBanLocalServiceUtil.hasBan(
+				groupId, permissionChecker.getUserId())) {
+
+			return false;
+		}
 
 		if ((categoryId == MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) ||
 			(categoryId == MBCategoryConstants.DISCUSSION_CATEGORY_ID)) {

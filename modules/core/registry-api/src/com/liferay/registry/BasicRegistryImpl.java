@@ -432,10 +432,10 @@ public class BasicRegistryImpl implements Registry {
 		}
 	}
 
-	private AtomicLong _serviceIdCounter = new AtomicLong();
-	private Map<ServiceReference<?>, Object> _services =
+	private final AtomicLong _serviceIdCounter = new AtomicLong();
+	private final Map<ServiceReference<?>, Object> _services =
 		new ConcurrentSkipListMap<ServiceReference<?>, Object>();
-	private Map<ServiceTracker<?, ?>, Filter> _serviceTrackers =
+	private final Map<ServiceTracker<?, ?>, Filter> _serviceTrackers =
 		new ConcurrentHashMap<ServiceTracker<?, ?>, Filter>();
 
 	private class BasicFilter implements Filter {
@@ -529,6 +529,11 @@ public class BasicRegistryImpl implements Registry {
 		}
 
 		@Override
+		public Map<String, Object> getProperties() {
+			return new HashMap<String, Object>(_properties);
+		}
+
+		@Override
 		public Object getProperty(String key) {
 			return _properties.get(key.toLowerCase());
 		}
@@ -568,7 +573,7 @@ public class BasicRegistryImpl implements Registry {
 				if (clazz.isArray()) {
 					array = (Object[])value;
 				}
-				else if (Collection.class.isInstance(value)) {
+				else if (value instanceof Collection) {
 					Collection<?> collection = (Collection<?>)value;
 
 					array = collection.toArray();
@@ -595,7 +600,8 @@ public class BasicRegistryImpl implements Registry {
 			return stringBuilder.toString();
 		}
 
-		private Map<String, Object> _properties = new LowerCaseKeyTreeMap();
+		private final Map<String, Object> _properties =
+			new LowerCaseKeyTreeMap();
 
 	}
 
@@ -627,7 +633,7 @@ public class BasicRegistryImpl implements Registry {
 			_removedService(_basicServiceReference);
 		}
 
-		private BasicServiceReference<S> _basicServiceReference;
+		private final BasicServiceReference<S> _basicServiceReference;
 
 	}
 
@@ -841,18 +847,14 @@ public class BasicRegistryImpl implements Registry {
 
 		private volatile CountDownLatch _countDownLatch = new CountDownLatch(1);
 		private Filter _filter;
-		private ServiceTrackerCustomizer<S, T> _serviceTrackerCustomizer;
-		private AtomicInteger _stateCounter = new AtomicInteger();
-		private NavigableMap<ServiceReference<S>, T> _trackedServices =
+		private final ServiceTrackerCustomizer<S, T> _serviceTrackerCustomizer;
+		private final AtomicInteger _stateCounter = new AtomicInteger();
+		private final NavigableMap<ServiceReference<S>, T> _trackedServices =
 			new ConcurrentSkipListMap<ServiceReference<S>, T>();
 
 	}
 
 	private class LowerCaseKeyTreeMap extends TreeMap<String, Object> {
-
-		public LowerCaseKeyTreeMap() {
-			super();
-		}
 
 		@Override
 		public Object put(String key, Object value) {

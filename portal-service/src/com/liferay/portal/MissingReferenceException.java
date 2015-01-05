@@ -23,31 +23,35 @@ import com.liferay.portal.kernel.lar.MissingReferences;
 public class MissingReferenceException extends PortalException {
 
 	public MissingReferenceException() {
-		super();
+		_missingReferences = null;
 	}
 
 	public MissingReferenceException(MissingReferences missingReferences) {
-		super();
-
 		_missingReferences = missingReferences;
 	}
 
 	public MissingReferenceException(String msg) {
 		super(msg);
+
+		_missingReferences = null;
 	}
 
 	public MissingReferenceException(String msg, Throwable cause) {
 		super(msg, cause);
+
+		_missingReferences = null;
 	}
 
 	public MissingReferenceException(Throwable cause) {
 		super(cause);
+
+		_missingReferences = null;
 	}
 
 	public MissingReferences getMissingReferences() {
 		return _missingReferences;
 	}
 
-	private MissingReferences _missingReferences;
+	private final MissingReferences _missingReferences;
 
 }

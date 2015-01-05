@@ -30,11 +30,11 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
  * @author Pablo Carvalho
  */
 @PrepareForTest({StringUtil.class})
-public class DDMFormXSDSerializerTest extends BaseDDMFormSerializer {
+public class DDMFormXSDSerializerTest extends BaseDDMFormSerializerTestCase {
 
 	@Before
 	public void setUp() {
-		setUpDDMFormToXSDSerializer();
+		setUpDDMFormXSDSerializerUtil();
 		setUpSAXReaderUtil();
 		setUpStringUtil();
 	}
@@ -46,14 +46,6 @@ public class DDMFormXSDSerializerTest extends BaseDDMFormSerializer {
 		String xsd = DDMFormXSDSerializerUtil.serialize(ddmForm);
 
 		testXSDMatchesExpected(xsd);
-	}
-
-	protected void setUpDDMFormToXSDSerializer() {
-		DDMFormXSDSerializerUtil ddmFormXSDSerializerUtil =
-			new DDMFormXSDSerializerUtil();
-
-		ddmFormXSDSerializerUtil.setDDMFormXSDSerializer(
-			new DDMFormXSDSerializerImpl());
 	}
 
 	protected void setUpStringUtil() {

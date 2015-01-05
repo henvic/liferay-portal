@@ -19,6 +19,8 @@ import com.liferay.portal.kernel.nio.intraband.proxy.annotation.Proxy;
 
 import java.io.Serializable;
 
+import java.util.List;
+
 /**
  * @author Brian Wing Shun Chan
  * @author Edward Han
@@ -26,23 +28,24 @@ import java.io.Serializable;
  */
 public interface PortalCache<K extends Serializable, V> {
 
+	public static final int DEFAULT_TIME_TO_LIVE = 0;
+
 	@Proxy
 	public V get(K key);
 
+	@Proxy
+	public List<K> getKeys();
+
 	@Id
 	public String getName();
+
+	public PortalCacheManager<K, V> getPortalCacheManager();
 
 	@Proxy
 	public void put(K key, V value);
 
 	@Proxy
 	public void put(K key, V value, int timeToLive);
-
-	@Proxy
-	public void putQuiet(K key, V value);
-
-	@Proxy
-	public void putQuiet(K key, V value, int timeToLive);
 
 	public void registerCacheListener(CacheListener<K, V> cacheListener);
 

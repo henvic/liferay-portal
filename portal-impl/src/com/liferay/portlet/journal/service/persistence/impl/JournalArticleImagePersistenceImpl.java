@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.journal.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -24,15 +26,11 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
 import com.liferay.portlet.journal.NoSuchArticleImageException;
@@ -43,7 +41,6 @@ import com.liferay.portlet.journal.service.persistence.JournalArticleImagePersis
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,6 +61,7 @@ import java.util.Set;
  * @see JournalArticleImageUtil
  * @generated
  */
+@ProviderType
 public class JournalArticleImagePersistenceImpl extends BasePersistenceImpl<JournalArticleImage>
 	implements JournalArticleImagePersistence {
 	/*
@@ -2885,25 +2883,6 @@ public class JournalArticleImagePersistenceImpl extends BasePersistenceImpl<Jour
 	 * Initializes the journal article image persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portlet.journal.model.JournalArticleImage")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<JournalArticleImage>> listenersList = new ArrayList<ModelListener<JournalArticleImage>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<JournalArticleImage>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
 	}
 
 	public void destroy() {
@@ -2922,8 +2901,8 @@ public class JournalArticleImagePersistenceImpl extends BasePersistenceImpl<Jour
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No JournalArticleImage exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No JournalArticleImage exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(JournalArticleImagePersistenceImpl.class);
-	private static JournalArticleImage _nullJournalArticleImage = new JournalArticleImageImpl() {
+	private static final Log _log = LogFactoryUtil.getLog(JournalArticleImagePersistenceImpl.class);
+	private static final JournalArticleImage _nullJournalArticleImage = new JournalArticleImageImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -2935,7 +2914,7 @@ public class JournalArticleImagePersistenceImpl extends BasePersistenceImpl<Jour
 			}
 		};
 
-	private static CacheModel<JournalArticleImage> _nullJournalArticleImageCacheModel =
+	private static final CacheModel<JournalArticleImage> _nullJournalArticleImageCacheModel =
 		new CacheModel<JournalArticleImage>() {
 			@Override
 			public JournalArticleImage toEntityModel() {

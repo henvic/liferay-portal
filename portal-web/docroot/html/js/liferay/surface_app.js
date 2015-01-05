@@ -63,7 +63,9 @@ AUI.add(
 							screen: Surface.ActionURLScreen
 						},
 						{
-							path: Surface.getPatternFriendlyURL(),
+							path: function(url) {
+								return url.search(Surface.getPatternFriendlyURL(url)) > -1;
+							},
 							screen: Surface.RenderURLScreen
 						},
 						{
@@ -95,7 +97,13 @@ AUI.add(
 
 						var surfaceId = Surface.getPortletBoundaryId(portletId);
 
-						if (Surface.isAllowedPortletId(portletId) && !Surface.app.surfaces[surfaceId]) {
+						var surface = Surface.app.surfaces[surfaceId];
+
+						if (surface && surface.activeChild && !surface.activeChild.inDoc()) {
+							surface = null;
+						}
+
+						if (!surface && Surface.isPortletSurface(portletId)) {
 							Surface.app.addSurfaces(surfaceId);
 						}
 					}

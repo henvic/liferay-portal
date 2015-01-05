@@ -55,7 +55,7 @@ if (iteratorURL != null) {
 	url = HttpUtil.removeParameter(url, namespace + searchContainer.getOrderByTypeParam());
 }
 
-List<String> primaryKeys = new ArrayList<String>();
+JSONArray primaryKeysJSONArray = JSONFactoryUtil.createJSONArray();
 %>
 
 <c:if test="<%= resultRows.isEmpty() && (emptyResultsMessage != null) %>">
@@ -224,7 +224,7 @@ List<String> primaryKeys = new ArrayList<String>();
 		for (int i = 0; i < resultRows.size(); i++) {
 			com.liferay.portal.kernel.dao.search.ResultRow row = (com.liferay.portal.kernel.dao.search.ResultRow)resultRows.get(i);
 
-			primaryKeys.add(HtmlUtil.escape(row.getPrimaryKey()));
+			primaryKeysJSONArray.put(row.getPrimaryKey());
 
 			request.setAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW, row);
 
@@ -290,10 +290,10 @@ List<String> primaryKeys = new ArrayList<String>();
 				}
 			%>
 
-				<td class="table-cell <%= columnClassName %>">
+				<td class="table-cell <%= columnClassName %> text-<%= entry.getAlign() %> text-<%= entry.getValign() %>" colspan="<%= entry.getColspan() %>">
 
 					<%
-					entry.print(pageContext);
+					entry.print(pageContext.getOut(), request, response);
 					%>
 
 				</td>
@@ -305,6 +305,9 @@ List<String> primaryKeys = new ArrayList<String>();
 			</tr>
 
 		<%
+			request.removeAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
+			request.removeAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW_ENTRY);
+
 			request.removeAttribute("liferay-ui:search-container-row:rowId");
 		}
 		%>
@@ -343,10 +346,10 @@ List<String> primaryKeys = new ArrayList<String>();
 </c:if>
 
 <c:if test="<%= Validator.isNotNull(id) %>">
-	<input id="<%= namespace + id %>PrimaryKeys" name="<%= namespace + id %>PrimaryKeys" type="hidden" value="<%= StringUtil.merge(primaryKeys) %>" />
+	<input id="<%= namespace + id %>PrimaryKeys" name="<%= namespace + id %>PrimaryKeys" type="hidden" value="" />
 
 	<aui:script use="liferay-search-container">
-		new Liferay.SearchContainer(
+		var searchContainer = new Liferay.SearchContainer(
 			{
 				classNameHover: '<%= _CLASS_NAME_HOVER %>',
 				hover: <%= searchContainer.isHover() %>,
@@ -357,6 +360,8 @@ List<String> primaryKeys = new ArrayList<String>();
 				rowClassNameBodyHover: '<%= _ROW_CLASS_NAME_BODY %>'
 			}
 		).render();
+
+		searchContainer.updateDataStore(<%= primaryKeysJSONArray.toString() %>);
 	</aui:script>
 </c:if>
 

@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -32,8 +35,36 @@ import java.io.ObjectOutput;
  * @see Group
  * @generated
  */
+@ProviderType
 public class GroupCacheModel implements CacheModel<Group>, Externalizable,
 	MVCCModel {
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof GroupCacheModel)) {
+			return false;
+		}
+
+		GroupCacheModel groupCacheModel = (GroupCacheModel)obj;
+
+		if ((groupId == groupCacheModel.groupId) &&
+				(mvccVersion == groupCacheModel.mvccVersion)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = HashUtil.hash(0, groupId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
 	@Override
 	public long getMvccVersion() {
 		return mvccVersion;
@@ -46,7 +77,7 @@ public class GroupCacheModel implements CacheModel<Group>, Externalizable,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(41);
+		StringBundler sb = new StringBundler(45);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -68,6 +99,8 @@ public class GroupCacheModel implements CacheModel<Group>, Externalizable,
 		sb.append(liveGroupId);
 		sb.append(", treePath=");
 		sb.append(treePath);
+		sb.append(", groupKey=");
+		sb.append(groupKey);
 		sb.append(", name=");
 		sb.append(name);
 		sb.append(", description=");
@@ -86,6 +119,8 @@ public class GroupCacheModel implements CacheModel<Group>, Externalizable,
 		sb.append(site);
 		sb.append(", remoteStagingGroupCount=");
 		sb.append(remoteStagingGroupCount);
+		sb.append(", inheritContent=");
+		sb.append(inheritContent);
 		sb.append(", active=");
 		sb.append(active);
 		sb.append("}");
@@ -119,6 +154,13 @@ public class GroupCacheModel implements CacheModel<Group>, Externalizable,
 		}
 		else {
 			groupImpl.setTreePath(treePath);
+		}
+
+		if (groupKey == null) {
+			groupImpl.setGroupKey(StringPool.BLANK);
+		}
+		else {
+			groupImpl.setGroupKey(groupKey);
 		}
 
 		if (name == null) {
@@ -156,6 +198,7 @@ public class GroupCacheModel implements CacheModel<Group>, Externalizable,
 
 		groupImpl.setSite(site);
 		groupImpl.setRemoteStagingGroupCount(remoteStagingGroupCount);
+		groupImpl.setInheritContent(inheritContent);
 		groupImpl.setActive(active);
 
 		groupImpl.resetOriginalValues();
@@ -175,6 +218,7 @@ public class GroupCacheModel implements CacheModel<Group>, Externalizable,
 		parentGroupId = objectInput.readLong();
 		liveGroupId = objectInput.readLong();
 		treePath = objectInput.readUTF();
+		groupKey = objectInput.readUTF();
 		name = objectInput.readUTF();
 		description = objectInput.readUTF();
 		type = objectInput.readInt();
@@ -184,6 +228,7 @@ public class GroupCacheModel implements CacheModel<Group>, Externalizable,
 		friendlyURL = objectInput.readUTF();
 		site = objectInput.readBoolean();
 		remoteStagingGroupCount = objectInput.readInt();
+		inheritContent = objectInput.readBoolean();
 		active = objectInput.readBoolean();
 	}
 
@@ -212,6 +257,13 @@ public class GroupCacheModel implements CacheModel<Group>, Externalizable,
 		}
 		else {
 			objectOutput.writeUTF(treePath);
+		}
+
+		if (groupKey == null) {
+			objectOutput.writeUTF(StringPool.BLANK);
+		}
+		else {
+			objectOutput.writeUTF(groupKey);
 		}
 
 		if (name == null) {
@@ -249,6 +301,7 @@ public class GroupCacheModel implements CacheModel<Group>, Externalizable,
 
 		objectOutput.writeBoolean(site);
 		objectOutput.writeInt(remoteStagingGroupCount);
+		objectOutput.writeBoolean(inheritContent);
 		objectOutput.writeBoolean(active);
 	}
 
@@ -262,6 +315,7 @@ public class GroupCacheModel implements CacheModel<Group>, Externalizable,
 	public long parentGroupId;
 	public long liveGroupId;
 	public String treePath;
+	public String groupKey;
 	public String name;
 	public String description;
 	public int type;
@@ -271,5 +325,6 @@ public class GroupCacheModel implements CacheModel<Group>, Externalizable,
 	public String friendlyURL;
 	public boolean site;
 	public int remoteStagingGroupCount;
+	public boolean inheritContent;
 	public boolean active;
 }

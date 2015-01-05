@@ -15,21 +15,22 @@
 package com.liferay.portal.security.pacl.test;
 
 import com.liferay.portal.kernel.portlet.PortletBagPool;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.security.pacl.PACLExecutionTestListener;
-import com.liferay.portal.security.pacl.PACLIntegrationJUnitTestRunner;
+import com.liferay.portal.test.PACLTestRule;
 import com.liferay.portlet.PortletBagImpl;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @author Raymond Augé
  */
-@ExecutionTestListeners(listeners = {PACLExecutionTestListener.class})
-@RunWith(PACLIntegrationJUnitTestRunner.class)
 public class PortletBagPoolTest {
+
+	@ClassRule
+	@Rule
+	public static final PACLTestRule paclTestRule = new PACLTestRule();
 
 	@Test
 	public void test1() throws Exception {
@@ -70,7 +71,8 @@ public class PortletBagPoolTest {
 				new PortletBagImpl(
 					null, null, null, null, null, null, null, null, null, null,
 					null, null, null, null, null, null, null, null, null, null,
-					null, null, null, null, null, null, null, null, null));
+					null, null, null, null, null, null, null, null, null, null,
+					null));
 		}
 		catch (SecurityException se) {
 			Assert.fail();
@@ -85,7 +87,8 @@ public class PortletBagPoolTest {
 				new PortletBagImpl(
 					null, null, null, null, null, null, null, null, null, null,
 					null, null, null, null, null, null, null, null, null, null,
-					null, null, null, null, null, null, null, null, null));
+					null, null, null, null, null, null, null, null, null, null,
+					null));
 
 			Assert.fail();
 		}
@@ -101,7 +104,8 @@ public class PortletBagPoolTest {
 				new PortletBagImpl(
 					null, null, null, null, null, null, null, null, null, null,
 					null, null, null, null, null, null, null, null, null, null,
-					null, null, null, null, null, null, null, null, null));
+					null, null, null, null, null, null, null, null, null, null,
+					null));
 		}
 		catch (SecurityException se) {
 			Assert.fail();

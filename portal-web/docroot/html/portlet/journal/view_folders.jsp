@@ -25,27 +25,19 @@ long folderId = GetterUtil.getLong((String)request.getAttribute("view.jsp-folder
 
 long parentFolderId = JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID;
 
-boolean expandFolder = ParamUtil.getBoolean(request, "expandFolder");
-
 if (folder != null) {
 	parentFolderId = folder.getParentFolderId();
-
-	if (expandFolder) {
-		parentFolderId = folderId;
-	}
 
 	if (parentFolderId != JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 		JournalFolder parentFolder = JournalFolderServiceUtil.fetchFolder(folderId);
 
-		if (parentFolder != null) {
+		if (parentFolder == null) {
 			parentFolderId = JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID;
 		}
 	}
 }
 
-String structureId = ParamUtil.getString(request, "structureId");
-
-String displayStyle = JournalUtil.getDisplayStyle(liferayPortletRequest, displayViews);
+String ddmStructureKey = ParamUtil.getString(request, "ddmStructureKey");
 
 int total = 0;
 
@@ -54,7 +46,7 @@ long[] groupIds = PortalUtil.getCurrentAndAncestorSiteGroupIds(scopeGroupId);
 if (browseBy.equals("structure")) {
 	total = DDMStructureLocalServiceUtil.getStructuresCount(groupIds, PortalUtil.getClassNameId(JournalArticle.class));
 }
-else if ((folderId != JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) || expandFolder) {
+else if (folderId != JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 	total = JournalFolderServiceUtil.getFoldersCount(scopeGroupId, parentFolderId);
 }
 
@@ -62,7 +54,6 @@ PortletURL portletURL = liferayPortletResponse.createRenderURL();
 
 portletURL.setParameter("struts_action", "/journal/view");
 portletURL.setParameter("folderId", String.valueOf(folderId));
-portletURL.setParameter("displayStyle", displayStyle);
 
 SearchContainer searchContainer = new SearchContainer(liferayPortletRequest, null, null, "cur2", SearchContainer.DEFAULT_DELTA, portletURL, null, null);
 
@@ -79,7 +70,7 @@ else {
 
 		parentTitle = grandparentFolder.getName();
 	}
-	else if (((folderId != JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) && (parentFolderId == 0)) || ((folderId == JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) && (parentFolderId == 0) && expandFolder)) {
+	else if (parentFolderId == 0) {
 		parentTitle = LanguageUtil.get(request, "home");
 	}
 }
@@ -89,13 +80,13 @@ else {
 	<div id="<portlet:namespace />folderContainer">
 		<aui:nav cssClass="list-group">
 			<c:if test="<%= Validator.isNotNull(parentTitle) %>">
-				<li class="dropdown-header list-group-item">
+				<li class="list-group-item nav-header">
 					<%= HtmlUtil.escape(parentTitle) %>
 				</li>
 			</c:if>
 
 			<c:choose>
-				<c:when test='<%= ((folderId == JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) && !expandFolder) && !browseBy.equals("structure") %>'>
+				<c:when test='<%= (folderId == JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) && !browseBy.equals("structure") %>'>
 
 					<%
 					String navigation = ParamUtil.getString(request, "navigation", "home");
@@ -107,16 +98,15 @@ else {
 					<portlet:renderURL var="viewArticlesHomeURL">
 						<portlet:param name="struts_action" value="/journal/view" />
 						<portlet:param name="folderId" value="<%= String.valueOf(JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
-						<portlet:param name="displayStyle" value="<%= displayStyle %>" />
 					</portlet:renderURL>
 
 					<aui:nav-item
-						cssClass="app-view-navigation-entry folder list-group-item"
+						cssClass="folder list-group-item navigation-entry"
 						href="<%= viewArticlesHomeURL %>"
 						iconCssClass="icon-home"
 						label='<%= HtmlUtil.escape(LanguageUtil.get(request, "home")) %>'
 						localizeLabel="<%= false %>"
-						selected='<%= (navigation.equals("home") && (folderId == JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID)) && Validator.isNull(structureId) %>'
+						selected='<%= (navigation.equals("home") && (folderId == JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID)) && Validator.isNull(ddmStructureKey) %>'
 					>
 
 						<%
@@ -130,11 +120,10 @@ else {
 						<portlet:param name="struts_action" value="/journal/view" />
 						<portlet:param name="navigation" value="recent" />
 						<portlet:param name="folderId" value="<%= String.valueOf(JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
-						<portlet:param name="displayStyle" value="<%= displayStyle %>" />
 					</portlet:renderURL>
 
 					<aui:nav-item
-						cssClass="app-view-navigation-entry folder list-group-item"
+						cssClass="folder list-group-item navigation-entry"
 						href="<%= viewRecentArticlesURL %>"
 						iconCssClass="icon-time"
 						label='<%= HtmlUtil.escape(LanguageUtil.get(request, "recent")) %>'
@@ -147,11 +136,10 @@ else {
 							<portlet:param name="struts_action" value="/journal/view" />
 							<portlet:param name="navigation" value="mine" />
 							<portlet:param name="folderId" value="<%= String.valueOf(JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
-							<portlet:param name="displayStyle" value="<%= displayStyle %>" />
 						</portlet:renderURL>
 
 						<aui:nav-item
-							cssClass="app-view-navigation-entry folder list-group-item"
+							cssClass="folder list-group-item navigation-entry"
 							href="<%= viewMyArticlesURL %>"
 							iconCssClass="icon-user"
 							label='<%= HtmlUtil.escape(LanguageUtil.get(request, "mine")) %>'
@@ -165,11 +153,10 @@ else {
 							<portlet:param name="struts_action" value="/journal/view" />
 							<portlet:param name="browseBy" value="structure" />
 							<portlet:param name="folderId" value="<%= String.valueOf(JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
-							<portlet:param name="displayStyle" value="<%= displayStyle %>" />
 						</portlet:renderURL>
 
 						<aui:nav-item
-							cssClass="app-view-navigation-entry folder list-group-item structure"
+							cssClass="folder list-group-item navigation-entry structure"
 							href="<%= filterDDMStructureArticlesURL %>"
 							iconCssClass="icon-th-large"
 							label='<%= HtmlUtil.escape(LanguageUtil.get(request, "browse-by-structure")) %>'
@@ -182,11 +169,10 @@ else {
 					<portlet:renderURL var="viewURL">
 						<portlet:param name="struts_action" value="/journal/view" />
 						<portlet:param name="folderId" value="<%= String.valueOf(JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
-						<portlet:param name="displayStyle" value="<%= displayStyle %>" />
 					</portlet:renderURL>
 
 					<aui:nav-item
-						cssClass="app-view-navigation-entry folder list-group-item"
+						cssClass="folder list-group-item navigation-entry"
 						href="<%= viewURL %>"
 						iconCssClass="icon-level-up"
 						label='<%= HtmlUtil.escape(LanguageUtil.get(request, "up")) %>'
@@ -206,17 +192,16 @@ else {
 								<portlet:param name="struts_action" value="/journal/view" />
 								<portlet:param name="browseBy" value="structure" />
 								<portlet:param name="folderId" value="<%= String.valueOf(JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
-								<portlet:param name="displayStyle" value="<%= displayStyle %>" />
-								<portlet:param name="structureId" value="<%= ddmStructure.getStructureKey() %>" />
+								<portlet:param name="ddmStructureKey" value="<%= ddmStructure.getStructureKey() %>" />
 							</portlet:renderURL>
 
 							<aui:nav-item
-								cssClass="app-view-navigation-entry folder list-group-item structure"
+								cssClass="folder list-group-item navigation-entry structure"
 								href="<%= viewDDMStructureArticlesURL %>"
 								iconCssClass="<%= assetRendererFactory.getIconCssClass() %>"
 								label="<%= HtmlUtil.escape(ddmStructure.getName(locale)) %>"
 								localizeLabel="<%= false %>"
-								selected="<%= structureId.equals(ddmStructure.getStructureKey()) %>"
+								selected="<%= ddmStructureKey.equals(ddmStructure.getStructureKey()) %>"
 							/>
 
 						<%
@@ -229,11 +214,10 @@ else {
 					<portlet:renderURL var="viewURL">
 						<portlet:param name="struts_action" value="/journal/view" />
 						<portlet:param name="folderId" value="<%= String.valueOf(parentFolderId) %>" />
-						<portlet:param name="displayStyle" value="<%= displayStyle %>" />
 					</portlet:renderURL>
 
 					<aui:nav-item
-						cssClass="app-view-navigation-entry folder list-group-item"
+						cssClass="folder list-group-item navigation-entry"
 						href="<%= viewURL %>"
 						iconCssClass="icon-level-up"
 						label='<%= LanguageUtil.get(request, "up") %>'
@@ -256,11 +240,10 @@ else {
 						<portlet:renderURL var="viewURL">
 							<portlet:param name="struts_action" value="/journal/view" />
 							<portlet:param name="folderId" value="<%= String.valueOf(curFolder.getFolderId()) %>" />
-							<portlet:param name="displayStyle" value="<%= displayStyle %>" />
 						</portlet:renderURL>
 
 						<aui:nav-item
-							cssClass="app-view-navigation-entry folder list-group-item"
+							cssClass="folder list-group-item navigation-entry"
 							href="<%= viewURL %>"
 							iconCssClass="<%= assetRenderer.getIconCssClass() %>"
 							label="<%= HtmlUtil.escape(curFolder.getName()) %>"

@@ -16,6 +16,7 @@ package com.liferay.portlet.shopping.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.PwdGenerator;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
@@ -36,7 +37,6 @@ import com.liferay.portlet.shopping.model.ShoppingCategory;
 import com.liferay.portlet.shopping.model.ShoppingCoupon;
 import com.liferay.portlet.shopping.model.ShoppingItem;
 import com.liferay.portlet.shopping.service.base.ShoppingCouponLocalServiceBaseImpl;
-import com.liferay.util.PwdGenerator;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -281,7 +281,16 @@ public class ShoppingCouponLocalServiceImpl
 
 		// Category IDs
 
-		long[] categoryIds = StringUtil.split(limitCategories, 0L);
+		List<Long> categoryIds = new ArrayList<Long>();
+
+		String[] categoryNames = StringUtil.split(limitCategories);
+
+		for (String categoryName : categoryNames) {
+			ShoppingCategory category = shoppingCategoryPersistence.fetchByG_N(
+				groupId, categoryName);
+
+			categoryIds.add(category.getCategoryId());
+		}
 
 		List<Long> invalidCategoryIds = new ArrayList<Long>();
 

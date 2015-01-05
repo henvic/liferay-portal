@@ -14,6 +14,7 @@
 
 package com.liferay.portal.search.lucene;
 
+import java.io.IOException;
 import java.io.Reader;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -30,10 +31,18 @@ public class LikeKeywordAnalyzer extends Analyzer {
 	}
 
 	@Override
-	public TokenStream tokenStream(String token, Reader reader) {
+	public final TokenStream reusableTokenStream(
+			String fieldName, Reader reader)
+		throws IOException {
+
+		return _analyzer.reusableTokenStream(fieldName, reader);
+	}
+
+	@Override
+	public final TokenStream tokenStream(String token, Reader reader) {
 		return _analyzer.tokenStream(token, reader);
 	}
 
-	private Analyzer _analyzer;
+	private final Analyzer _analyzer;
 
 }

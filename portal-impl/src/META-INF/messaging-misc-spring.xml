@@ -38,6 +38,12 @@
 	<bean id="destination.document_library_video_processor" class="com.liferay.portal.kernel.messaging.SerialDestination">
 		<property name="name" value="liferay/document_library_video_processor" />
 	</bean>
+	<bean id="destination.export_import_lifecycle_event_async" class="com.liferay.portal.kernel.messaging.SerialDestination">
+		<property name="name" value="liferay/export_import_lifecycle_event_async" />
+	</bean>
+	<bean id="destination.export_import_lifecycle_event_sync" class="com.liferay.portal.kernel.messaging.SynchronousDestination">
+		<property name="name" value="liferay/export_import_lifecycle_event_sync" />
+	</bean>
 	<bean id="destination.flags" class="com.liferay.portal.kernel.messaging.ParallelDestination">
 		<property name="name" value="liferay/flags" />
 	</bean>
@@ -59,9 +65,6 @@
 	<bean id="destination.message_boards_mailing_list" class="com.liferay.portal.kernel.messaging.ParallelDestination">
 		<property name="name" value="liferay/message_boards_mailing_list" />
 	</bean>
-	<bean id="destination.push_notification" class="com.liferay.portal.kernel.messaging.SerialDestination">
-		<property name="name" value="liferay/push_notification" />
-	</bean>
 	<bean id="destination.subscription_clean_up" class="com.liferay.portal.kernel.messaging.ParallelDestination">
 		<property name="name" value="liferay/subscription_clean_up" />
 	</bean>
@@ -80,11 +83,10 @@
 	<bean id="messageListener.document_library_pdf_processor" class="com.liferay.portlet.documentlibrary.messaging.PDFProcessorMessageListener" />
 	<bean id="messageListener.document_library_raw_metadata_processor" class="com.liferay.portlet.documentlibrary.messaging.RawMetadataProcessorMessageListener" />
 	<bean id="messageListener.document_library_video_processor" class="com.liferay.portlet.documentlibrary.messaging.VideoProcessorMessageListener" />
+	<bean id="messageListener.export_import_lifecycle_event" class="com.liferay.portal.lar.lifecycle.ExportImportLifecycleMessageListener" />
 	<bean id="messageListener.flags" class="com.liferay.portlet.flags.messaging.FlagsRequestMessageListener" />
 	<bean id="messageListener.hot_deploy" class="com.liferay.portal.deploy.hot.messaging.HotDeployMessageListener" />
 	<bean id="messageListener.layouts_local_publisher" class="com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListenerWrapper">
-		<property name="groupName" value="com.liferay.portal.lar.messaging.LayoutsLocalPublisherMessageListener" />
-		<property name="jobName" value="com.liferay.portal.lar.messaging.LayoutsLocalPublisherMessageListener" />
 		<property name="messageListener">
 			<bean class="com.liferay.portal.lar.messaging.LayoutsLocalPublisherMessageListener">
 				<property name="responseSender" ref="com.liferay.portal.kernel.messaging.sender.MessageSender" />
@@ -93,8 +95,6 @@
 		</property>
 	</bean>
 	<bean id="messageListener.layouts_remote_publisher" class="com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListenerWrapper">
-		<property name="groupName" value="com.liferay.portal.lar.messaging.LayoutsRemotePublisherMessageListener" />
-		<property name="jobName" value="com.liferay.portal.lar.messaging.LayoutsRemotePublisherMessageListener" />
 		<property name="messageListener">
 			<bean class="com.liferay.portal.lar.messaging.LayoutsRemotePublisherMessageListener">
 				<property name="responseSender" ref="com.liferay.portal.kernel.messaging.sender.MessageSender" />
@@ -109,8 +109,6 @@
 		</property>
 	</bean>
 	<bean id="messageListener.message_boards_mailing_list" class="com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListenerWrapper">
-		<property name="groupName" value="com.liferay.portlet.messageboards.messaging.MailingListMessageListener" />
-		<property name="jobName" value="com.liferay.portlet.messageboards.messaging.MailingListMessageListener" />
 		<property name="messageListener">
 			<bean class="com.liferay.portlet.messageboards.messaging.MailingListMessageListener" />
 		</property>
@@ -132,6 +130,8 @@
 				<ref bean="destination.document_library_pdf_processor" />
 				<ref bean="destination.document_library_raw_metadata_processor" />
 				<ref bean="destination.document_library_video_processor" />
+				<ref bean="destination.export_import_lifecycle_event_async" />
+				<ref bean="destination.export_import_lifecycle_event_sync" />
 				<ref bean="destination.flags" />
 				<ref bean="destination.hot_deploy" />
 				<ref bean="destination.layouts_local_publisher" />
@@ -139,7 +139,6 @@
 				<ref bean="destination.live_users" />
 				<ref bean="destination.marketplace" />
 				<ref bean="destination.message_boards_mailing_list" />
-				<ref bean="destination.push_notification" />
 				<ref bean="destination.subscription_clean_up" />
 				<ref bean="destination.subscription_sender" />
 			</list>
@@ -192,6 +191,16 @@
 				<entry key="liferay/document_library_video_processor">
 					<list value-type="com.liferay.portal.kernel.messaging.MessageListener">
 						<ref bean="messageListener.document_library_video_processor" />
+					</list>
+				</entry>
+				<entry key="liferay/export_import_lifecycle_event_async">
+					<list value-type="com.liferay.portal.kernel.messaging.MessageListener">
+						<ref bean="messageListener.export_import_lifecycle_event" />
+					</list>
+				</entry>
+				<entry key="liferay/export_import_lifecycle_event_sync">
+					<list value-type="com.liferay.portal.kernel.messaging.MessageListener">
+						<ref bean="messageListener.export_import_lifecycle_event" />
 					</list>
 				</entry>
 				<entry key="liferay/flags">

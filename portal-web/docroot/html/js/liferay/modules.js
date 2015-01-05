@@ -44,18 +44,6 @@
 				base: PATH_JAVASCRIPT + '/liferay/',
 				combine: COMBINE,
 				modules: {
-					'liferay-app-view-folders': {
-						path: 'app_view_folders.js',
-						requires: [
-							'aui-base',
-							'aui-parse-content',
-							'liferay-app-view-move',
-							'liferay-history-manager',
-							'liferay-list-view',
-							'liferay-node',
-							'liferay-portlet-base'
-						]
-					},
 					'liferay-app-view-move': {
 						path: 'app_view_move.js',
 						plugins: {
@@ -75,8 +63,7 @@
 							'dd-drop',
 							'dd-proxy',
 							'liferay-history-manager',
-							'liferay-portlet-base',
-							'liferay-util-list-fields'
+							'liferay-portlet-base'
 						]
 					},
 					'liferay-app-view-move-touch': {
@@ -85,22 +72,12 @@
 							'aui-base'
 						]
 					},
-					'liferay-app-view-paginator': {
-						path: 'app_view_paginator.js',
-						requires: [
-							'aui-parse-content',
-							'liferay-history-manager',
-							'liferay-pagination',
-							'liferay-portlet-base'
-						]
-					},
 					'liferay-app-view-select': {
 						path: 'app_view_select.js',
 						requires: [
 							'liferay-app-view-move',
 							'liferay-history-manager',
-							'liferay-portlet-base',
-							'liferay-util-list-fields'
+							'liferay-portlet-base'
 						]
 					},
 					'liferay-asset-categories-selector': {
@@ -209,12 +186,31 @@
 						path: 'browser_selectors.js',
 						requires: ['yui-base']
 					},
-					'liferay-ddm-repeatable-fields': {
-						path: 'ddm_repeatable_fields.js',
+					'liferay-cover-cropper': {
+						path: 'cover_cropper.js',
 						requires: [
 							'aui-base',
+							'dd-constrain',
+							'dd-drag',
+							'liferay-crop-region',
+							'plugin'
+						]
+					},
+					'liferay-crop-region': {
+						path: 'crop_region.js',
+						requires: [
+							'aui-base'
+						]
+					},
+					'liferay-ddm-form': {
+						path: 'ddm_form.js',
+						requires: [
+							'aui-base',
+							'aui-datatype',
 							'aui-io-request',
-							'aui-parse-content'
+							'aui-parse-content',
+							'liferay-map-base',
+							'liferay-translation-manager'
 						]
 					},
 					'liferay-diff-version-comparator': {
@@ -237,27 +233,23 @@
 						path: 'dockbar_add_application.js',
 						requires: [
 							'aui-io-request',
+							'event-key',
 							'event-mouseenter',
 							'liferay-dockbar',
 							'liferay-dockbar-add-base',
-							'liferay-dockbar-add-application-search',
-							'liferay-portlet-base'
-						]
-					},
-					'liferay-dockbar-add-application-search': {
-						path: 'dockbar_add_application_search.js',
-						requires: [
-							'aui-base',
-							'liferay-dockbar',
-							'liferay-dockbar-add-search'
+							'liferay-panel-search',
+							'liferay-portlet-base',
+							'liferay-toggler-interaction'
 						]
 					},
 					'liferay-dockbar-add-base': {
 						path: 'dockbar_add_base.js',
 						requires: [
+							'anim',
 							'aui-base',
 							'liferay-dockbar',
-							'liferay-layout'
+							'liferay-layout',
+							'transition'
 						]
 					},
 					'liferay-dockbar-add-content': {
@@ -284,12 +276,13 @@
 						requires: [
 							'aui-base',
 							'liferay-dockbar',
-							'liferay-dockbar-add-search'
+							'liferay-search-filter'
 						]
 					},
 					'liferay-dockbar-add-page': {
 						path: 'dockbar_add_page.js',
 						requires: [
+							'aui-loading-mask-deprecated',
 							'aui-parse-content',
 							'aui-toggler-delegate',
 							'liferay-dockbar',
@@ -304,16 +297,7 @@
 						requires: [
 							'aui-base',
 							'liferay-dockbar',
-							'liferay-dockbar-add-search'
-						]
-					},
-					'liferay-dockbar-add-search': {
-						path: 'dockbar_add_search.js',
-						requires: [
-							'aui-base',
-							'autocomplete-base',
-							'autocomplete-filters',
-							'liferay-dockbar'
+							'liferay-search-filter'
 						]
 					},
 					'liferay-dockbar-device-preview': {
@@ -365,6 +349,15 @@
 						path: 'dynamic_select.js',
 						requires: [
 							'aui-base'
+						]
+					},
+					'liferay-editor-image-uploader': {
+						path: 'editor_image_uploader.js',
+						requires: [
+							'aui-alert',
+							'aui-base',
+							'aui-progressbar',
+							'uploader'
 						]
 					},
 					'liferay-form': {
@@ -426,6 +419,14 @@
 						path: 'icon.js',
 						requires: [
 							'aui-base'
+						]
+					},
+					'liferay-image-selector': {
+						path: 'image_selector.js',
+						requires: [
+							'aui-base',
+							'liferay-portlet-base',
+							'uploader'
 						]
 					},
 					'liferay-inline-editor-base': {
@@ -500,6 +501,38 @@
 							'resize'
 						]
 					},
+					'liferay-layouts-tree': {
+						path: 'layouts_tree.js',
+						requires: [
+							'aui-tree-view'
+						]
+					},
+					'liferay-layouts-tree-check-content-display-page': {
+						path: 'layouts_tree_check_content_display_page.js',
+						requires: [
+							'aui-base'
+						]
+					},
+					'liferay-layouts-tree-node-task': {
+						path: 'layouts_tree_node_task.js',
+						requires: [
+							'aui-tree-node'
+						]
+					},
+					'liferay-layouts-tree-selectable': {
+						path: 'layouts_tree_selectable.js',
+						requires: [
+							'liferay-layouts-tree-node-task'
+						]
+					},
+					'liferay-layouts-tree-state': {
+						path: 'layouts_tree_state.js',
+						requires: [
+							'aui-base',
+							'aui-io-request',
+							'liferay-store'
+						]
+					},
 					'liferay-list-view': {
 						path: 'list_view.js',
 						requires: [
@@ -512,6 +545,7 @@
 						requires: [
 							'aui-image-cropper',
 							'aui-io-request',
+							'liferay-crop-region',
 							'liferay-portlet-base',
 							'liferay-storage-formatter'
 						]
@@ -530,6 +564,26 @@
 							'aui-io-request',
 							'aui-modal',
 							'aui-tabview'
+						]
+					},
+					'liferay-map-base': {
+						path: 'map_base.js',
+						requires: [
+							'aui-base'
+						]
+					},
+					'liferay-map-google': {
+						path: 'map_google.js',
+						requires: [
+							'liferay-map-base'
+						]
+					},
+					'liferay-map-openstreet': {
+						path: 'map_openstreet.js',
+						requires: [
+							'jsonp',
+							'liferay-map-base',
+							'timers'
 						]
 					},
 					'liferay-menu': {
@@ -630,6 +684,13 @@
 							'aui-pagination'
 						]
 					},
+					'liferay-panel-search': {
+						path: 'panel_search.js',
+						requires: [
+							'aui-base',
+							'liferay-search-filter'
+						]
+					},
 					'liferay-poller': {
 						path: 'poller.js',
 						requires: [
@@ -701,6 +762,14 @@
 							'event-mouseenter'
 						]
 					},
+					'liferay-search-filter': {
+						path: 'search_filter.js',
+						requires: [
+							'aui-base',
+							'autocomplete-base',
+							'autocomplete-filters'
+						]
+					},
 					'liferay-service-datasource': {
 						path: 'service_datasource.js',
 						requires: [
@@ -759,8 +828,8 @@
 							'aui-surface-app',
 							'aui-surface-base',
 							'aui-surface-screen-html',
-							'liferay-portlet-url',
-							'json'
+							'json',
+							'liferay-portlet-url'
 						]
 					},
 					'liferay-surface-app': {
@@ -814,12 +883,6 @@
 							'liferay-portlet-base',
 							'liferay-storage-formatter',
 							'uploader'
-						]
-					},
-					'liferay-util-list-fields': {
-						path: 'util_list_fields.js',
-						requires: [
-							'aui-base'
 						]
 					},
 					'liferay-util-window': {

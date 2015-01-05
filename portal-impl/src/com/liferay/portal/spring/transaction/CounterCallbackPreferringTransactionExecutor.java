@@ -38,14 +38,6 @@ public class CounterCallbackPreferringTransactionExecutor
 	private class CounterCallbackPreferringTransactionCallback
 		implements TransactionCallback<Object> {
 
-		private CounterCallbackPreferringTransactionCallback(
-			TransactionAttribute transactionAttribute,
-			MethodInvocation methodInvocation) {
-
-			_transactionAttribute = transactionAttribute;
-			_methodInvocation = methodInvocation;
-		}
-
 		@Override
 		public Object doInTransaction(TransactionStatus transactionStatus) {
 			try {
@@ -66,8 +58,16 @@ public class CounterCallbackPreferringTransactionExecutor
 			}
 		}
 
-		private MethodInvocation _methodInvocation;
-		private TransactionAttribute _transactionAttribute;
+		private CounterCallbackPreferringTransactionCallback(
+			TransactionAttribute transactionAttribute,
+			MethodInvocation methodInvocation) {
+
+			_transactionAttribute = transactionAttribute;
+			_methodInvocation = methodInvocation;
+		}
+
+		private final MethodInvocation _methodInvocation;
+		private final TransactionAttribute _transactionAttribute;
 
 	}
 

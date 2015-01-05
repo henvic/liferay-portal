@@ -281,6 +281,13 @@ public class ModelHintsImpl implements ModelHints {
 	}
 
 	@Override
+	public void read(ClassLoader classLoader, InputStream inputStream)
+		throws Exception {
+
+		read(classLoader, null, inputStream);
+	}
+
+	@Override
 	public void read(ClassLoader classLoader, String source) throws Exception {
 		read(classLoader, source, classLoader.getResourceAsStream(source));
 	}
@@ -490,7 +497,7 @@ public class ModelHintsImpl implements ModelHints {
 
 	private static final String _VALIDATORS_SUFFIX = "_VALIDATORS";
 
-	private static Log _log = LogFactoryUtil.getLog(ModelHintsImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(ModelHintsImpl.class);
 
 	private Map<String, Map<String, String>> _defaultHints;
 	private Map<String, Map<String, String>> _hintCollections;

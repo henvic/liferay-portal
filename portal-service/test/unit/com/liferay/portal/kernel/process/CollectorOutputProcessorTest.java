@@ -29,16 +29,16 @@ import org.junit.Test;
 public class CollectorOutputProcessorTest extends BaseOutputProcessorTestCase {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	public static final CodeCoverageAssertor codeCoverageAssertor =
+		CodeCoverageAssertor.INSTANCE;
 
 	@Test
-	public void testCollectFail() throws Exception {
+	public void testCollectFail() {
 		testFailToRead(new CollectorOutputProcessor());
 	}
 
 	@Test
-	public void testCollectSuccess() throws Exception, ProcessException {
+	public void testCollectSuccess() throws ProcessException {
 		CollectorOutputProcessor collectorOutputProcessor =
 			new CollectorOutputProcessor();
 

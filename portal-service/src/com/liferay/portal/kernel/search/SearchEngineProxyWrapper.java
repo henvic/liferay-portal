@@ -25,9 +25,16 @@ public class SearchEngineProxyWrapper implements SearchEngine {
 		SearchEngine searchEngine, IndexSearcher indexSearcher,
 		IndexWriter indexWriter) {
 
+		_searchEngine = searchEngine;
 		_indexSearcher = indexSearcher;
 		_indexWriter = indexWriter;
-		_searchEngine = searchEngine;
+	}
+
+	@Override
+	public String backup(long companyId, String backupName)
+		throws SearchException {
+
+		return _searchEngine.backup(companyId, backupName);
 	}
 
 	@Override
@@ -90,12 +97,26 @@ public class SearchEngineProxyWrapper implements SearchEngine {
 	}
 
 	@Override
+	public void removeBackup(long companyId, String backupName)
+		throws SearchException {
+
+		_searchEngine.removeBackup(companyId, backupName);
+	}
+
+	@Override
 	public void removeCompany(long companyId) {
 		_searchEngine.removeCompany(companyId);
 	}
 
-	private IndexSearcher _indexSearcher;
-	private IndexWriter _indexWriter;
-	private SearchEngine _searchEngine;
+	@Override
+	public void restore(long companyId, String backupName)
+		throws SearchException {
+
+		_searchEngine.restore(companyId, backupName);
+	}
+
+	private final IndexSearcher _indexSearcher;
+	private final IndexWriter _indexWriter;
+	private final SearchEngine _searchEngine;
 
 }

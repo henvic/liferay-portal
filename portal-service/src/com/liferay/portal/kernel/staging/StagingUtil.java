@@ -264,11 +264,11 @@ public class StagingUtil {
 			locale, e, contextMap);
 	}
 
-	public static Group getLiveGroup(long groupId) throws PortalException {
+	public static Group getLiveGroup(long groupId) {
 		return getStaging().getLiveGroup(groupId);
 	}
 
-	public static long getLiveGroupId(long groupId) throws PortalException {
+	public static long getLiveGroupId(long groupId) {
 		return getStaging().getLiveGroupId(groupId);
 	}
 
@@ -325,6 +325,10 @@ public class StagingUtil {
 		PortalRuntimePermission.checkGetBeanProperty(StagingUtil.class);
 
 		return _staging;
+	}
+
+	public static Group getStagingGroup(long groupId) {
+		return getStaging().getStagingGroup(groupId);
 	}
 
 	public static Map<String, String[]> getStagingParameters() {
@@ -544,6 +548,13 @@ public class StagingUtil {
 			layoutElement, layout, portletDataContext);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             com.liferay.portal.kernel.lar.ExportImportDateUtil#updateLastPublishDate(
+	 *             long, boolean, com.liferay.portal.kernel.util.DateRange,
+	 *             Date)}
+	 */
+	@Deprecated
 	public static void updateLastPublishDate(
 			long sourceGroupId, boolean privateLayout, Date lastPublishDate)
 		throws PortalException {
@@ -552,6 +563,13 @@ public class StagingUtil {
 			sourceGroupId, privateLayout, lastPublishDate);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             com.liferay.portal.kernel.lar.ExportImportDateUtil#updateLastPublishDate(
+	 *             String, PortletPreferences,
+	 *             com.liferay.portal.kernel.util.DateRange, Date)}
+	 */
+	@Deprecated
 	public static void updateLastPublishDate(
 			String portletId, PortletPreferences portletPreferences,
 			Date lastPublishDate)

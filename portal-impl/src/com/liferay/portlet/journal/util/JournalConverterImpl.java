@@ -38,7 +38,6 @@ import com.liferay.portal.kernel.xml.XPath;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.storage.Field;
 import com.liferay.portlet.dynamicdatamapping.storage.FieldConstants;
@@ -239,6 +238,7 @@ public class JournalConverterImpl implements JournalConverter {
 		throws Exception {
 
 		String name = dynamicElementElement.attributeValue("name");
+		String instanceId = dynamicElementElement.attributeValue("instance-id");
 
 		if (!ddmStructure.hasField(name)) {
 			return;
@@ -263,7 +263,7 @@ public class JournalConverterImpl implements JournalConverter {
 			}
 		}
 
-		updateFieldsDisplay(ddmFields, name);
+		updateFieldsDisplay(ddmFields, name, instanceId);
 
 		List<Element> childrenDynamicElementElements =
 			dynamicElementElement.elements("dynamic-element");
@@ -354,7 +354,7 @@ public class JournalConverterImpl implements JournalConverter {
 			int x = url.indexOf("/documents/");
 
 			if (x == -1) {
-				return null;
+				return StringPool.BLANK;
 			}
 
 			int y = url.indexOf(StringPool.QUESTION);
@@ -376,6 +376,7 @@ public class JournalConverterImpl implements JournalConverter {
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 			jsonObject.put("groupId", fileEntry.getGroupId());
+			jsonObject.put("title", fileEntry.getTitle());
 			jsonObject.put("uuid", fileEntry.getUuid());
 			jsonObject.put("version", fileEntry.getVersion());
 
@@ -387,7 +388,7 @@ public class JournalConverterImpl implements JournalConverter {
 			}
 		}
 
-		return null;
+		return StringPool.BLANK;
 	}
 
 	protected Field getField(
@@ -429,6 +430,30 @@ public class JournalConverterImpl implements JournalConverter {
 		return ddmField;
 	}
 
+	protected String getFieldInstanceId(
+		Fields ddmFields, String fieldName, int index) {
+
+		Field fieldsDisplayField = ddmFields.get(DDMImpl.FIELDS_DISPLAY_NAME);
+
+		String prefix = fieldName.concat(DDMImpl.INSTANCE_SEPARATOR);
+
+		String[] fieldsDisplayValues = StringUtil.split(
+			(String)fieldsDisplayField.getValue());
+
+		for (String fieldsDisplayValue : fieldsDisplayValues) {
+			if (fieldsDisplayValue.startsWith(prefix)) {
+				index--;
+
+				if (index < 0) {
+					return StringUtil.extractLast(
+						fieldsDisplayValue, DDMImpl.INSTANCE_SEPARATOR);
+				}
+			}
+		}
+
+		return null;
+	}
+
 	protected Serializable getFieldValue(
 			String dataType, String type, Element dynamicContentElement)
 		throws Exception {
@@ -444,6 +469,8 @@ public class JournalConverterImpl implements JournalConverter {
 
 			jsonObject.put("alt", dynamicContentElement.attributeValue("alt"));
 			jsonObject.put("data", dynamicContentElement.getText());
+			jsonObject.put(
+				"name", dynamicContentElement.attributeValue("name"));
 
 			serializable = jsonObject.toString();
 		}
@@ -452,7 +479,7 @@ public class JournalConverterImpl implements JournalConverter {
 				dynamicContentElement.getText(), CharPool.AT);
 
 			if (ArrayUtil.isEmpty(values)) {
-				values = new String[] {"1", "public"};
+				return StringPool.BLANK;
 			}
 
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
@@ -553,6 +580,12 @@ public class JournalConverterImpl implements JournalConverter {
 				childDynamicElementElement.addAttribute(
 					"index", String.valueOf(i));
 
+				String instanceId = getFieldInstanceId(
+					ddmFields, fieldName, (count + i));
+
+				childDynamicElementElement.addAttribute(
+					"instance-id", instanceId);
+
 				updateContentDynamicElement(
 					childDynamicElementElement, ddmStructure, ddmFields,
 					ddmFieldsCounter);
@@ -587,6 +620,10 @@ public class JournalConverterImpl implements JournalConverter {
 		int count = ddmFieldsCounter.get(fieldName);
 
 		dynamicElementElement.addAttribute("index", String.valueOf(count));
+
+		String instanceId = getFieldInstanceId(ddmFields, fieldName, count);
+
+		dynamicElementElement.addAttribute("instance-id", instanceId);
 
 		Field ddmField = ddmFields.get(fieldName);
 
@@ -722,25 +759,6 @@ public class JournalConverterImpl implements JournalConverter {
 
 			dynamicContentElement.addCDATA(fieldValue);
 		}
-		else if (DDMImpl.TYPE_DDM_DOCUMENTLIBRARY.equals(fieldType) &&
-				 Validator.isNotNull(fieldValue)) {
-
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-				fieldValue);
-
-			String uuid = jsonObject.getString("uuid");
-			long groupId = jsonObject.getLong("groupId");
-
-			FileEntry fileEntry =
-				DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(
-					uuid, groupId);
-
-			fieldValue = DLUtil.getPreviewURL(
-				fileEntry, fileEntry.getFileVersion(), null, StringPool.BLANK,
-				false, true);
-
-			dynamicContentElement.addCDATA(fieldValue);
-		}
 		else if (DDMImpl.TYPE_DDM_IMAGE.equals(fieldType) &&
 				 Validator.isNotNull(fieldValue)) {
 
@@ -749,7 +767,9 @@ public class JournalConverterImpl implements JournalConverter {
 
 			dynamicContentElement.addAttribute(
 				"alt", jsonObject.getString("alt"));
-			dynamicContentElement.addCDATA(jsonObject.getString("data"));
+			dynamicContentElement.addAttribute(
+				"name", jsonObject.getString("name"));
+			dynamicContentElement.addCDATA(fieldValue);
 		}
 		else if (DDMImpl.TYPE_DDM_LINK_TO_PAGE.equals(fieldType) &&
 				 Validator.isNotNull(fieldValue)) {
@@ -814,10 +834,15 @@ public class JournalConverterImpl implements JournalConverter {
 		}
 	}
 
-	protected void updateFieldsDisplay(Fields ddmFields, String fieldName) {
-		String fieldsDisplayValue =
-			fieldName.concat(DDMImpl.INSTANCE_SEPARATOR).concat(
-				StringUtil.randomString());
+	protected void updateFieldsDisplay(
+		Fields ddmFields, String fieldName, String instanceId) {
+
+		if (Validator.isNull(instanceId)) {
+			instanceId = StringUtil.randomString();
+		}
+
+		String fieldsDisplayValue = fieldName.concat(
+			DDMImpl.INSTANCE_SEPARATOR).concat(instanceId);
 
 		Field fieldsDisplayField = ddmFields.get(DDMImpl.FIELDS_DISPLAY_NAME);
 

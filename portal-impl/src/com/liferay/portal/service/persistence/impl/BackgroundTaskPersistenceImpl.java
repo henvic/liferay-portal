@@ -14,6 +14,8 @@
 
 package com.liferay.portal.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.NoSuchBackgroundTaskException;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -26,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -36,14 +36,12 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.BackgroundTask;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.MVCCModel;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.impl.BackgroundTaskImpl;
 import com.liferay.portal.model.impl.BackgroundTaskModelImpl;
 import com.liferay.portal.service.persistence.BackgroundTaskPersistence;
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,6 +62,7 @@ import java.util.Set;
  * @see BackgroundTaskUtil
  * @generated
  */
+@ProviderType
 public class BackgroundTaskPersistenceImpl extends BasePersistenceImpl<BackgroundTask>
 	implements BackgroundTaskPersistence {
 	/*
@@ -7485,7 +7484,7 @@ public class BackgroundTaskPersistenceImpl extends BasePersistenceImpl<Backgroun
 		backgroundTaskImpl.setName(backgroundTask.getName());
 		backgroundTaskImpl.setServletContextNames(backgroundTask.getServletContextNames());
 		backgroundTaskImpl.setTaskExecutorClassName(backgroundTask.getTaskExecutorClassName());
-		backgroundTaskImpl.setTaskContext(backgroundTask.getTaskContext());
+		backgroundTaskImpl.setTaskContextMap(backgroundTask.getTaskContextMap());
 		backgroundTaskImpl.setCompleted(backgroundTask.isCompleted());
 		backgroundTaskImpl.setCompletionDate(backgroundTask.getCompletionDate());
 		backgroundTaskImpl.setStatus(backgroundTask.getStatus());
@@ -7852,25 +7851,6 @@ public class BackgroundTaskPersistenceImpl extends BasePersistenceImpl<Backgroun
 	 * Initializes the background task persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portal.model.BackgroundTask")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<BackgroundTask>> listenersList = new ArrayList<ModelListener<BackgroundTask>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<BackgroundTask>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
 	}
 
 	public void destroy() {
@@ -7889,8 +7869,8 @@ public class BackgroundTaskPersistenceImpl extends BasePersistenceImpl<Backgroun
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No BackgroundTask exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No BackgroundTask exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(BackgroundTaskPersistenceImpl.class);
-	private static BackgroundTask _nullBackgroundTask = new BackgroundTaskImpl() {
+	private static final Log _log = LogFactoryUtil.getLog(BackgroundTaskPersistenceImpl.class);
+	private static final BackgroundTask _nullBackgroundTask = new BackgroundTaskImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -7902,13 +7882,14 @@ public class BackgroundTaskPersistenceImpl extends BasePersistenceImpl<Backgroun
 			}
 		};
 
-	private static CacheModel<BackgroundTask> _nullBackgroundTaskCacheModel = new NullCacheModel();
+	private static final CacheModel<BackgroundTask> _nullBackgroundTaskCacheModel =
+		new NullCacheModel();
 
 	private static class NullCacheModel implements CacheModel<BackgroundTask>,
 		MVCCModel {
 		@Override
 		public long getMvccVersion() {
-			return 0;
+			return -1;
 		}
 
 		@Override

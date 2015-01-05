@@ -14,9 +14,11 @@
 
 package com.liferay.portal.search.lucene;
 
+import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.NewEnv;
 import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJMockingNewClassLoaderJUnitTestRunner;
+import com.liferay.portal.test.AspectJNewEnvTestRule;
 
 import java.io.IOException;
 
@@ -48,19 +50,20 @@ import org.aspectj.lang.annotation.Aspect;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @author Tina Tian
  * @author Shuyang Zhou
  */
-@RunWith(AspectJMockingNewClassLoaderJUnitTestRunner.class)
 public class IndexSearcherManagerTest {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			CodeCoverageAssertor.INSTANCE, AspectJNewEnvTestRule.INSTANCE);
 
 	@Before
 	public void setUp() throws Exception {
@@ -79,6 +82,7 @@ public class IndexSearcherManagerTest {
 	}
 
 	@AdviseWith(adviceClasses = {IndexReaderAdvice.class})
+	@NewEnv(type = NewEnv.Type.CLASSLOADER)
 	@Test
 	public void testAcquire() throws Exception {
 		IndexSearcher indexSearcher = _indexSearcherManager.acquire();
@@ -256,21 +260,6 @@ public class IndexSearcherManagerTest {
 	@Aspect
 	public static class IndexReaderAdvice {
 
-		@Around(
-			"execution(public boolean org.apache.lucene.index.IndexReader." +
-				"tryIncRef())")
-		public Object tryIncRef(ProceedingJoinPoint proceedingJoinPoint)
-			throws Throwable {
-
-			Semaphore semaphore = _semaphore;
-
-			if (semaphore != null) {
-				semaphore.acquire();
-			}
-
-			return proceedingJoinPoint.proceed();
-		}
-
 		public static void block() {
 			_semaphore = new Semaphore(0);
 		}
@@ -289,6 +278,21 @@ public class IndexSearcherManagerTest {
 			if (semaphore != null) {
 				while (semaphore.getQueueLength() < threadCount);
 			}
+		}
+
+		@Around(
+			"execution(public boolean org.apache.lucene.index.IndexReader." +
+				"tryIncRef())")
+		public Object tryIncRef(ProceedingJoinPoint proceedingJoinPoint)
+			throws Throwable {
+
+			Semaphore semaphore = _semaphore;
+
+			if (semaphore != null) {
+				semaphore.acquire();
+			}
+
+			return proceedingJoinPoint.proceed();
 		}
 
 		private static volatile Semaphore _semaphore;

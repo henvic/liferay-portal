@@ -47,6 +47,7 @@ import com.liferay.portal.kernel.xml.Node;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.xml.XPath;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.dynamicdatamapping.io.DDMFormJSONDeserializerUtil;
 import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDSerializerUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
@@ -213,9 +214,8 @@ public class DDMXSDImpl implements DDMXSD {
 
 		Document document = SAXReaderUtil.read(xsd);
 
-		String xPathExpression =
-			"//dynamic-element[@name=".concat(
-				HtmlUtil.escapeXPathAttribute(fieldName)).concat("]");
+		String xPathExpression = "//dynamic-element[@name=".concat(
+			HtmlUtil.escapeXPathAttribute(fieldName)).concat("]");
 
 		XPath xPathSelector = SAXReaderUtil.createXPath(xPathExpression);
 
@@ -539,9 +539,8 @@ public class DDMXSDImpl implements DDMXSD {
 
 		Document document = SAXReaderUtil.read(xsd);
 
-		String xPathExpression =
-			"//dynamic-element[@name=".concat(
-				HtmlUtil.escapeXPathAttribute(field.getName())).concat("]");
+		String xPathExpression = "//dynamic-element[@name=".concat(
+			HtmlUtil.escapeXPathAttribute(field.getName())).concat("]");
 
 		XPath xPathSelector = SAXReaderUtil.createXPath(xPathExpression);
 
@@ -584,6 +583,13 @@ public class DDMXSDImpl implements DDMXSD {
 		}
 
 		return null;
+	}
+
+	@Override
+	public String getXSD(String json) throws PortalException {
+		DDMForm ddmForm = DDMFormJSONDeserializerUtil.deserialize(json);
+
+		return DDMFormXSDSerializerUtil.serialize(ddmForm);
 	}
 
 	protected JSONArray addStructureFieldAttributes(

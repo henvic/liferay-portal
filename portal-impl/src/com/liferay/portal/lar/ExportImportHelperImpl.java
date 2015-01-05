@@ -50,9 +50,12 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.DateRange;
+import com.liferay.portal.kernel.util.Digester;
+import com.liferay.portal.kernel.util.DigesterUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -60,7 +63,7 @@ import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.TempFileUtil;
+import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
@@ -73,6 +76,7 @@ import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
+import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.LayoutFriendlyURL;
 import com.liferay.portal.model.LayoutSet;
 import com.liferay.portal.model.Organization;
@@ -485,7 +489,12 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 				group.getCompanyId(), groupId, parameterMap,
 				getUserIdStrategy(userId, userIdStrategy), zipReader);
 
-		return getManifestSummary(portletDataContext);
+		try {
+			return getManifestSummary(portletDataContext);
+		}
+		finally {
+			zipReader.close();
+		}
 	}
 
 	@Override
@@ -497,6 +506,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		File file = FileUtil.createTempFile("lar");
 		InputStream inputStream = DLFileEntryLocalServiceUtil.getFileAsStream(
 			fileEntry.getFileEntryId(), fileEntry.getVersion(), false);
+		ZipReader zipReader = null;
 
 		ManifestSummary manifestSummary = null;
 
@@ -506,7 +516,8 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			Group group = GroupLocalServiceUtil.getGroup(groupId);
 			String userIdStrategy = MapUtil.getString(
 				parameterMap, PortletDataHandlerKeys.USER_ID_STRATEGY);
-			ZipReader zipReader = ZipReaderFactoryUtil.getZipReader(file);
+
+			zipReader = ZipReaderFactoryUtil.getZipReader(file);
 
 			PortletDataContext portletDataContext =
 				PortletDataContextFactoryUtil.createImportPortletDataContext(
@@ -517,6 +528,10 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		}
 		finally {
 			StreamUtil.cleanUp(inputStream);
+
+			if (zipReader != null) {
+				zipReader.close();
+			}
 
 			FileUtil.delete(file);
 		}
@@ -610,19 +625,38 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	}
 
 	@Override
+	public String getSelectedLayoutsJSON(
+		long groupId, boolean privateLayout, String selectedNodes) {
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
+			groupId, privateLayout, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
+
+		for (Layout layout : layouts) {
+			populateLayoutsJSON(
+				jsonArray, layout, StringUtil.split(selectedNodes, 0L));
+		}
+
+		return jsonArray.toString();
+	}
+
+	@Override
 	public FileEntry getTempFileEntry(
 			long groupId, long userId, String folderName)
 		throws PortalException {
 
-		String[] tempFileEntryNames = LayoutServiceUtil.getTempFileEntryNames(
+		String[] tempFileNames = LayoutServiceUtil.getTempFileNames(
 			groupId, folderName);
 
-		if (tempFileEntryNames.length == 0) {
+		if (tempFileNames.length == 0) {
 			return null;
 		}
 
-		return TempFileUtil.getTempFile(
-			groupId, userId, tempFileEntryNames[0], folderName);
+		return TempFileEntryUtil.getTempFileEntry(
+			groupId, userId,
+			DigesterUtil.digestHex(Digester.SHA_256, folderName),
+			tempFileNames[0]);
 	}
 
 	@Override
@@ -713,6 +747,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		content = replaceExportDLReferences(
 			portletDataContext, entityStagedModel, content,
 			exportReferencedContent);
+
 		content = replaceExportLayoutReferences(portletDataContext, content);
 		content = replaceExportLinksToLayouts(
 			portletDataContext, entityStagedModel, content);
@@ -1162,6 +1197,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 		content = replaceImportDLReferences(
 			portletDataContext, entityStagedModel, content);
+
 		content = replaceImportLayoutReferences(portletDataContext, content);
 		content = replaceImportLinksToLayouts(portletDataContext, content);
 
@@ -1226,21 +1262,18 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 				portletDataContext, entityStagedModel, DLFileEntry.class,
 				classPK);
 
-			String uuid = referenceElement.attributeValue("uuid");
-
-			Map<Long, Long> groupIds =
+			Map<Long, Long> dlFileEntryIds =
 				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-					Group.class);
+					DLFileEntry.class);
 
-			long importGroupId = MapUtil.getLong(
-				groupIds, groupId, portletDataContext.getScopeGroupId());
+			long fileEntryId = MapUtil.getLong(
+				dlFileEntryIds, classPK, classPK);
 
 			FileEntry importedFileEntry = null;
 
 			try {
-				importedFileEntry =
-					DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(
-						uuid, importGroupId);
+				importedFileEntry = DLAppLocalServiceUtil.getFileEntry(
+					fileEntryId);
 			}
 			catch (PortalException pe) {
 				if (_log.isDebugEnabled()) {
@@ -1619,6 +1652,35 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		portletPreferences.setValues(key, newValues);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #validateMissingReferences(PortletDataContext)}
+	 */
+	@Deprecated
+	@Override
+	public MissingReferences validateMissingReferences(
+			long userId, long groupId, Map<String, String[]> parameterMap,
+			File file)
+		throws Exception {
+
+		Group group = GroupLocalServiceUtil.getGroup(groupId);
+		String userIdStrategy = MapUtil.getString(
+			parameterMap, PortletDataHandlerKeys.USER_ID_STRATEGY);
+		ZipReader zipReader = ZipReaderFactoryUtil.getZipReader(file);
+
+		PortletDataContext portletDataContext =
+			PortletDataContextFactoryUtil.createImportPortletDataContext(
+				group.getCompanyId(), groupId, parameterMap,
+				getUserIdStrategy(userId, userIdStrategy), zipReader);
+
+		try {
+			return validateMissingReferences(portletDataContext);
+		}
+		finally {
+			zipReader.close();
+		}
+	}
+
 	@Override
 	public MissingReferences validateMissingReferences(
 			final PortletDataContext portletDataContext)
@@ -1651,30 +1713,6 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 				portletDataContext.getZipEntryAsInputStream("/manifest.xml")));
 
 		return missingReferences;
-	}
-
-	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             #validateMissingReferences(PortletDataContext)}
-	 */
-	@Deprecated
-	@Override
-	public MissingReferences validateMissingReferences(
-			long userId, long groupId, Map<String, String[]> parameterMap,
-			File file)
-		throws Exception {
-
-		Group group = GroupLocalServiceUtil.getGroup(groupId);
-		String userIdStrategy = MapUtil.getString(
-			parameterMap, PortletDataHandlerKeys.USER_ID_STRATEGY);
-		ZipReader zipReader = ZipReaderFactoryUtil.getZipReader(file);
-
-		PortletDataContext portletDataContext =
-			PortletDataContextFactoryUtil.createImportPortletDataContext(
-				group.getCompanyId(), groupId, parameterMap,
-				getUserIdStrategy(userId, userIdStrategy), zipReader);
-
-		return validateMissingReferences(portletDataContext);
 	}
 
 	@Override
@@ -2013,9 +2051,8 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 				MapUtil.getBoolean(
 					parameterMap,
 					PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS_ALL);
-			exportCurPortletSetup =
-				MapUtil.getBoolean(
-					parameterMap, PortletDataHandlerKeys.PORTLET_SETUP_ALL);
+			exportCurPortletSetup = MapUtil.getBoolean(
+				parameterMap, PortletDataHandlerKeys.PORTLET_SETUP_ALL);
 			exportCurPortletUserPreferences =
 				MapUtil.getBoolean(
 					parameterMap,
@@ -2079,9 +2116,8 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			long groupId = MapUtil.getLong(map, "groupId");
 
 			if (Validator.isNotNull(uuid)) {
-				fileEntry =
-					DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(
-						uuid, groupId);
+				fileEntry = DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(
+					uuid, groupId);
 			}
 			else {
 				if (map.containsKey("folderId")) {
@@ -2365,6 +2401,54 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			importCurPortletUserPreferences);
 
 		return importPortletSetupMap;
+	}
+
+	protected boolean populateLayoutsJSON(
+		JSONArray layoutsJSONArray, Layout layout, long[] selectedLayoutIds) {
+
+		List<Layout> childLayouts = layout.getChildren();
+		JSONArray childLayoutsJSONArray = null;
+		boolean includeChildren = true;
+
+		if (ListUtil.isNotEmpty(childLayouts)) {
+			childLayoutsJSONArray = JSONFactoryUtil.createJSONArray();
+
+			for (Layout childLayout : childLayouts) {
+				if (!populateLayoutsJSON(
+						childLayoutsJSONArray, childLayout,
+						selectedLayoutIds)) {
+
+					includeChildren = false;
+				}
+			}
+		}
+
+		boolean checked = ArrayUtil.contains(
+			selectedLayoutIds, layout.getLayoutId());
+
+		if (checked) {
+			JSONObject layoutJSONObject = JSONFactoryUtil.createJSONObject();
+
+			layoutJSONObject.put("includeChildren", includeChildren);
+			layoutJSONObject.put("plid", layout.getPlid());
+
+			layoutsJSONArray.put(layoutJSONObject);
+		}
+
+		if (checked && includeChildren) {
+			return true;
+		}
+
+		if (childLayoutsJSONArray != null) {
+
+			// We want a 1 level array and not an array of arrays
+
+			for (int i = 0; i < childLayoutsJSONArray.length(); i++) {
+				layoutsJSONArray.put(childLayoutsJSONArray.getJSONObject(i));
+			}
+		}
+
+		return false;
 	}
 
 	protected String replaceExportHostname(

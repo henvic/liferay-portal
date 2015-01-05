@@ -17,6 +17,7 @@ package com.liferay.portlet.shopping.service.impl;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PwdGenerator;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.User;
@@ -60,7 +61,6 @@ import com.liferay.portlet.shopping.service.base.ShoppingOrderLocalServiceBaseIm
 import com.liferay.portlet.shopping.util.ShoppingUtil;
 import com.liferay.portlet.shopping.util.comparator.OrderDateComparator;
 import com.liferay.util.CreditCard;
-import com.liferay.util.PwdGenerator;
 
 import java.util.Currency;
 import java.util.Date;
@@ -181,6 +181,10 @@ public class ShoppingOrderLocalServiceImpl
 				ShoppingItem item = shoppingItemLocalService.getItem(
 					ShoppingUtil.getItemId(orderItem.getItemId()));
 
+				if (item.isInfiniteStock()) {
+					continue;
+				}
+
 				if (!item.isFields()) {
 					int quantity =
 						item.getStockQuantity() - orderItem.getQuantity();
@@ -270,19 +274,8 @@ public class ShoppingOrderLocalServiceImpl
 	public ShoppingOrder getLatestOrder(long userId, long groupId)
 		throws PortalException {
 
-		List<ShoppingOrder> orders = shoppingOrderPersistence.findByG_U_PPPS(
-			groupId, userId, ShoppingOrderConstants.STATUS_LATEST, 0, 1);
-
-		ShoppingOrder order = null;
-
-		if (orders.size() == 1) {
-			order = orders.get(0);
-		}
-		else {
-			order = shoppingOrderLocalService.addLatestOrder(userId, groupId);
-		}
-
-		return order;
+		return shoppingOrderPersistence.findByG_U_PPPS_First(
+			groupId, userId, ShoppingOrderConstants.STATUS_LATEST, null);
 	}
 
 	@Override

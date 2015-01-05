@@ -111,7 +111,11 @@ String type = GetterUtil.getString((String)request.getAttribute("liferay-ui:tabs
 
 	<%
 	for (int i = 0; i < values.length; i++) {
-		String curURL = (String)request.getAttribute("liferay-ui:tabs:url" + i);
+		String curURL = StringPool.BLANK;
+
+		if ((urls != null) && (i < urls.length)) {
+			curURL = urls[i];
+		}
 
 		if (Validator.isNull(curURL)) {
 			if (values.length == 1) {
@@ -179,7 +183,7 @@ String type = GetterUtil.getString((String)request.getAttribute("liferay-ui:tabs
 			</c:when>
 			<c:otherwise>
 				<li class="<%= cssClassName %>" id="<%= namespace %><%= param %><%= StringUtil.toCharCode(values[i]) %>TabsId">
-					<a href="<%= Validator.isNotNull(curURL) ? curURL : "javascript:;" %>" onClick="<%= Validator.isNotNull(curOnClick) ? curOnClick : StringPool.BLANK %>">
+					<a href="<%= Validator.isNotNull(curURL) ? HtmlUtil.escapeAttribute(curURL) : "javascript:;" %>" onClick="<%= Validator.isNotNull(curOnClick) ? curOnClick : StringPool.BLANK %>">
 						<%= LanguageUtil.get(request, names[i]) %>
 					</a>
 				</li>

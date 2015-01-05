@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.social.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -24,15 +26,11 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
 import com.liferay.portlet.social.NoSuchActivityLimitException;
@@ -43,7 +41,6 @@ import com.liferay.portlet.social.service.persistence.SocialActivityLimitPersist
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,6 +61,7 @@ import java.util.Set;
  * @see SocialActivityLimitUtil
  * @generated
  */
+@ProviderType
 public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<SocialActivityLimit>
 	implements SocialActivityLimitPersistence {
 	/*
@@ -2700,25 +2698,6 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 * Initializes the social activity limit persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portlet.social.model.SocialActivityLimit")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<SocialActivityLimit>> listenersList = new ArrayList<ModelListener<SocialActivityLimit>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<SocialActivityLimit>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
 	}
 
 	public void destroy() {
@@ -2737,8 +2716,8 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No SocialActivityLimit exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No SocialActivityLimit exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(SocialActivityLimitPersistenceImpl.class);
-	private static SocialActivityLimit _nullSocialActivityLimit = new SocialActivityLimitImpl() {
+	private static final Log _log = LogFactoryUtil.getLog(SocialActivityLimitPersistenceImpl.class);
+	private static final SocialActivityLimit _nullSocialActivityLimit = new SocialActivityLimitImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -2750,7 +2729,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 			}
 		};
 
-	private static CacheModel<SocialActivityLimit> _nullSocialActivityLimitCacheModel =
+	private static final CacheModel<SocialActivityLimit> _nullSocialActivityLimitCacheModel =
 		new CacheModel<SocialActivityLimit>() {
 			@Override
 			public SocialActivityLimit toEntityModel() {

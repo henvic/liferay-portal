@@ -197,12 +197,15 @@ public class SearchResultUtil {
 			assetRenderer.getTitle(locale),
 			assetRenderer.getSearchSummary(locale), portletURL);
 
-		summary.setMaxContentLength(200);
+		summary.setMaxContentLength(SUMMARY_MAX_CONTENT_LENGTH);
 		summary.setPortletURL(portletURL);
 
 		return summary;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(SearchResultUtil.class);
+	protected static final int SUMMARY_MAX_CONTENT_LENGTH = 200;
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		SearchResultUtil.class);
 
 }

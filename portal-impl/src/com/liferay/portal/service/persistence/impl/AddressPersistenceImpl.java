@@ -14,6 +14,8 @@
 
 package com.liferay.portal.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.NoSuchAddressException;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -25,26 +27,21 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.Address;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.MVCCModel;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.impl.AddressImpl;
 import com.liferay.portal.model.impl.AddressModelImpl;
 import com.liferay.portal.service.persistence.AddressPersistence;
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,6 +62,7 @@ import java.util.Set;
  * @see AddressUtil
  * @generated
  */
+@ProviderType
 public class AddressPersistenceImpl extends BasePersistenceImpl<Address>
 	implements AddressPersistence {
 	/*
@@ -5180,25 +5178,6 @@ public class AddressPersistenceImpl extends BasePersistenceImpl<Address>
 	 * Initializes the address persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portal.model.Address")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<Address>> listenersList = new ArrayList<ModelListener<Address>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<Address>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
 	}
 
 	public void destroy() {
@@ -5217,11 +5196,11 @@ public class AddressPersistenceImpl extends BasePersistenceImpl<Address>
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No Address exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No Address exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(AddressPersistenceImpl.class);
-	private static Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+	private static final Log _log = LogFactoryUtil.getLog(AddressPersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"uuid", "primary"
 			});
-	private static Address _nullAddress = new AddressImpl() {
+	private static final Address _nullAddress = new AddressImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -5233,13 +5212,13 @@ public class AddressPersistenceImpl extends BasePersistenceImpl<Address>
 			}
 		};
 
-	private static CacheModel<Address> _nullAddressCacheModel = new NullCacheModel();
+	private static final CacheModel<Address> _nullAddressCacheModel = new NullCacheModel();
 
 	private static class NullCacheModel implements CacheModel<Address>,
 		MVCCModel {
 		@Override
 		public long getMvccVersion() {
-			return 0;
+			return -1;
 		}
 
 		@Override

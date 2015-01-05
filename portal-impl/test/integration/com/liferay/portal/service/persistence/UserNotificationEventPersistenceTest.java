@@ -15,83 +15,56 @@
 package com.liferay.portal.service.persistence;
 
 import com.liferay.portal.NoSuchUserNotificationEventException;
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.UserNotificationEvent;
 import com.liferay.portal.service.UserNotificationEventLocalServiceUtil;
-import com.liferay.portal.service.persistence.BasePersistence;
-import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
-import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.LiferayIntegrationTestRule;
+import com.liferay.portal.test.PersistenceTestRule;
+import com.liferay.portal.test.TransactionalTestRule;
 import com.liferay.portal.util.test.RandomTestUtil;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-
-import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Brian Wing Shun Chan
+ * @generated
  */
-@ExecutionTestListeners(listeners =  {
-	PersistenceExecutionTestListener.class})
-@RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
 public class UserNotificationEventPersistenceTest {
-	@Before
-	public void setUp() {
-		_modelListeners = _persistence.getListeners();
-
-		for (ModelListener<UserNotificationEvent> modelListener : _modelListeners) {
-			_persistence.unregisterListener(modelListener);
-		}
-	}
+	@Rule
+	public final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
+			PersistenceTestRule.INSTANCE,
+			new TransactionalTestRule(Propagation.REQUIRED));
 
 	@After
 	public void tearDown() throws Exception {
-		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
+		Iterator<UserNotificationEvent> iterator = _userNotificationEvents.iterator();
 
-		Set<Serializable> primaryKeys = basePersistences.keySet();
+		while (iterator.hasNext()) {
+			_persistence.remove(iterator.next());
 
-		for (Serializable primaryKey : primaryKeys) {
-			BasePersistence<?> basePersistence = basePersistences.get(primaryKey);
-
-			try {
-				basePersistence.remove(primaryKey);
-			}
-			catch (Exception e) {
-				if (_log.isDebugEnabled()) {
-					_log.debug("The model with primary key " + primaryKey +
-						" was already deleted");
-				}
-			}
-		}
-
-		_transactionalPersistenceAdvice.reset();
-
-		for (ModelListener<UserNotificationEvent> modelListener : _modelListeners) {
-			_persistence.registerListener(modelListener);
+			iterator.remove();
 		}
 	}
 
@@ -152,7 +125,8 @@ public class UserNotificationEventPersistenceTest {
 
 		newUserNotificationEvent.setArchived(RandomTestUtil.randomBoolean());
 
-		_persistence.update(newUserNotificationEvent);
+		_userNotificationEvents.add(_persistence.update(
+				newUserNotificationEvent));
 
 		UserNotificationEvent existingUserNotificationEvent = _persistence.findByPrimaryKey(newUserNotificationEvent.getPrimaryKey());
 
@@ -311,6 +285,36 @@ public class UserNotificationEventPersistenceTest {
 				RandomTestUtil.randomBoolean(), RandomTestUtil.randomBoolean());
 
 			_persistence.countByU_A_A(0L, RandomTestUtil.randomBoolean(),
+				RandomTestUtil.randomBoolean());
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByU_DT_D_A() {
+		try {
+			_persistence.countByU_DT_D_A(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextInt(), RandomTestUtil.randomBoolean(),
+				RandomTestUtil.randomBoolean());
+
+			_persistence.countByU_DT_D_A(0L, 0, RandomTestUtil.randomBoolean(),
+				RandomTestUtil.randomBoolean());
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByU_DT_A_A() {
+		try {
+			_persistence.countByU_DT_A_A(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextInt(), RandomTestUtil.randomBoolean(),
+				RandomTestUtil.randomBoolean());
+
+			_persistence.countByU_DT_A_A(0L, 0, RandomTestUtil.randomBoolean(),
 				RandomTestUtil.randomBoolean());
 		}
 		catch (Exception e) {
@@ -592,13 +596,11 @@ public class UserNotificationEventPersistenceTest {
 
 		userNotificationEvent.setArchived(RandomTestUtil.randomBoolean());
 
-		_persistence.update(userNotificationEvent);
+		_userNotificationEvents.add(_persistence.update(userNotificationEvent));
 
 		return userNotificationEvent;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(UserNotificationEventPersistenceTest.class);
-	private ModelListener<UserNotificationEvent>[] _modelListeners;
-	private UserNotificationEventPersistence _persistence = (UserNotificationEventPersistence)PortalBeanLocatorUtil.locate(UserNotificationEventPersistence.class.getName());
-	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
+	private List<UserNotificationEvent> _userNotificationEvents = new ArrayList<UserNotificationEvent>();
+	private UserNotificationEventPersistence _persistence = UserNotificationEventUtil.getPersistence();
 }

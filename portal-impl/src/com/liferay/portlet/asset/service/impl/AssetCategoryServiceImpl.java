@@ -84,16 +84,20 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 			getUserId(), title, vocabularyId, serviceContext);
 	}
 
-	/**
-	 * @deprecated As of 6.2.0, Replaced by {@link #deleteCategories(long[],
-	 *             ServiceContext)}
-	 */
-	@Deprecated
 	@Override
 	public void deleteCategories(long[] categoryIds) throws PortalException {
-		deleteCategories(categoryIds, null);
+		for (long categoryId : categoryIds) {
+			AssetCategoryPermission.check(
+				getPermissionChecker(), categoryId, ActionKeys.DELETE);
+		}
+
+		assetCategoryLocalService.deleteCategories(categoryIds);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, Replaced by {@link #deleteCategories(long[])}
+	 */
+	@Deprecated
 	@Override
 	public List<AssetCategory> deleteCategories(
 			long[] categoryIds, ServiceContext serviceContext)
@@ -288,6 +292,15 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 
 	@Override
 	public List<AssetCategory> getVocabularyCategories(
+		long groupId, long parentCategoryId, long vocabularyId, int start,
+		int end, OrderByComparator<AssetCategory> obc) {
+
+		return assetCategoryPersistence.filterFindByG_P_V(
+			groupId, parentCategoryId, vocabularyId, start, end, obc);
+	}
+
+	@Override
+	public List<AssetCategory> getVocabularyCategories(
 		long groupId, String name, long vocabularyId, int start, int end,
 		OrderByComparator<AssetCategory> obc) {
 
@@ -304,6 +317,14 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 	@Override
 	public int getVocabularyCategoriesCount(long groupId, long vocabularyId) {
 		return assetCategoryPersistence.filterCountByG_V(groupId, vocabularyId);
+	}
+
+	@Override
+	public int getVocabularyCategoriesCount(
+		long groupId, long parentCategory, long vocabularyId) {
+
+		return assetCategoryPersistence.filterCountByG_P_V(
+			groupId, parentCategory, vocabularyId);
 	}
 
 	@Override
@@ -481,6 +502,17 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 
 	@Override
 	public AssetCategoryDisplay searchCategoriesDisplay(
+			long groupId, String title, long parentCategoryId,
+			long vocabularyId, int start, int end)
+		throws PortalException {
+
+		return searchCategoriesDisplay(
+			new long[] {groupId}, title, new long[] {parentCategoryId},
+			new long[] {vocabularyId}, start, end);
+	}
+
+	@Override
+	public AssetCategoryDisplay searchCategoriesDisplay(
 			long[] groupIds, String title, long[] vocabularyIds, int start,
 			int end)
 		throws PortalException {
@@ -491,6 +523,24 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 			assetCategoryLocalService.searchCategories(
 				user.getCompanyId(), groupIds, title, vocabularyIds, start,
 				end);
+
+		return new AssetCategoryDisplay(
+			baseModelSearchResult.getBaseModels(),
+			baseModelSearchResult.getLength(), start, end);
+	}
+
+	@Override
+	public AssetCategoryDisplay searchCategoriesDisplay(
+			long[] groupIds, String title, long[] parentCategoryIds,
+			long[] vocabularyIds, int start, int end)
+		throws PortalException {
+
+		User user = getUser();
+
+		BaseModelSearchResult<AssetCategory> baseModelSearchResult =
+			assetCategoryLocalService.searchCategories(
+				user.getCompanyId(), groupIds, title, parentCategoryIds,
+				vocabularyIds, start, end);
 
 		return new AssetCategoryDisplay(
 			baseModelSearchResult.getBaseModels(),

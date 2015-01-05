@@ -18,7 +18,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portlet.dynamicdatamapping.BaseDDMTest;
+import com.liferay.portlet.dynamicdatamapping.BaseDDMTestCase;
 
 import java.util.Map;
 
@@ -35,7 +35,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
  * @author Pablo Carvalho
  */
 @PrepareForTest({LocalizationUtil.class})
-public class DDMXSDImplTest extends BaseDDMTest {
+public class DDMXSDImplTest extends BaseDDMTestCase {
 
 	@Before
 	public void setUp() {
@@ -119,12 +119,12 @@ public class DDMXSDImplTest extends BaseDDMTest {
 
 	private static final String _PORTLET_NAMESPACE = "_portletNamespace_";
 
-	private DDMXSDImpl _ddmXSD = new DDMXSDImpl();
+	private final DDMXSDImpl _ddmXSD = new DDMXSDImpl();
 	private Document _document;
 	private String _fieldsContextKey;
-	private MockHttpServletRequest _mockHttpServletRequest =
+	private final MockHttpServletRequest _mockHttpServletRequest =
 		new MockHttpServletRequest();
-	private MockHttpServletResponse _mockHttpServletResponse =
+	private final MockHttpServletResponse _mockHttpServletResponse =
 		new MockHttpServletResponse();
 
 }

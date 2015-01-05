@@ -16,15 +16,19 @@ package com.liferay.portal.tools.sourceformatter;
 
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.util.ContentUtil;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author Hugo Huijser
@@ -32,42 +36,47 @@ import java.util.List;
 public class PropertiesSourceProcessor extends BaseSourceProcessor {
 
 	@Override
+	protected String doFormat(
+			File file, String fileName, String absolutePath, String content)
+		throws Exception {
+
+		if (!portalSource && fileName.endsWith("portlet.properties")) {
+			return formatPortletProperties(content);
+		}
+
+		if (fileName.endsWith("source-formatter.properties")) {
+			formatSourceFormatterProperties(fileName, content);
+		}
+		else {
+			formatPortalProperties(fileName, content);
+		}
+
+		return content;
+	}
+
+	@Override
 	protected void format() throws Exception {
-		String portalPortalPropertiesContent = formatPortalPortalProperties();
+		_portalPortalPropertiesContent = formatPortalPortalProperties();
 
 		String[] includes = null;
 
 		if (portalSource) {
 			includes = new String[] {
-				"**\\portal-ext.properties", "**\\portal-legacy-*.properties"
+				"**\\portal-ext.properties", "**\\portal-legacy-*.properties",
+				"**\\source-formatter.properties"
 			};
 		}
 		else {
 			includes = new String[] {
 				"**\\portal.properties", "**\\portal-ext.properties",
-				"**\\portlet.properties"
+				"**\\portlet.properties", "**\\source-formatter.properties"
 			};
 		}
 
 		List<String> fileNames = getFileNames(new String[0], includes);
 
 		for (String fileName : fileNames) {
-			File file = new File(BASEDIR + fileName);
-
-			fileName = StringUtil.replace(
-				fileName, StringPool.BACK_SLASH, StringPool.SLASH);
-
-			String content = fileUtil.read(file);
-
-			if (!portalSource && fileName.endsWith("portlet.properties")) {
-				String newContent = formatPortletProperties(content);
-
-				compareAndAutoFixContent(file, fileName, content, newContent);
-			}
-			else {
-				formatPortalProperties(
-					fileName, content, portalPortalPropertiesContent);
-			}
+			format(fileName);
 		}
 	}
 
@@ -78,30 +87,29 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 
 		String fileName = "portal-impl/src/portal.properties";
 
-		File file = new File(BASEDIR + fileName);
+		File file = getFile(fileName, 4);
 
 		String content = fileUtil.read(file);
 
 		StringBundler sb = new StringBundler();
 
-		UnsyncBufferedReader unsyncBufferedReader = new UnsyncBufferedReader(
-			new UnsyncStringReader(content));
+		try (UnsyncBufferedReader unsyncBufferedReader =
+				new UnsyncBufferedReader(new UnsyncStringReader(content))) {
 
-		String line = null;
+			String line = null;
 
-		while ((line = unsyncBufferedReader.readLine()) != null) {
-			line = trimLine(line, true);
+			while ((line = unsyncBufferedReader.readLine()) != null) {
+				line = trimLine(line, true);
 
-			if (line.startsWith(StringPool.TAB)) {
-				line = line.replaceFirst(
-					StringPool.TAB, StringPool.FOUR_SPACES);
+				if (line.startsWith(StringPool.TAB)) {
+					line = line.replaceFirst(
+						StringPool.TAB, StringPool.FOUR_SPACES);
+				}
+
+				sb.append(line);
+				sb.append("\n");
 			}
-
-			sb.append(line);
-			sb.append("\n");
 		}
-
-		unsyncBufferedReader.close();
 
 		String newContent = sb.toString();
 
@@ -109,15 +117,13 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 			newContent = newContent.substring(0, newContent.length() - 1);
 		}
 
-		compareAndAutoFixContent(file, fileName, content, newContent);
+		processFormattedFile(file, fileName, content, newContent);
 
 		return newContent;
 	}
 
-	protected void formatPortalProperties(
-			String fileName, String content,
-			String portalPortalPropertiesContent)
-		throws IOException {
+	protected void formatPortalProperties(String fileName, String content)
+		throws Exception {
 
 		UnsyncBufferedReader unsyncBufferedReader = new UnsyncBufferedReader(
 			new UnsyncStringReader(content));
@@ -141,7 +147,7 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 
 			property = property.trim();
 
-			pos = portalPortalPropertiesContent.indexOf(
+			pos = _portalPortalPropertiesContent.indexOf(
 				StringPool.FOUR_SPACES + property);
 
 			if (pos == -1) {
@@ -166,5 +172,61 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 
 		return content;
 	}
+
+	protected void formatSourceFormatterProperties(
+			String fileName, String content)
+		throws Exception {
+
+		String path = StringPool.BLANK;
+
+		int pos = fileName.lastIndexOf(StringPool.SLASH);
+
+		if (pos != -1) {
+			path = fileName.substring(0, pos + 1);
+		}
+
+		Properties properties = new Properties();
+
+		InputStream inputStream = new FileInputStream(fileName);
+
+		properties.load(inputStream);
+
+		Enumeration<String> enu =
+			(Enumeration<String>)properties.propertyNames();
+
+		while (enu.hasMoreElements()) {
+			String key = enu.nextElement();
+
+			if (!key.endsWith("excludes.files")) {
+				continue;
+			}
+
+			String value = properties.getProperty(key);
+
+			if (Validator.isNull(value)) {
+				continue;
+			}
+
+			List<String> propertyFileNames = ListUtil.fromString(
+				value, StringPool.COMMA);
+
+			for (String propertyFileName : propertyFileNames) {
+				pos = propertyFileName.indexOf(StringPool.AT);
+
+				if (pos != -1) {
+					propertyFileName = propertyFileName.substring(0, pos);
+				}
+
+				if (!fileUtil.exists(path + propertyFileName)) {
+					processErrorMessage(
+						fileName,
+						"Incorrect property value: " + propertyFileName + " " +
+							fileName);
+				}
+			}
+		}
+	}
+
+	private String _portalPortalPropertiesContent;
 
 }

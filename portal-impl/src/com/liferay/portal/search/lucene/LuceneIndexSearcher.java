@@ -228,6 +228,7 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 			}
 
 			browseRequest.setCount(end);
+
 			browseRequest.setOffset(0);
 			browseRequest.setQuery(
 				(org.apache.lucene.search.Query)QueryTranslatorUtil.translate(
@@ -562,18 +563,12 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 
 			Document subsetDocument = getDocument(document);
 
-			if (queryConfig.isHighlightEnabled()) {
-				Locale locale = queryConfig.getLocale();
+			String[] highlightFieldNames = queryConfig.getHighlightFieldNames();
 
+			for (String highlightFieldName : highlightFieldNames) {
 				getSnippet(
-					document, query, Field.CONTENT, locale, subsetDocument,
-					queryTerms);
-				getSnippet(
-					document, query, Field.DESCRIPTION, locale, subsetDocument,
-					queryTerms);
-				getSnippet(
-					document, query, Field.TITLE, locale, subsetDocument,
-					queryTerms);
+					document, query, highlightFieldName,
+					queryConfig.getLocale(), subsetDocument, queryTerms);
 			}
 
 			subsetDocs.add(subsetDocument);
@@ -606,7 +601,7 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 		hits.setLength(total);
 		hits.setQuery(query);
 		hits.setQueryTerms(queryTerms.toArray(new String[queryTerms.size()]));
-		hits.setScores(subsetScores.toArray(new Float[subsetScores.size()]));
+		hits.setScores(ArrayUtil.toFloatArray(subsetScores));
 		hits.setSearchTime(searchTime);
 		hits.setStart(startTime);
 

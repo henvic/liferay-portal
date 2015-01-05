@@ -4,13 +4,22 @@ AUI.add(
 		var AArray = A.Array;
 
 		var FormBuilderTextField = A.FormBuilderTextField;
-		var FormBuilderTypes = A.FormBuilder.types;
+		var FormBuilderTypes = A.FormBuilderField.types;
+
+		var LiferayFormBuilderUtil = Liferay.FormBuilder.Util;
 
 		var Lang = A.Lang;
 
+		var LString = Lang.String;
+
 		var booleanParse = A.DataType.Boolean.parse;
-		var camelize = Liferay.Util.camelize;
-		var trim = A.Lang.trim;
+		var camelize = Lang.String.camelize;
+		var instanceOf = A.instanceOf;
+		var isObject = Lang.isObject;
+		var isUndefined = Lang.isUndefined;
+		var isNull = Lang.isNull;
+		var isValue = Lang.isValue;
+		var trim = Lang.trim;
 
 		var STR_BLANK = '';
 
@@ -23,7 +32,7 @@ AUI.add(
 						'<div>';
 
 		var TPL_GEOLOCATION = '<div class="field-labels-inline">' +
-									'<input type="button" value="' + A.Escape.html(Liferay.Language.get('geolocate')) + '" />' +
+									'<img src="' + themeDisplay.getPathThemeImages() + '/common/geolocation.png" title="' + A.Escape.html(Liferay.Language.get('geolocate')) + '" />' +
 								'<div>';
 
 		var TPL_LINK_TO_PAGE = '<div class="lfr-ddm-link-to-page">' +
@@ -40,10 +49,34 @@ AUI.add(
 
 		var DEFAULTS_FORM_VALIDATOR = A.config.FormValidator;
 
+		var LOCALIZABLE_FIELD_ATTRS = Liferay.FormBuilder.LOCALIZABLE_FIELD_ATTRS;
+
+		var UNIQUE_FIELD_NAMES_MAP = Liferay.FormBuilder.UNIQUE_FIELD_NAMES_MAP;
+
+		var UNLOCALIZABLE_FIELD_ATTRS = Liferay.FormBuilder.UNLOCALIZABLE_FIELD_ATTRS;
+
+		DEFAULTS_FORM_VALIDATOR.STRINGS.structureDuplicateFieldName = Liferay.Language.get('please-enter-a-unique-field-name');
+
+		DEFAULTS_FORM_VALIDATOR.RULES.structureDuplicateFieldName = function(value, editorNode) {
+			var instance = this;
+
+			var editingField = UNIQUE_FIELD_NAMES_MAP.getValue(value);
+
+			var duplicate = editingField && !editingField.get('selected');
+
+			if (duplicate) {
+				editorNode.selectText(0, value.length);
+
+				instance.resetField(editorNode);
+			}
+
+			return !duplicate;
+		};
+
 		DEFAULTS_FORM_VALIDATOR.STRINGS.structureFieldName = Liferay.Language.get('please-enter-only-alphanumeric-characters');
 
 		DEFAULTS_FORM_VALIDATOR.RULES.structureFieldName = function(value) {
-			return (/^[\w\-]+$/).test(value);
+			return LiferayFormBuilderUtil.validateFieldName(value);
 		};
 
 		var applyStyles = function(node, styleContent) {
@@ -118,7 +151,7 @@ AUI.add(
 						portletURL.setParameter('refererPortletName', '167');
 						portletURL.setParameter('struts_action', '/document_selector/view');
 						portletURL.setParameter('tabs1Names', 'documents');
-						portletURL.setPortletId('200');
+						portletURL.setPortletId(Liferay.PortletKeys.DOCUMENT_SELECTOR);
 						portletURL.setWindowState('pop_up');
 
 						Liferay.Util.selectEntity(
@@ -161,6 +194,21 @@ AUI.add(
 						);
 					},
 
+					_syncElementsFocus: function() {
+						var instance = this;
+
+						var boundingBox = instance.toolbar.get('boundingBox');
+
+						var button = boundingBox.one('button');
+
+						if (button) {
+							button.focus();
+						}
+						else {
+							DLFileEntryCellEditor.superclass._syncElementsFocus.apply(instance, arguments);
+						}
+					},
+
 					_syncFileLabel: function(title, url) {
 						var instance = this;
 
@@ -175,17 +223,17 @@ AUI.add(
 						}
 
 						linkNode.setAttribute('href', url);
-						linkNode.setContent(Liferay.Util.escapeHTML(title));
+						linkNode.setContent(LString.escapeHTML(title));
 					},
 
 					_uiSetValue: function(val) {
 						var instance = this;
 
 						if (val) {
-							Liferay.FormBuilder.Util.getFileEntry(
+							LiferayFormBuilderUtil.getFileEntry(
 								val,
 								function(fileEntry) {
-									var url = Liferay.FormBuilder.Util.getFileEntryURL(fileEntry);
+									var url = LiferayFormBuilderUtil.getFileEntryURL(fileEntry);
 
 									instance._syncFileLabel(fileEntry.title, url);
 								}
@@ -280,7 +328,7 @@ AUI.add(
 								var values = {
 									id: A.guid(),
 									label: index,
-									value: Liferay.Util.escapeHTML(JSON.stringify(item))
+									value: LString.escapeHTML(JSON.stringify(item))
 								};
 
 								var optionsArray = publicOptions;
@@ -328,12 +376,12 @@ AUI.add(
 						if (options && options.size()) {
 							options.set('selected', false);
 
-							if (Lang.isValue(val)) {
-								var selLayout = Liferay.FormBuilder.Util.parseJSON(val);
+							if (isValue(val)) {
+								var selLayout = LiferayFormBuilderUtil.parseJSON(val);
 
 								options.each(
 									function(item, index) {
-										var curLayout = Liferay.FormBuilder.Util.parseJSON(item.attr('value'));
+										var curLayout = LiferayFormBuilderUtil.parseJSON(item.attr('value'));
 
 										if ((curLayout.groupId === selLayout.groupId) &&
 											(curLayout.layoutId === selLayout.layoutId) &&
@@ -366,10 +414,10 @@ AUI.add(
 			}
 		);
 
-		var LiferayFormBuilderField = function() {
+		var LiferayFieldSupport = function() {
 		};
 
-		LiferayFormBuilderField.ATTRS = {
+		LiferayFieldSupport.ATTRS = {
 			autoGeneratedName: {
 				setter: booleanParse,
 				value: true
@@ -385,11 +433,20 @@ AUI.add(
 			},
 
 			name: {
-				setter: Liferay.FormBuilder.normalizeKey,
+				setter: LiferayFormBuilderUtil.normalizeKey,
+				validator: function(val) {
+					return !UNIQUE_FIELD_NAMES_MAP.has(val);
+				},
 				valueFn: function() {
 					var instance = this;
 
-					return A.FormBuilderField.buildFieldName(instance.get('label'));
+					var name = LiferayFormBuilderUtil.normalizeKey(instance.get('label'));
+
+					while (UNIQUE_FIELD_NAMES_MAP.has(name)) {
+						name = A.FormBuilderField.buildFieldName(name);
+					}
+
+					return name;
 				}
 			},
 
@@ -399,7 +456,344 @@ AUI.add(
 			}
 		};
 
-		A.Base.mix(A.FormBuilderField, [LiferayFormBuilderField]);
+		LiferayFieldSupport.prototype.initializer = function() {
+			var instance = this;
+
+			instance.after('nameChange', instance._afterNameChange);
+		};
+
+		LiferayFieldSupport.prototype._afterNameChange = function(event) {
+			var instance = this;
+
+			UNIQUE_FIELD_NAMES_MAP.remove(event.prevVal);
+			UNIQUE_FIELD_NAMES_MAP.put(event.newVal, instance);
+		};
+
+		var LocalizableFieldSupport = function() {
+		};
+
+		LocalizableFieldSupport.ATTRS = {
+			localizationMap: {
+				value: {}
+			},
+
+			readOnlyAttributes: {
+				getter: '_getReadOnlyAttributes'
+			}
+		};
+
+		LocalizableFieldSupport.prototype.initializer = function() {
+			var instance = this;
+
+			var builder = instance.get('builder');
+
+			instance.after('render', instance._afterLocalizableFieldRender);
+
+			A.each(
+				LOCALIZABLE_FIELD_ATTRS,
+				function(localizableField) {
+					instance.after(localizableField + 'Change', instance._afterLocalizableFieldChange);
+				}
+			);
+
+			builder.translationManager.after('editingLocaleChange', instance._afterEditingLocaleChange, instance);
+		};
+
+		LocalizableFieldSupport.prototype._afterEditingLocaleChange = function(event) {
+			var instance = this;
+
+			instance._syncLocaleUI(event.newVal);
+		};
+
+		LocalizableFieldSupport.prototype._afterLocalizableFieldChange = function(event) {
+			var instance = this;
+
+			var builder = instance.get('builder');
+
+			var translationManager = builder.translationManager;
+
+			var editingLocale = translationManager.get('editingLocale');
+
+			instance._updateLocalizationMapAttribute(editingLocale, event.attrName);
+		};
+
+		LocalizableFieldSupport.prototype._afterLocalizableFieldRender = function(event) {
+			var instance = this;
+
+			var builder = instance.get('builder');
+
+			var translationManager = builder.translationManager;
+
+			var editingLocale = translationManager.get('editingLocale');
+
+			instance._updateLocalizationMap(editingLocale);
+		};
+
+		LocalizableFieldSupport.prototype._getReadOnlyAttributes = function(val) {
+			var instance = this;
+
+			var builder = instance.get('builder');
+
+			var translationManager = builder.translationManager;
+
+			var defaultLocale = translationManager.get('defaultLocale');
+			var editingLocale = translationManager.get('editingLocale');
+
+			AArray.each(
+				UNLOCALIZABLE_FIELD_ATTRS,
+				function(item, index) {
+					if (defaultLocale === editingLocale) {
+						AArray.removeItem(val, item);
+					}
+					else {
+						val.push(item);
+					}
+				}
+			);
+
+			return AArray.dedupe(val);
+		};
+
+		LocalizableFieldSupport.prototype._syncLocaleUI = function(locale) {
+			var instance = this;
+
+			var builder = instance.get('builder');
+
+			var localizationMap = instance.get('localizationMap');
+
+			var localeMap = localizationMap[locale];
+
+			if (isObject(localeMap)) {
+				AArray.each(
+					LOCALIZABLE_FIELD_ATTRS,
+					function(item, index) {
+						if (item !== 'options') {
+							var localizedItem = localeMap[item];
+
+							if (!isUndefined(localizedItem) && !isNull(localizedItem)) {
+								instance.set(item, localizedItem);
+							}
+						}
+					}
+				);
+
+				builder._syncUniqueField(instance);
+			}
+
+			if (instanceOf(instance, A.FormBuilderMultipleChoiceField)) {
+				instance._syncOptionsLocaleUI(locale);
+			}
+
+			if (builder.editingField === instance) {
+				builder.propertyList.set('data', instance.getProperties());
+			}
+		};
+
+		LocalizableFieldSupport.prototype._syncOptionsLocaleUI = function(locale) {
+			var instance = this;
+
+			var options = instance.get('options');
+
+			AArray.each(
+				options,
+				function(item, index) {
+					var localizationMap = item.localizationMap;
+
+					if (isObject(localizationMap)) {
+						var localeMap = localizationMap[locale];
+
+						if (isObject(localeMap)) {
+							item.label = localeMap.label;
+						}
+					}
+				}
+			);
+
+			instance.set('options', options);
+		};
+
+		LocalizableFieldSupport.prototype._updateLocalizationMap = function(locale) {
+			var instance = this;
+
+			AArray.each(
+				LOCALIZABLE_FIELD_ATTRS,
+				function(item, index) {
+					instance._updateLocalizationMapAttribute(locale, item);
+				}
+			);
+		};
+
+		LocalizableFieldSupport.prototype._updateLocalizationMapAttribute = function(locale, attributeName) {
+			var instance = this;
+
+			if (attributeName === 'options') {
+				instance._updateLocalizationMapOptions(locale);
+			}
+			else {
+				var localizationMap = {};
+
+				localizationMap[locale] = instance.getAttrs([attributeName]);
+
+				instance.set(
+					'localizationMap',
+					A.mix(
+						instance.get('localizationMap'),
+						localizationMap,
+						true,
+						null,
+						0,
+						true
+					)
+				);
+			}
+		};
+
+		LocalizableFieldSupport.prototype._updateLocalizationMapOptions = function(locale) {
+			var instance = this;
+
+			var options = instance.get('options');
+
+			AArray.each(
+				options,
+				function(item, index) {
+					var localizationMap = item.localizationMap;
+
+					if (!isObject(localizationMap)) {
+						localizationMap = {};
+					}
+
+					localizationMap[locale] = {
+						label: item.label
+					};
+
+					item.localizationMap = localizationMap;
+				}
+			);
+		};
+
+		var SerializableFieldSupport = function() {
+		};
+
+		SerializableFieldSupport.prototype._addDefinitionFieldLocalizedAttributes = function(fieldJSON) {
+			var instance = this;
+
+			AArray.each(
+				LOCALIZABLE_FIELD_ATTRS,
+				function(attr) {
+					if (attr === 'options') {
+						if (instanceOf(instance, A.FormBuilderMultipleChoiceField)) {
+							instance._addDefinitionFieldOptions(fieldJSON);
+						}
+					}
+					else {
+						fieldJSON[attr] = instance._getLocalizedValue(attr);
+					}
+				}
+			);
+		};
+
+		SerializableFieldSupport.prototype._addDefinitionFieldUnlocalizedAttributes = function(fieldJSON) {
+			var instance = this;
+
+			AArray.each(
+				UNLOCALIZABLE_FIELD_ATTRS,
+				function(attr) {
+					fieldJSON[attr] = instance.get(attr);
+				}
+			);
+		};
+
+		SerializableFieldSupport.prototype._addDefinitionFieldOptions = function(fieldJSON) {
+			var instance = this;
+
+			var options = instance.get('options');
+
+			var fieldOptions = [];
+
+			if (options) {
+				AArray.each(
+					options,
+					function(option) {
+						var fieldOption = {};
+
+						var localizationMap = option.localizationMap;
+
+						fieldOption.value = option.value;
+						fieldOption.label = {};
+
+						A.each(
+							localizationMap,
+							function(item, index, collection) {
+								fieldOption.label[index] = LiferayFormBuilderUtil.normalizeValue(item.label);
+							}
+						);
+
+						fieldOptions.push(fieldOption);
+					}
+				);
+
+				fieldJSON.options = fieldOptions;
+			}
+		};
+
+		SerializableFieldSupport.prototype._addDefinitionFieldNestedFields = function(fieldJSON) {
+			var instance = this;
+
+			var nestedFields = [];
+
+			instance.get('fields').each(
+				function(childField) {
+					nestedFields.push(
+						childField.serialize()
+					);
+				}
+			);
+
+			if (nestedFields.length > 0) {
+				fieldJSON.nestedFields = nestedFields;
+			}
+		};
+
+		SerializableFieldSupport.prototype._getLocalizedValue = function(attribute) {
+			var instance = this;
+
+			var builder = instance.get('builder');
+
+			var localizationMap = instance.get('localizationMap');
+
+			var localizedValue = {};
+
+			var translationManager = builder.translationManager;
+
+			AArray.each(
+				translationManager.get('availableLocales'),
+				function(locale) {
+					var value = A.Object.getValue(localizationMap, [locale, attribute]);
+
+					if (!isValue(value)) {
+						value = STR_BLANK;
+					}
+
+					localizedValue[locale] = LiferayFormBuilderUtil.normalizeValue(value);
+				}
+			);
+
+			return localizedValue;
+		};
+
+		SerializableFieldSupport.prototype.serialize = function() {
+			var instance = this;
+
+			var fieldJSON = {};
+
+			instance._addDefinitionFieldLocalizedAttributes(fieldJSON);
+			instance._addDefinitionFieldUnlocalizedAttributes(fieldJSON);
+			instance._addDefinitionFieldNestedFields(fieldJSON);
+
+			return fieldJSON;
+		};
+
+		A.Base.mix(A.FormBuilderField, [LiferayFieldSupport, LocalizableFieldSupport, SerializableFieldSupport]);
 
 		var FormBuilderProto = A.FormBuilderField.prototype;
 
@@ -440,6 +834,7 @@ AUI.add(
 									rules: {
 										value: {
 											required: true,
+											structureDuplicateFieldName: true,
 											structureFieldName: true
 										}
 									}
@@ -517,17 +912,21 @@ AUI.add(
 						instance.datePicker = new A.DatePicker(
 							{
 								calendar: {
-									locale: Liferay.ThemeDisplay.getLanguageId(),
-									strings: {
-										next: Liferay.Language.get('next'),
-										none: Liferay.Language.get('none'),
-										previous: Liferay.Language.get('previous'),
-										today: Liferay.Language.get('today')
-									}
+									locale: Liferay.ThemeDisplay.getLanguageId()
 								},
 								trigger: instance.get('templateNode')
 							}
 						).render();
+
+						instance.datePicker.calendar.set(
+							'strings',
+							{
+								next: Liferay.Language.get('next'),
+								none: Liferay.Language.get('none'),
+								previous: Liferay.Language.get('previous'),
+								today: Liferay.Language.get('today')
+							}
+						);
 					},
 
 					getPropertyModel: function() {
@@ -545,7 +944,18 @@ AUI.add(
 										attributeName: attributeName,
 										editor: new A.DateCellEditor(
 											{
-												dateFormat: '%m/%d/%Y'
+												dateFormat: '%m/%d/%Y',
+												inputFormatter: function(val) {
+													var instance = this;
+
+													var value = STR_BLANK;
+
+													if (val && val.length) {
+														value = instance.formatDate(val[0]);
+													}
+
+													return value;
+												}
 											}
 										),
 										name: Liferay.Language.get('predefined-value')
@@ -659,16 +1069,32 @@ AUI.add(
 
 					fieldNamespace: {
 						value: 'ddm'
+					},
+
+					localizable: {
+						setter: booleanParse,
+						value: false
 					}
 				},
 
-				EXTENDS: A.FormBuilderTextField,
+				EXTENDS: A.FormBuilderField,
 
 				NAME: 'ddm-geolocation',
 
 				prototype: {
 					getHTML: function() {
 						return TPL_GEOLOCATION;
+					},
+
+					getPropertyModel: function() {
+						var instance = this;
+
+						return AArray.filter(
+							DDMGeolocationField.superclass.getPropertyModel.apply(instance, arguments),
+							function(item, index) {
+								return item.attributeName !== 'predefinedValue';
+							}
+						);
 					}
 				}
 			}

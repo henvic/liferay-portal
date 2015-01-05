@@ -14,16 +14,20 @@
 
 package com.liferay.portlet.dynamicdatamapping.util;
 
+import com.liferay.portal.kernel.test.CaptureHandler;
+import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.xml.Attribute;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.Node;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
-import com.liferay.portlet.dynamicdatamapping.BaseDDMTest;
+import com.liferay.portlet.dynamicdatamapping.BaseDDMTestCase;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -33,7 +37,7 @@ import org.junit.Test;
  * @author Manuel de la Peña
  * @author Miguel Angelo Caldas Gallindo
  */
-public class DDMXMLImplTest extends BaseDDMTest {
+public class DDMXMLImplTest extends BaseDDMTestCase {
 
 	@Before
 	public void setUp() {
@@ -42,7 +46,30 @@ public class DDMXMLImplTest extends BaseDDMTest {
 
 	@Test
 	public void testUpdateContentDefaultLocale() throws Exception {
-		updateContentDefaultLocale("dynamic-data-mapping-structures.xml", true);
+		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
+			LocaleUtil.class.getName(), Level.WARNING);
+
+		try {
+			updateContentDefaultLocale(
+				"dynamic-data-mapping-structures.xml", true);
+
+			List<LogRecord> logRecords = captureHandler.getLogRecords();
+
+			Assert.assertEquals(2, logRecords.size());
+
+			LogRecord logRecord = logRecords.get(0);
+
+			Assert.assertEquals(
+				"en_US is not a valid language id", logRecord.getMessage());
+
+			logRecord = logRecords.get(1);
+
+			Assert.assertEquals(
+				"es_ES is not a valid language id", logRecord.getMessage());
+		}
+		finally {
+			captureHandler.close();
+		}
 	}
 
 	@Test
@@ -133,6 +160,6 @@ public class DDMXMLImplTest extends BaseDDMTest {
 		Assert.assertFalse(expectedResult);
 	}
 
-	private DDMXML _ddmXML = new DDMXMLImpl();
+	private final DDMXML _ddmXML = new DDMXMLImpl();
 
 }

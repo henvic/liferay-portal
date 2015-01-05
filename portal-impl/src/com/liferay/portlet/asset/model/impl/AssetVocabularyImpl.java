@@ -38,13 +38,16 @@ import java.util.Locale;
  */
 public class AssetVocabularyImpl extends AssetVocabularyBaseImpl {
 
-	public AssetVocabularyImpl() {
-	}
-
 	@Override
 	public List<AssetCategory> getCategories() {
 		return AssetCategoryLocalServiceUtil.getVocabularyCategories(
 			getVocabularyId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	@Override
+	public int getCategoriesCount() {
+		return AssetCategoryLocalServiceUtil.getVocabularyCategoriesCount(
+			getVocabularyId());
 	}
 
 	@Override

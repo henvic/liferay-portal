@@ -67,12 +67,7 @@ String layoutSetBranchName = MapUtil.getString(parameterMap, "layoutSetBranchNam
 
 boolean localPublishing = true;
 
-if (liveGroup.isStaged()) {
-	if (liveGroup.isStagedRemotely()) {
-		localPublishing = false;
-	}
-}
-else if (cmd.equals(Constants.PUBLISH_TO_REMOTE)) {
+if ((liveGroup.isStaged() && liveGroup.isStagedRemotely()) || cmd.equals(Constants.PUBLISH_TO_REMOTE)) {
 	localPublishing = false;
 }
 
@@ -91,10 +86,7 @@ treeId = treeId + liveGroupId;
 
 String publishActionKey = "copy";
 
-if (liveGroup.isStaged()) {
-	publishActionKey = "publish";
-}
-else if (cmd.equals(Constants.PUBLISH_TO_REMOTE)) {
+if (liveGroup.isStaged() || cmd.equals(Constants.PUBLISH_TO_REMOTE)) {
 	publishActionKey = "publish";
 }
 
@@ -114,22 +106,23 @@ catch (NoSuchLayoutException nsle) {
 
 treeId = treeId + privateLayout + layoutSetBranchId;
 
-long[] selectedLayoutIds = GetterUtil.getLongValues(StringUtil.split(SessionTreeJSClicks.getOpenNodes(request, treeId + "SelectedNode"), ','));
+long[] selectedLayoutIds = null;
 
-List<Layout> selectedLayouts = new ArrayList<Layout>();
+String openNodes = SessionTreeJSClicks.getOpenNodes(request, treeId + "SelectedNode");
 
-long selectedLayoutsGroupId = group.getGroupId();
+if (openNodes == null) {
+	List<Layout> stagingGroupLayouts = LayoutLocalServiceUtil.getLayouts(stagingGroupId, privateLayout, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 
-if (stagingGroupId > 0) {
-	selectedLayoutsGroupId = stagingGroupId;
+	selectedLayoutIds = new long[stagingGroupLayouts.size()];
+
+	for (int i = 0; i < stagingGroupLayouts.size(); i++) {
+		Layout stagingGroupLayout = stagingGroupLayouts.get(i);
+
+		selectedLayoutIds[i] = stagingGroupLayout.getLayoutId();
+	}
 }
-
-for (int i = 0; i < selectedLayoutIds.length; i++) {
-	try {
-		selectedLayouts.add(LayoutLocalServiceUtil.getLayout(selectedLayoutsGroupId, privateLayout, selectedLayoutIds[i]));
-	}
-	catch (NoSuchLayoutException nsle) {
-	}
+else {
+	selectedLayoutIds = GetterUtil.getLongValues(StringUtil.split(openNodes, ','));
 }
 
 UnicodeProperties liveGroupTypeSettings = liveGroup.getTypeSettingsProperties();
@@ -351,15 +344,7 @@ else {
 								</aui:fieldset>
 							</c:if>
 
-							<%
-							List<Portlet> dataSiteLevelPortlets = LayoutExporter.getDataSiteLevelPortlets(company.getCompanyId(), false);
-							%>
-
-							<c:if test="<%= !dataSiteLevelPortlets.isEmpty() %>">
-								<aui:fieldset cssClass="options-group" label="content">
-									<%@ include file="/html/portlet/layouts_admin/publish_layouts_portlets_data.jspf" %>
-								</aui:fieldset>
-							</c:if>
+							<liferay-staging:content parameterMap="<%= parameterMap %>" type="<%= localPublishing ? Constants.PUBLISH_TO_LIVE : Constants.PUBLISH_TO_REMOTE %>" />
 
 							<aui:fieldset cssClass="options-group" label="permissions">
 								<%@ include file="/html/portlet/layouts_admin/export_configuration/permissions.jspf" %>
@@ -380,9 +365,9 @@ else {
 									<aui:button href="<%= renderURL.toString() %>" type="reset" value="cancel" />
 								</c:when>
 								<c:otherwise>
-									<aui:button id="addButton" name="addButton" onClick='<%= renderResponse.getNamespace() + "schedulePublishEvent();" %>' value="add-event" />
+									<aui:button id="addButton" onClick='<%= renderResponse.getNamespace() + "schedulePublishEvent();" %>' value="add-event" />
 
-									<aui:button id="publishButton" name="publishButton" type="submit" value="<%= publishActionKey %>" />
+									<aui:button id="publishButton" type="submit" value="<%= publishActionKey %>" />
 								</c:otherwise>
 							</c:choose>
 						</aui:button-row>
@@ -433,33 +418,18 @@ else {
 </liferay-ui:tabs>
 
 <aui:script>
-	Liferay.provide(
-		window,
-		'<portlet:namespace />publishPages',
-		function() {
-			if (confirm('<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-" + publishActionKey + "-these-pages") %>')) {
-				var A = AUI();
+	function <portlet:namespace />publishPages() {
+		var form = AUI.$(document.<portlet:namespace />exportPagesFm);
 
-				var allContentRadioChecked = A.one('#<portlet:namespace />allContent').attr('checked');
+		if (form.fm('allContent').prop('checked')) {
+			form.fm('<%= PortletDataHandlerKeys.PORTLET_DATA_CONTROL_DEFAULT %>').val(true);
+		}
 
-				if (allContentRadioChecked) {
-					var selectedContents = A.one('#<portlet:namespace />selectContents');
-
-					var portletDataControlDefault = A.one('#<portlet:namespace /><%= PortletDataHandlerKeys.PORTLET_DATA_CONTROL_DEFAULT %>');
-
-					portletDataControlDefault.val(true);
-				}
-
-				submitForm(document.<portlet:namespace />exportPagesFm);
-			}
-		},
-		['aui-base']
-	);
+		submitForm(form);
+	}
 
 	Liferay.Util.toggleRadio('<portlet:namespace />allApplications', '<portlet:namespace />showChangeGlobalConfiguration', ['<portlet:namespace />selectApplications']);
 	Liferay.Util.toggleRadio('<portlet:namespace />allContent', '<portlet:namespace />showChangeGlobalContent', ['<portlet:namespace />selectContents']);
-	Liferay.Util.toggleRadio('<portlet:namespace />chooseApplications', '<portlet:namespace />selectApplications', ['<portlet:namespace />showChangeGlobalConfiguration']);
-	Liferay.Util.toggleRadio('<portlet:namespace />chooseContent', '<portlet:namespace />selectContents', ['<portlet:namespace />showChangeGlobalContent']);
 	Liferay.Util.toggleRadio('<portlet:namespace />publishingEventNow', '<portlet:namespace />publishButton', ['<portlet:namespace />selectSchedule', '<portlet:namespace />addButton']);
 	Liferay.Util.toggleRadio('<portlet:namespace />publishingEventSchedule', ['<portlet:namespace />selectSchedule', '<portlet:namespace />addButton'], '<portlet:namespace />publishButton');
 	Liferay.Util.toggleRadio('<portlet:namespace />rangeAll', '', ['<portlet:namespace />startEndDate', '<portlet:namespace />rangeLastInputs']);
@@ -503,9 +473,9 @@ else {
 			ratingsNode: '#<%= PortletDataHandlerKeys.RATINGS %>',
 			remoteAddressNode: '#<portlet:namespace />remoteAddress',
 			remoteDeletePortletDataNode: '#remoteDeletePortletData',
-			remotePortNode: '#<portlet:namespace />remotePort',
-			remotePathContextNode: '#<portlet:namespace />remotePathContext',
 			remoteGroupIdNode: '#<portlet:namespace />remoteGroupId',
+			remotePathContextNode: '#<portlet:namespace />remotePathContext',
+			remotePortNode: '#<portlet:namespace />remotePort',
 			secureConnectionNode: '#secureConnection',
 			setupNode: '#<%= PortletDataHandlerKeys.PORTLET_SETUP_ALL %>',
 			themeReferenceNode: '#<%= PortletDataHandlerKeys.THEME_REFERENCE %>',

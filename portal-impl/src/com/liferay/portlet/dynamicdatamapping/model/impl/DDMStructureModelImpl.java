@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.dynamicdatamapping.model.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.LocaleException;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -66,6 +68,7 @@ import java.util.TreeSet;
  * @generated
  */
 @JSON(strict = true)
+@ProviderType
 public class DDMStructureModelImpl extends BaseModelImpl<DDMStructure>
 	implements DDMStructureModel {
 	/*
@@ -86,13 +89,14 @@ public class DDMStructureModelImpl extends BaseModelImpl<DDMStructure>
 			{ "parentStructureId", Types.BIGINT },
 			{ "classNameId", Types.BIGINT },
 			{ "structureKey", Types.VARCHAR },
+			{ "version", Types.VARCHAR },
 			{ "name", Types.VARCHAR },
 			{ "description", Types.VARCHAR },
 			{ "definition", Types.CLOB },
 			{ "storageType", Types.VARCHAR },
 			{ "type_", Types.INTEGER }
 		};
-	public static final String TABLE_SQL_CREATE = "create table DDMStructure (uuid_ VARCHAR(75) null,structureId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,parentStructureId LONG,classNameId LONG,structureKey VARCHAR(75) null,name STRING null,description STRING null,definition TEXT null,storageType VARCHAR(75) null,type_ INTEGER)";
+	public static final String TABLE_SQL_CREATE = "create table DDMStructure (uuid_ VARCHAR(75) null,structureId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,parentStructureId LONG,classNameId LONG,structureKey VARCHAR(75) null,version VARCHAR(75) null,name STRING null,description STRING null,definition TEXT null,storageType VARCHAR(75) null,type_ INTEGER)";
 	public static final String TABLE_SQL_DROP = "drop table DDMStructure";
 	public static final String ORDER_BY_JPQL = " ORDER BY ddmStructure.structureId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY DDMStructure.structureId ASC";
@@ -108,15 +112,15 @@ public class DDMStructureModelImpl extends BaseModelImpl<DDMStructure>
 	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.column.bitmask.enabled.com.liferay.portlet.dynamicdatamapping.model.DDMStructure"),
 			true);
-	public static long CLASSNAMEID_COLUMN_BITMASK = 1L;
-	public static long COMPANYID_COLUMN_BITMASK = 2L;
-	public static long DESCRIPTION_COLUMN_BITMASK = 4L;
-	public static long GROUPID_COLUMN_BITMASK = 8L;
-	public static long NAME_COLUMN_BITMASK = 16L;
-	public static long PARENTSTRUCTUREID_COLUMN_BITMASK = 32L;
-	public static long STRUCTUREKEY_COLUMN_BITMASK = 64L;
-	public static long UUID_COLUMN_BITMASK = 128L;
-	public static long STRUCTUREID_COLUMN_BITMASK = 256L;
+	public static final long CLASSNAMEID_COLUMN_BITMASK = 1L;
+	public static final long COMPANYID_COLUMN_BITMASK = 2L;
+	public static final long DESCRIPTION_COLUMN_BITMASK = 4L;
+	public static final long GROUPID_COLUMN_BITMASK = 8L;
+	public static final long NAME_COLUMN_BITMASK = 16L;
+	public static final long PARENTSTRUCTUREID_COLUMN_BITMASK = 32L;
+	public static final long STRUCTUREKEY_COLUMN_BITMASK = 64L;
+	public static final long UUID_COLUMN_BITMASK = 128L;
+	public static final long STRUCTUREID_COLUMN_BITMASK = 256L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -142,6 +146,7 @@ public class DDMStructureModelImpl extends BaseModelImpl<DDMStructure>
 		model.setParentStructureId(soapModel.getParentStructureId());
 		model.setClassNameId(soapModel.getClassNameId());
 		model.setStructureKey(soapModel.getStructureKey());
+		model.setVersion(soapModel.getVersion());
 		model.setName(soapModel.getName());
 		model.setDescription(soapModel.getDescription());
 		model.setDefinition(soapModel.getDefinition());
@@ -247,6 +252,7 @@ public class DDMStructureModelImpl extends BaseModelImpl<DDMStructure>
 		attributes.put("parentStructureId", getParentStructureId());
 		attributes.put("classNameId", getClassNameId());
 		attributes.put("structureKey", getStructureKey());
+		attributes.put("version", getVersion());
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
 		attributes.put("definition", getDefinition());
@@ -325,6 +331,12 @@ public class DDMStructureModelImpl extends BaseModelImpl<DDMStructure>
 
 		if (structureKey != null) {
 			setStructureKey(structureKey);
+		}
+
+		String version = (String)attributes.get("version");
+
+		if (version != null) {
+			setVersion(version);
 		}
 
 		String name = (String)attributes.get("name");
@@ -598,6 +610,22 @@ public class DDMStructureModelImpl extends BaseModelImpl<DDMStructure>
 
 	@JSON
 	@Override
+	public String getVersion() {
+		if (_version == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _version;
+		}
+	}
+
+	@Override
+	public void setVersion(String version) {
+		_version = version;
+	}
+
+	@JSON
+	@Override
 	public String getName() {
 		if (_name == null) {
 			return StringPool.BLANK;
@@ -861,36 +889,20 @@ public class DDMStructureModelImpl extends BaseModelImpl<DDMStructure>
 		_type = type;
 	}
 
-	public com.liferay.portlet.dynamicdatamapping.model.DDMForm getDdmForm() {
+	public com.liferay.portlet.dynamicdatamapping.model.DDMForm getDDMForm() {
 		return null;
 	}
 
-	public void setDdmForm(
+	public void setDDMForm(
 		com.liferay.portlet.dynamicdatamapping.model.DDMForm ddmForm) {
 	}
 
-	public java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>>> getLocalizedFieldsMap() {
+	public com.liferay.portlet.dynamicdatamapping.model.DDMForm getFullHierarchyDDMForm() {
 		return null;
 	}
 
-	public void setLocalizedFieldsMap(
-		java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>>> localizedFieldsMap) {
-	}
-
-	public java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>>> getLocalizedPersistentFieldsMap() {
-		return null;
-	}
-
-	public void setLocalizedPersistentFieldsMap(
-		java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>>> localizedPersistentFieldsMap) {
-	}
-
-	public java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>>> getLocalizedTransientFieldsMap() {
-		return null;
-	}
-
-	public void setLocalizedTransientFieldsMap(
-		java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>>> localizedTransientFieldsMap) {
+	public void setFullHierarchyDDMForm(
+		com.liferay.portlet.dynamicdatamapping.model.DDMForm fullHierarchyDDMForm) {
 	}
 
 	@Override
@@ -1023,6 +1035,7 @@ public class DDMStructureModelImpl extends BaseModelImpl<DDMStructure>
 		ddmStructureImpl.setParentStructureId(getParentStructureId());
 		ddmStructureImpl.setClassNameId(getClassNameId());
 		ddmStructureImpl.setStructureKey(getStructureKey());
+		ddmStructureImpl.setVersion(getVersion());
 		ddmStructureImpl.setName(getName());
 		ddmStructureImpl.setDescription(getDescription());
 		ddmStructureImpl.setDefinition(getDefinition());
@@ -1114,13 +1127,9 @@ public class DDMStructureModelImpl extends BaseModelImpl<DDMStructure>
 
 		ddmStructureModelImpl._originalDescription = ddmStructureModelImpl._description;
 
-		setDdmForm(null);
+		setDDMForm(null);
 
-		setLocalizedFieldsMap(null);
-
-		setLocalizedPersistentFieldsMap(null);
-
-		setLocalizedTransientFieldsMap(null);
+		setFullHierarchyDDMForm(null);
 
 		ddmStructureModelImpl._columnBitmask = 0;
 	}
@@ -1183,6 +1192,14 @@ public class DDMStructureModelImpl extends BaseModelImpl<DDMStructure>
 			ddmStructureCacheModel.structureKey = null;
 		}
 
+		ddmStructureCacheModel.version = getVersion();
+
+		String version = ddmStructureCacheModel.version;
+
+		if ((version != null) && (version.length() == 0)) {
+			ddmStructureCacheModel.version = null;
+		}
+
 		ddmStructureCacheModel.name = getName();
 
 		String name = ddmStructureCacheModel.name;
@@ -1217,20 +1234,16 @@ public class DDMStructureModelImpl extends BaseModelImpl<DDMStructure>
 
 		ddmStructureCacheModel.type = getType();
 
-		ddmStructureCacheModel._ddmForm = getDdmForm();
+		ddmStructureCacheModel._ddmForm = getDDMForm();
 
-		ddmStructureCacheModel._localizedFieldsMap = getLocalizedFieldsMap();
-
-		ddmStructureCacheModel._localizedPersistentFieldsMap = getLocalizedPersistentFieldsMap();
-
-		ddmStructureCacheModel._localizedTransientFieldsMap = getLocalizedTransientFieldsMap();
+		ddmStructureCacheModel._fullHierarchyDDMForm = getFullHierarchyDDMForm();
 
 		return ddmStructureCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(33);
+		StringBundler sb = new StringBundler(35);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -1254,6 +1267,8 @@ public class DDMStructureModelImpl extends BaseModelImpl<DDMStructure>
 		sb.append(getClassNameId());
 		sb.append(", structureKey=");
 		sb.append(getStructureKey());
+		sb.append(", version=");
+		sb.append(getVersion());
 		sb.append(", name=");
 		sb.append(getName());
 		sb.append(", description=");
@@ -1271,7 +1286,7 @@ public class DDMStructureModelImpl extends BaseModelImpl<DDMStructure>
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(52);
+		StringBundler sb = new StringBundler(55);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portlet.dynamicdatamapping.model.DDMStructure");
@@ -1322,6 +1337,10 @@ public class DDMStructureModelImpl extends BaseModelImpl<DDMStructure>
 		sb.append(getStructureKey());
 		sb.append("]]></column-value></column>");
 		sb.append(
+			"<column><column-name>version</column-name><column-value><![CDATA[");
+		sb.append(getVersion());
+		sb.append("]]></column-value></column>");
+		sb.append(
 			"<column><column-name>name</column-name><column-value><![CDATA[");
 		sb.append(getName());
 		sb.append("]]></column-value></column>");
@@ -1347,8 +1366,8 @@ public class DDMStructureModelImpl extends BaseModelImpl<DDMStructure>
 		return sb.toString();
 	}
 
-	private static ClassLoader _classLoader = DDMStructure.class.getClassLoader();
-	private static Class<?>[] _escapedModelInterfaces = new Class[] {
+	private static final ClassLoader _classLoader = DDMStructure.class.getClassLoader();
+	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
 			DDMStructure.class
 		};
 	private String _uuid;
@@ -1372,6 +1391,7 @@ public class DDMStructureModelImpl extends BaseModelImpl<DDMStructure>
 	private boolean _setOriginalClassNameId;
 	private String _structureKey;
 	private String _originalStructureKey;
+	private String _version;
 	private String _name;
 	private String _nameCurrentLanguageId;
 	private String _originalName;

@@ -14,6 +14,8 @@
 
 package com.liferay.portal.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.NoSuchResourcePermissionException;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -27,8 +29,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -36,7 +36,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.MVCCModel;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.ResourcePermission;
 import com.liferay.portal.model.impl.ResourcePermissionImpl;
 import com.liferay.portal.model.impl.ResourcePermissionModelImpl;
@@ -65,6 +64,7 @@ import java.util.Set;
  * @see ResourcePermissionUtil
  * @generated
  */
+@ProviderType
 public class ResourcePermissionPersistenceImpl extends BasePersistenceImpl<ResourcePermission>
 	implements ResourcePermissionPersistence {
 	/*
@@ -4696,25 +4696,6 @@ public class ResourcePermissionPersistenceImpl extends BasePersistenceImpl<Resou
 	 * Initializes the resource permission persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portal.model.ResourcePermission")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<ResourcePermission>> listenersList = new ArrayList<ModelListener<ResourcePermission>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<ResourcePermission>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
 	}
 
 	public void destroy() {
@@ -4733,8 +4714,8 @@ public class ResourcePermissionPersistenceImpl extends BasePersistenceImpl<Resou
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No ResourcePermission exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No ResourcePermission exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(ResourcePermissionPersistenceImpl.class);
-	private static ResourcePermission _nullResourcePermission = new ResourcePermissionImpl() {
+	private static final Log _log = LogFactoryUtil.getLog(ResourcePermissionPersistenceImpl.class);
+	private static final ResourcePermission _nullResourcePermission = new ResourcePermissionImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -4746,14 +4727,14 @@ public class ResourcePermissionPersistenceImpl extends BasePersistenceImpl<Resou
 			}
 		};
 
-	private static CacheModel<ResourcePermission> _nullResourcePermissionCacheModel =
+	private static final CacheModel<ResourcePermission> _nullResourcePermissionCacheModel =
 		new NullCacheModel();
 
 	private static class NullCacheModel implements CacheModel<ResourcePermission>,
 		MVCCModel {
 		@Override
 		public long getMvccVersion() {
-			return 0;
+			return -1;
 		}
 
 		@Override

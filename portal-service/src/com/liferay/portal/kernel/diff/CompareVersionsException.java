@@ -22,27 +22,31 @@ import com.liferay.portal.kernel.exception.PortalException;
 public class CompareVersionsException extends PortalException {
 
 	public CompareVersionsException(double version) {
-		super();
-
 		_version = version;
 	}
 
 	public CompareVersionsException(String msg) {
 		super(msg);
+
+		_version = 0;
 	}
 
 	public CompareVersionsException(String msg, Throwable cause) {
 		super(msg, cause);
+
+		_version = 0;
 	}
 
 	public CompareVersionsException(Throwable cause) {
 		super(cause);
+
+		_version = 0;
 	}
 
 	public double getVersion() {
 		return _version;
 	}
 
-	private double _version;
+	private final double _version;
 
 }

@@ -51,7 +51,7 @@ portletURL.setParameter("eventName", eventName);
 				</aui:nav>
 			</c:if>
 
-			<aui:nav-bar-search cssClass="navbar-search-advanced" file="/html/portlet/mobile_device_rules/rule_group_search.jsp" searchContainer="<%= ruleGroupSearch %>" />
+			<aui:nav-bar-search file="/html/portlet/mobile_device_rules/rule_group_search.jsp" searchContainer="<%= ruleGroupSearch %>" />
 		</aui:nav-bar>
 
 		<%
@@ -109,6 +109,6 @@ portletURL.setParameter("eventName", eventName);
 	</liferay-ui:search-container>
 </aui:form>
 
-<aui:script use="aui-base">
+<aui:script>
 	Liferay.Util.selectEntityHandler('#<portlet:namespace />selectRuleGroupFm', '<%= HtmlUtil.escapeJS(eventName) %>');
 </aui:script>

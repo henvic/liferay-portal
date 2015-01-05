@@ -14,6 +14,8 @@
 
 package com.liferay.portal.model;
 
+import aQute.bnd.annotation.ProviderType;
+
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ import java.util.List;
  * @see com.liferay.portal.service.http.LayoutBranchServiceSoap
  * @generated
  */
+@ProviderType
 public class LayoutBranchSoap implements Serializable {
 	public static LayoutBranchSoap toSoapModel(LayoutBranch model) {
 		LayoutBranchSoap soapModel = new LayoutBranchSoap();
@@ -86,7 +89,7 @@ public class LayoutBranchSoap implements Serializable {
 	}
 
 	public long getPrimaryKey() {
-		return _LayoutBranchId;
+		return _layoutBranchId;
 	}
 
 	public void setPrimaryKey(long pk) {
@@ -102,11 +105,11 @@ public class LayoutBranchSoap implements Serializable {
 	}
 
 	public long getLayoutBranchId() {
-		return _LayoutBranchId;
+		return _layoutBranchId;
 	}
 
-	public void setLayoutBranchId(long LayoutBranchId) {
-		_LayoutBranchId = LayoutBranchId;
+	public void setLayoutBranchId(long layoutBranchId) {
+		_layoutBranchId = layoutBranchId;
 	}
 
 	public long getGroupId() {
@@ -186,7 +189,7 @@ public class LayoutBranchSoap implements Serializable {
 	}
 
 	private long _mvccVersion;
-	private long _LayoutBranchId;
+	private long _layoutBranchId;
 	private long _groupId;
 	private long _companyId;
 	private long _userId;

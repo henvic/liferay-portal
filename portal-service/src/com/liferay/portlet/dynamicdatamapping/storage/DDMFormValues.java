@@ -14,13 +14,16 @@
 
 package com.liferay.portlet.dynamicdatamapping.storage;
 
-import com.liferay.portlet.dynamicdatamapping.model.Value;
+import com.liferay.portal.kernel.util.HashUtil;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Marcellus Tavares
@@ -28,33 +31,68 @@ import java.util.Map;
  */
 public class DDMFormValues {
 
+	public DDMFormValues(DDMForm ddmForm) {
+		_ddmForm = ddmForm;
+	}
+
 	public void addDDMFormFieldValue(DDMFormFieldValue ddmFormFieldValue) {
+		ddmFormFieldValue.setDDMFormValues(this);
+
 		_ddmFormFieldValues.add(ddmFormFieldValue);
 	}
 
-	public List<Locale> getAvailableLocales() {
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof DDMFormValues)) {
+			return false;
+		}
+
+		DDMFormValues ddmFormValues = (DDMFormValues)obj;
+
+		if (Validator.equals(
+				_availableLocales, ddmFormValues._availableLocales) &&
+			Validator.equals(_defaultLocale, ddmFormValues._defaultLocale) &&
+			Validator.equals(
+				_ddmFormFieldValues, ddmFormValues._ddmFormFieldValues)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	public Set<Locale> getAvailableLocales() {
 		return _availableLocales;
+	}
+
+	public DDMForm getDDMForm() {
+		return _ddmForm;
 	}
 
 	public List<DDMFormFieldValue> getDDMFormFieldValues() {
 		return _ddmFormFieldValues;
 	}
 
-	public Map<String, List<Value>> getDDMFormFieldValuesMap() {
-		Map<String, List<Value>> ddmFormFieldValuesMap =
-			new HashMap<String, List<Value>>();
+	public Map<String, List<DDMFormFieldValue>> getDDMFormFieldValuesMap() {
+		Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap =
+			new LinkedHashMap<String, List<DDMFormFieldValue>>();
 
 		for (DDMFormFieldValue ddmFormFieldValue : _ddmFormFieldValues) {
-			List<Value> values = ddmFormFieldValuesMap.get(
-				ddmFormFieldValue.getName());
+			List<DDMFormFieldValue> ddmFormFieldValues =
+				ddmFormFieldValuesMap.get(ddmFormFieldValue.getName());
 
-			if (values == null) {
-				values = new ArrayList<Value>();
+			if (ddmFormFieldValues == null) {
+				ddmFormFieldValues = new ArrayList<DDMFormFieldValue>();
 
-				ddmFormFieldValuesMap.put(ddmFormFieldValue.getName(), values);
+				ddmFormFieldValuesMap.put(
+					ddmFormFieldValue.getName(), ddmFormFieldValues);
 			}
 
-			values.add(ddmFormFieldValue.getValue());
+			ddmFormFieldValues.add(ddmFormFieldValue);
 		}
 
 		return ddmFormFieldValuesMap;
@@ -64,12 +102,25 @@ public class DDMFormValues {
 		return _defaultLocale;
 	}
 
-	public void setAvailableLocales(List<Locale> availableLocales) {
+	@Override
+	public int hashCode() {
+		int hash = HashUtil.hash(0, _availableLocales);
+
+		hash = HashUtil.hash(hash, _defaultLocale);
+
+		return HashUtil.hash(hash, _ddmFormFieldValues);
+	}
+
+	public void setAvailableLocales(Set<Locale> availableLocales) {
 		_availableLocales = availableLocales;
 	}
 
 	public void setDDMFormFieldValues(
 		List<DDMFormFieldValue> ddmFormFieldValues) {
+
+		for (DDMFormFieldValue ddmFormFieldValue : ddmFormFieldValues) {
+			ddmFormFieldValue.setDDMFormValues(this);
+		}
 
 		_ddmFormFieldValues = ddmFormFieldValues;
 	}
@@ -78,7 +129,8 @@ public class DDMFormValues {
 		_defaultLocale = defaultLocale;
 	}
 
-	private List<Locale> _availableLocales;
+	private Set<Locale> _availableLocales;
+	private final DDMForm _ddmForm;
 	private List<DDMFormFieldValue> _ddmFormFieldValues =
 		new ArrayList<DDMFormFieldValue>();
 	private Locale _defaultLocale;

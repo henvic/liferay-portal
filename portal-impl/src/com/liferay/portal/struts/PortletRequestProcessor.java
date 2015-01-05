@@ -560,14 +560,10 @@ public class PortletRequestProcessor extends TilesRequestProcessor {
 			if (!strutsPath.equals(portlet.getStrutsPath()) &&
 				!strutsPath.equals(portlet.getParentStrutsPath())) {
 
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"The struts path " + strutsPath + " does not belong " +
-							"to portlet " + portlet.getPortletId() + ". " +
-								"Check the definition in liferay-portlet.xml");
-				}
-
-				throw new PrincipalException();
+				throw new PrincipalException(
+					"The struts path " + strutsPath + " does not belong to " +
+						"portlet " + portlet.getPortletId() + ". Check the " +
+							"definition in liferay-portlet.xml");
 			}
 			else if (!portlet.isActive()) {
 				ForwardConfig forwardConfig = actionMapping.findForward(
@@ -648,7 +644,7 @@ public class PortletRequestProcessor extends TilesRequestProcessor {
 	private static final String _PATH_PORTAL_PORTLET_INACTIVE =
 		"/portal/portlet_inactive";
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		PortletRequestProcessor.class);
 
 }

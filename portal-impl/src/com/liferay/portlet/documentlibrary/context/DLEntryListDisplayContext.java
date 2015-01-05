@@ -50,13 +50,13 @@ public class DLEntryListDisplayContext {
 	public String[] getEntryColumns() {
 		String[] entryColumns = _dlPortletInstanceSettings.getEntryColumns();
 
-		String portletId = _portletDisplay.getId();
+		String portletName = _portletDisplay.getPortletName();
 
 		if (!_dlActionsDisplayContext.isShowActions()) {
 			entryColumns = ArrayUtil.remove(entryColumns, "action");
 		}
-		else if (!portletId.equals(PortletKeys.DOCUMENT_LIBRARY) &&
-				 !portletId.equals(PortletKeys.DOCUMENT_LIBRARY_ADMIN) &&
+		else if (!portletName.equals(PortletKeys.DOCUMENT_LIBRARY) &&
+				 !portletName.equals(PortletKeys.DOCUMENT_LIBRARY_ADMIN) &&
 				 !ArrayUtil.contains(entryColumns, "action")) {
 
 			entryColumns = ArrayUtil.append(entryColumns, "action");
@@ -86,8 +86,8 @@ public class DLEntryListDisplayContext {
 		return folderColumns;
 	}
 
-	private DLActionsDisplayContext _dlActionsDisplayContext;
-	private DLPortletInstanceSettings _dlPortletInstanceSettings;
-	private PortletDisplay _portletDisplay;
+	private final DLActionsDisplayContext _dlActionsDisplayContext;
+	private final DLPortletInstanceSettings _dlPortletInstanceSettings;
+	private final PortletDisplay _portletDisplay;
 
 }

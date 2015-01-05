@@ -79,30 +79,22 @@ public class BlockingPortalCache<K extends Serializable, V>
 
 	@Override
 	public void put(K key, V value) {
-		doPut(key, value, false, -1);
+		put(key, value, DEFAULT_TIME_TO_LIVE);
 	}
 
 	@Override
 	public void put(K key, V value, int timeToLive) {
-		if (timeToLive < 0) {
-			throw new IllegalArgumentException("Time to live is negative");
+		portalCache.put(key, value, timeToLive);
+
+		CompeteLatch competeLatch = _competeLatch.get();
+
+		if (competeLatch != null) {
+			competeLatch.done();
+
+			_competeLatch.set(null);
 		}
 
-		doPut(key, value, false, timeToLive);
-	}
-
-	@Override
-	public void putQuiet(K key, V value) {
-		doPut(key, value, true, -1);
-	}
-
-	@Override
-	public void putQuiet(K key, V value, int timeToLive) {
-		if (timeToLive < 0) {
-			throw new IllegalArgumentException("Time to live is negative");
-		}
-
-		doPut(key, value, true, timeToLive);
+		_competeLatchMap.remove(key);
 	}
 
 	@Override
@@ -122,44 +114,7 @@ public class BlockingPortalCache<K extends Serializable, V>
 		_competeLatchMap.clear();
 	}
 
-	protected void doPut(K key, V value, boolean quiet, int timeToLive) {
-		if (key == null) {
-			throw new IllegalArgumentException("Key is null");
-		}
-
-		if (value == null) {
-			throw new IllegalArgumentException("Value is null");
-		}
-
-		if (quiet) {
-			if (timeToLive >= 0) {
-				portalCache.putQuiet(key, value, timeToLive);
-			}
-			else {
-				portalCache.putQuiet(key, value);
-			}
-		}
-		else {
-			if (timeToLive >= 0) {
-				portalCache.put(key, value, timeToLive);
-			}
-			else {
-				portalCache.put(key, value);
-			}
-		}
-
-		CompeteLatch competeLatch = _competeLatch.get();
-
-		if (competeLatch != null) {
-			competeLatch.done();
-
-			_competeLatch.set(null);
-		}
-
-		_competeLatchMap.remove(key);
-	}
-
-	private static ThreadLocal<CompeteLatch> _competeLatch =
+	private static final ThreadLocal<CompeteLatch> _competeLatch =
 		new ThreadLocal<CompeteLatch>();
 
 	private final ConcurrentMap<K, CompeteLatch> _competeLatchMap =

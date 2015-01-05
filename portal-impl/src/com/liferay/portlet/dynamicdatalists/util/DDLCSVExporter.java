@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.dynamicdatalists.util;
 
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.CSVUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -22,13 +23,14 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecord;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordVersion;
 import com.liferay.portlet.dynamicdatalists.service.DDLRecordLocalServiceUtil;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
+import com.liferay.portlet.dynamicdatamapping.model.LocalizedValue;
 import com.liferay.portlet.dynamicdatamapping.storage.Field;
-import com.liferay.portlet.dynamicdatamapping.storage.FieldConstants;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
 import com.liferay.portlet.dynamicdatamapping.storage.StorageEngineUtil;
 
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Marcellus Tavares
@@ -42,31 +44,35 @@ public class DDLCSVExporter extends BaseDDLExporter {
 			OrderByComparator<DDLRecord> orderByComparator)
 		throws Exception {
 
-		Map<String, Map<String, String>> fieldsMap = getFieldsMap(recordSetId);
-
 		StringBundler sb = new StringBundler();
 
-		for (Map<String, String> fieldMap : fieldsMap.values()) {
-			String label = fieldMap.get(FieldConstants.LABEL);
+		List<DDMFormField> ddmFormFields = getDDMFormFields(recordSetId);
 
-			sb.append(label);
+		for (DDMFormField ddmFormField : ddmFormFields) {
+			LocalizedValue label = ddmFormField.getLabel();
+
+			sb.append(label.getString(getLocale()));
 			sb.append(CharPool.COMMA);
 		}
 
-		sb.setIndex(sb.index() - 1);
+		sb.append(LanguageUtil.get(getLocale(), "status"));
 		sb.append(StringPool.NEW_LINE);
 
 		List<DDLRecord> records = DDLRecordLocalServiceUtil.getRecords(
 			recordSetId, status, start, end, orderByComparator);
 
-		for (DDLRecord record : records) {
+		Iterator<DDLRecord> iterator = records.iterator();
+
+		while (iterator.hasNext()) {
+			DDLRecord record = iterator.next();
+
 			DDLRecordVersion recordVersion = record.getRecordVersion();
 
 			Fields fields = StorageEngineUtil.getFields(
 				recordVersion.getDDMStorageId());
 
-			for (Map<String, String> fieldMap : fieldsMap.values()) {
-				String name = fieldMap.get(FieldConstants.NAME);
+			for (DDMFormField ddmFormField : ddmFormFields) {
+				String name = ddmFormField.getName();
 				String value = StringPool.BLANK;
 
 				if (fields.contains(name)) {
@@ -79,8 +85,11 @@ public class DDLCSVExporter extends BaseDDLExporter {
 				sb.append(CharPool.COMMA);
 			}
 
-			sb.setIndex(sb.index() - 1);
-			sb.append(StringPool.NEW_LINE);
+			sb.append(getStatusMessage(recordVersion.getStatus()));
+
+			if (iterator.hasNext()) {
+				sb.append(StringPool.NEW_LINE);
+			}
 		}
 
 		String csv = sb.toString();

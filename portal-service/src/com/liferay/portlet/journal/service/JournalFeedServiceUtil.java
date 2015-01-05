@@ -40,31 +40,12 @@ public class JournalFeedServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portlet.journal.service.impl.JournalFeedServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
-
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	public static java.lang.String getBeanIdentifier() {
-		return getService().getBeanIdentifier();
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
-		getService().setBeanIdentifier(beanIdentifier);
-	}
-
 	public static com.liferay.portlet.journal.model.JournalFeed addFeed(
 		long groupId, java.lang.String feedId, boolean autoFeedId,
 		java.lang.String name, java.lang.String description,
-		java.lang.String type, java.lang.String structureId,
-		java.lang.String templateId, java.lang.String rendererTemplateId,
-		int delta, java.lang.String orderByCol, java.lang.String orderByType,
+		java.lang.String ddmStructureKey, java.lang.String ddmTemplateKey,
+		java.lang.String ddmRendererTemplateKey, int delta,
+		java.lang.String orderByCol, java.lang.String orderByType,
 		java.lang.String targetLayoutFriendlyUrl,
 		java.lang.String targetPortletId, java.lang.String contentField,
 		java.lang.String feedType, double feedVersion,
@@ -72,7 +53,7 @@ public class JournalFeedServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .addFeed(groupId, feedId, autoFeedId, name, description,
-			type, structureId, templateId, rendererTemplateId, delta,
+			ddmStructureKey, ddmTemplateKey, ddmRendererTemplateKey, delta,
 			orderByCol, orderByType, targetLayoutFriendlyUrl, targetPortletId,
 			contentField, feedType, feedVersion, serviceContext);
 	}
@@ -96,6 +77,15 @@ public class JournalFeedServiceUtil {
 		getService().deleteFeed(groupId, feedId);
 	}
 
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public static java.lang.String getBeanIdentifier() {
+		return getService().getBeanIdentifier();
+	}
+
 	public static com.liferay.portlet.journal.model.JournalFeed getFeed(
 		long feedId) throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getFeed(feedId);
@@ -117,11 +107,20 @@ public class JournalFeedServiceUtil {
 		return getService().getFeed(groupId, feedId);
 	}
 
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
+		getService().setBeanIdentifier(beanIdentifier);
+	}
+
 	public static com.liferay.portlet.journal.model.JournalFeed updateFeed(
 		long groupId, java.lang.String feedId, java.lang.String name,
-		java.lang.String description, java.lang.String type,
-		java.lang.String structureId, java.lang.String templateId,
-		java.lang.String rendererTemplateId, int delta,
+		java.lang.String description, java.lang.String ddmStructureKey,
+		java.lang.String ddmTemplateKey,
+		java.lang.String ddmRendererTemplateKey, int delta,
 		java.lang.String orderByCol, java.lang.String orderByType,
 		java.lang.String targetLayoutFriendlyUrl,
 		java.lang.String targetPortletId, java.lang.String contentField,
@@ -129,9 +128,9 @@ public class JournalFeedServiceUtil {
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
-				   .updateFeed(groupId, feedId, name, description, type,
-			structureId, templateId, rendererTemplateId, delta, orderByCol,
-			orderByType, targetLayoutFriendlyUrl, targetPortletId,
+				   .updateFeed(groupId, feedId, name, description,
+			ddmStructureKey, ddmTemplateKey, ddmRendererTemplateKey, delta,
+			orderByCol, orderByType, targetLayoutFriendlyUrl, targetPortletId,
 			contentField, feedType, feedVersion, serviceContext);
 	}
 

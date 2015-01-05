@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.messageboards.service.base;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -74,6 +76,7 @@ import javax.sql.DataSource;
  * @see com.liferay.portlet.messageboards.service.MBDiscussionLocalServiceUtil
  * @generated
  */
+@ProviderType
 public abstract class MBDiscussionLocalServiceBaseImpl
 	extends BaseLocalServiceImpl implements MBDiscussionLocalService,
 		IdentifiableBean {
@@ -193,10 +196,10 @@ public abstract class MBDiscussionLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
@@ -204,11 +207,11 @@ public abstract class MBDiscussionLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
@@ -220,19 +223,6 @@ public abstract class MBDiscussionLocalServiceBaseImpl
 	@Override
 	public MBDiscussion fetchMBDiscussion(long discussionId) {
 		return mbDiscussionPersistence.fetchByPrimaryKey(discussionId);
-	}
-
-	/**
-	 * Returns the message boards discussion with the matching UUID and company.
-	 *
-	 * @param uuid the message boards discussion's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching message boards discussion, or <code>null</code> if a matching message boards discussion could not be found
-	 */
-	@Override
-	public MBDiscussion fetchMBDiscussionByUuidAndCompanyId(String uuid,
-		long companyId) {
-		return mbDiscussionPersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
 	/**
@@ -364,17 +354,34 @@ public abstract class MBDiscussionLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the message boards discussion with the matching UUID and company.
+	 * Returns all the message boards discussions matching the UUID and company.
 	 *
-	 * @param uuid the message boards discussion's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching message boards discussion
-	 * @throws PortalException if a matching message boards discussion could not be found
+	 * @param uuid the UUID of the message boards discussions
+	 * @param companyId the primary key of the company
+	 * @return the matching message boards discussions, or an empty list if no matches were found
 	 */
 	@Override
-	public MBDiscussion getMBDiscussionByUuidAndCompanyId(String uuid,
-		long companyId) throws PortalException {
-		return mbDiscussionPersistence.findByUuid_C_First(uuid, companyId, null);
+	public List<MBDiscussion> getMBDiscussionsByUuidAndCompanyId(String uuid,
+		long companyId) {
+		return mbDiscussionPersistence.findByUuid_C(uuid, companyId);
+	}
+
+	/**
+	 * Returns a range of message boards discussions matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the message boards discussions
+	 * @param companyId the primary key of the company
+	 * @param start the lower bound of the range of message boards discussions
+	 * @param end the upper bound of the range of message boards discussions (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the range of matching message boards discussions, or an empty list if no matches were found
+	 */
+	@Override
+	public List<MBDiscussion> getMBDiscussionsByUuidAndCompanyId(String uuid,
+		long companyId, int start, int end,
+		OrderByComparator<MBDiscussion> orderByComparator) {
+		return mbDiscussionPersistence.findByUuid_C(uuid, companyId, start,
+			end, orderByComparator);
 	}
 
 	/**

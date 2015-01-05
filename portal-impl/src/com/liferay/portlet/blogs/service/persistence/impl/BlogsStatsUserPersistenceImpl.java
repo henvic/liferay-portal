@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.blogs.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -24,15 +26,11 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
 import com.liferay.portlet.blogs.NoSuchStatsUserException;
@@ -45,7 +43,6 @@ import java.io.Serializable;
 
 import java.sql.Timestamp;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -67,6 +64,7 @@ import java.util.Set;
  * @see BlogsStatsUserUtil
  * @generated
  */
+@ProviderType
 public class BlogsStatsUserPersistenceImpl extends BasePersistenceImpl<BlogsStatsUser>
 	implements BlogsStatsUserPersistence {
 	/*
@@ -3563,25 +3561,6 @@ public class BlogsStatsUserPersistenceImpl extends BasePersistenceImpl<BlogsStat
 	 * Initializes the blogs stats user persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portlet.blogs.model.BlogsStatsUser")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<BlogsStatsUser>> listenersList = new ArrayList<ModelListener<BlogsStatsUser>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<BlogsStatsUser>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
 	}
 
 	public void destroy() {
@@ -3600,8 +3579,8 @@ public class BlogsStatsUserPersistenceImpl extends BasePersistenceImpl<BlogsStat
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No BlogsStatsUser exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No BlogsStatsUser exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(BlogsStatsUserPersistenceImpl.class);
-	private static BlogsStatsUser _nullBlogsStatsUser = new BlogsStatsUserImpl() {
+	private static final Log _log = LogFactoryUtil.getLog(BlogsStatsUserPersistenceImpl.class);
+	private static final BlogsStatsUser _nullBlogsStatsUser = new BlogsStatsUserImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -3613,7 +3592,8 @@ public class BlogsStatsUserPersistenceImpl extends BasePersistenceImpl<BlogsStat
 			}
 		};
 
-	private static CacheModel<BlogsStatsUser> _nullBlogsStatsUserCacheModel = new CacheModel<BlogsStatsUser>() {
+	private static final CacheModel<BlogsStatsUser> _nullBlogsStatsUserCacheModel =
+		new CacheModel<BlogsStatsUser>() {
 			@Override
 			public BlogsStatsUser toEntityModel() {
 				return _nullBlogsStatsUser;

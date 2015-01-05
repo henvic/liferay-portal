@@ -16,12 +16,14 @@ package com.liferay.portlet.documentlibrary.service;
 
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
-import com.liferay.portal.test.MainServletExecutionTestListener;
+import com.liferay.portal.test.LiferayIntegrationTestRule;
+import com.liferay.portal.test.MainServletTestRule;
 import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.util.test.ServiceContextTestUtil;
 import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
@@ -31,22 +33,56 @@ import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import org.testng.Assert;
 
 /**
  * @author Shinn Lok
  */
-@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
-@RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class DLFileVersionLocalServiceTreeTest {
+
+	@ClassRule
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
 
 	@Before
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
+	}
+
+	@Test
+	public void testFileVersionTreePathWhenMovingSubfolderWithFileVersion()
+		throws Exception {
+
+		Folder folderA = DLAppTestUtil.addFolder(
+			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			"Folder A");
+
+		Folder folderAA = DLAppTestUtil.addFolder(
+			_group.getGroupId(), folderA.getFolderId(), "Folder AA");
+
+		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
+			_group.getGroupId(), folderAA.getFolderId(), "Entry.txt");
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
+
+		DLAppLocalServiceUtil.moveFolder(
+			TestPropsValues.getUserId(), folderAA.getFolderId(),
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, serviceContext);
+
+		DLFileVersion dlFileVersion =
+			DLFileVersionLocalServiceUtil.getFileVersion(
+				fileEntry.getFileEntryId(),
+				DLFileEntryConstants.VERSION_DEFAULT);
+
+		Assert.assertEquals(
+			dlFileVersion.buildTreePath(), dlFileVersion.getTreePath());
 	}
 
 	@Test
@@ -95,7 +131,7 @@ public class DLFileVersionLocalServiceTreeTest {
 		_fileEntries.add(fileEntryAA);
 	}
 
-	private List<FileEntry> _fileEntries = new ArrayList<FileEntry>();
+	private final List<FileEntry> _fileEntries = new ArrayList<FileEntry>();
 	private Folder _folder;
 
 	@DeleteAfterTestRun

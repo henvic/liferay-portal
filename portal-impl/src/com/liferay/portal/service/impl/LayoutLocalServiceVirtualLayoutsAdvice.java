@@ -95,7 +95,6 @@ public class LayoutLocalServiceVirtualLayoutsAdvice
 			LayoutSet layoutSet = layout.getLayoutSet();
 
 			try {
-				MergeLayoutPrototypesThreadLocal.setInProgress(true);
 				WorkflowThreadLocal.setEnabled(false);
 
 				SitesUtil.mergeLayoutPrototypeLayout(group, layout);
@@ -287,7 +286,6 @@ public class LayoutLocalServiceVirtualLayoutsAdvice
 				return;
 			}
 
-			MergeLayoutPrototypesThreadLocal.setInProgress(true);
 			WorkflowThreadLocal.setEnabled(false);
 
 			SitesUtil.mergeLayoutSetPrototypeLayouts(group, layoutSet);
@@ -315,10 +313,10 @@ public class LayoutLocalServiceVirtualLayoutsAdvice
 		Integer.TYPE
 	};
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutLocalServiceVirtualLayoutsAdvice.class);
 
-	private static ThreadLocal<Long> _virtualLayoutTargetGroupId =
+	private static final ThreadLocal<Long> _virtualLayoutTargetGroupId =
 		new AutoResetThreadLocal<Long>(
 			LayoutLocalServiceVirtualLayoutsAdvice.class +
 				"._virtualLayoutTargetGroupId",

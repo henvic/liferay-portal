@@ -14,6 +14,9 @@
 
 package com.liferay.portlet.mobiledevicerules.model.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -34,8 +37,33 @@ import java.util.Date;
  * @see MDRRuleGroup
  * @generated
  */
+@ProviderType
 public class MDRRuleGroupCacheModel implements CacheModel<MDRRuleGroup>,
 	Externalizable {
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof MDRRuleGroupCacheModel)) {
+			return false;
+		}
+
+		MDRRuleGroupCacheModel mdrRuleGroupCacheModel = (MDRRuleGroupCacheModel)obj;
+
+		if (ruleGroupId == mdrRuleGroupCacheModel.ruleGroupId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, ruleGroupId);
+	}
+
 	@Override
 	public String toString() {
 		StringBundler sb = new StringBundler(21);

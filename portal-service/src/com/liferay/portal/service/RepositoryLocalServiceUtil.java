@@ -52,6 +52,41 @@ public class RepositoryLocalServiceUtil {
 		return getService().addRepository(repository);
 	}
 
+	public static com.liferay.portal.model.Repository addRepository(
+		long userId, long groupId, long classNameId, long parentFolderId,
+		java.lang.String name, java.lang.String description,
+		java.lang.String portletId,
+		com.liferay.portal.kernel.util.UnicodeProperties typeSettingsProperties,
+		boolean hidden, com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .addRepository(userId, groupId, classNameId, parentFolderId,
+			name, description, portletId, typeSettingsProperties, hidden,
+			serviceContext);
+	}
+
+	/**
+	* @deprecated As of 6.2.0, replaced by {@link #addRepository(long, long,
+	long, long, String, String, String, UnicodeProperties,
+	boolean, ServiceContext)}
+	*/
+	@Deprecated
+	public static com.liferay.portal.model.Repository addRepository(
+		long userId, long groupId, long classNameId, long parentFolderId,
+		java.lang.String name, java.lang.String description,
+		java.lang.String portletId,
+		com.liferay.portal.kernel.util.UnicodeProperties typeSettingsProperties,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .addRepository(userId, groupId, classNameId, parentFolderId,
+			name, description, portletId, typeSettingsProperties, serviceContext);
+	}
+
+	public static void checkRepository(long repositoryId) {
+		getService().checkRepository(repositoryId);
+	}
+
 	/**
 	* Creates a new repository with the primary key. Does not add the repository to the database.
 	*
@@ -61,6 +96,30 @@ public class RepositoryLocalServiceUtil {
 	public static com.liferay.portal.model.Repository createRepository(
 		long repositoryId) {
 		return getService().createRepository(repositoryId);
+	}
+
+	/**
+	* @throws PortalException
+	*/
+	public static com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().deletePersistedModel(persistedModel);
+	}
+
+	public static void deleteRepositories(long groupId) {
+		getService().deleteRepositories(groupId);
+	}
+
+	/**
+	* Deletes the repository from the database. Also notifies the appropriate model listeners.
+	*
+	* @param repository the repository
+	* @return the repository that was removed
+	*/
+	public static com.liferay.portal.model.Repository deleteRepository(
+		com.liferay.portal.model.Repository repository) {
+		return getService().deleteRepository(repository);
 	}
 
 	/**
@@ -74,17 +133,6 @@ public class RepositoryLocalServiceUtil {
 		long repositoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().deleteRepository(repositoryId);
-	}
-
-	/**
-	* Deletes the repository from the database. Also notifies the appropriate model listeners.
-	*
-	* @param repository the repository
-	* @return the repository that was removed
-	*/
-	public static com.liferay.portal.model.Repository deleteRepository(
-		com.liferay.portal.model.Repository repository) {
-		return getService().deleteRepository(repository);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
@@ -142,10 +190,10 @@ public class RepositoryLocalServiceUtil {
 	}
 
 	/**
-	* Returns the number of rows that match the dynamic query.
+	* Returns the number of rows matching the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
-	* @return the number of rows that match the dynamic query
+	* @return the number of rows matching the dynamic query
 	*/
 	public static long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
@@ -153,11 +201,11 @@ public class RepositoryLocalServiceUtil {
 	}
 
 	/**
-	* Returns the number of rows that match the dynamic query.
+	* Returns the number of rows matching the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
-	* @return the number of rows that match the dynamic query
+	* @return the number of rows matching the dynamic query
 	*/
 	public static long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
@@ -166,20 +214,18 @@ public class RepositoryLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.model.Repository fetchRepository(
-		long repositoryId) {
-		return getService().fetchRepository(repositoryId);
+		long groupId, java.lang.String name, java.lang.String portletId) {
+		return getService().fetchRepository(groupId, name, portletId);
 	}
 
-	/**
-	* Returns the repository with the matching UUID and company.
-	*
-	* @param uuid the repository's UUID
-	* @param companyId the primary key of the company
-	* @return the matching repository, or <code>null</code> if a matching repository could not be found
-	*/
-	public static com.liferay.portal.model.Repository fetchRepositoryByUuidAndCompanyId(
-		java.lang.String uuid, long companyId) {
-		return getService().fetchRepositoryByUuidAndCompanyId(uuid, companyId);
+	public static com.liferay.portal.model.Repository fetchRepository(
+		long groupId, java.lang.String portletId) {
+		return getService().fetchRepository(groupId, portletId);
+	}
+
+	public static com.liferay.portal.model.Repository fetchRepository(
+		long repositoryId) {
+		return getService().fetchRepository(repositoryId);
 	}
 
 	/**
@@ -194,21 +240,17 @@ public class RepositoryLocalServiceUtil {
 		return getService().fetchRepositoryByUuidAndGroupId(uuid, groupId);
 	}
 
-	/**
-	* Returns the repository with the primary key.
-	*
-	* @param repositoryId the primary key of the repository
-	* @return the repository
-	* @throws PortalException if a repository with the primary key could not be found
-	*/
-	public static com.liferay.portal.model.Repository getRepository(
-		long repositoryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getRepository(repositoryId);
-	}
-
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
 		return getService().getActionableDynamicQuery();
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public static java.lang.String getBeanIdentifier() {
+		return getService().getBeanIdentifier();
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
@@ -216,13 +258,23 @@ public class RepositoryLocalServiceUtil {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
-	/**
-	* @throws PortalException
-	*/
-	public static com.liferay.portal.model.PersistedModel deletePersistedModel(
-		com.liferay.portal.model.PersistedModel persistedModel)
+	public static java.util.List<com.liferay.portal.kernel.repository.LocalRepository> getGroupLocalRepositoryImpl(
+		long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().deletePersistedModel(persistedModel);
+		return getService().getGroupLocalRepositoryImpl(groupId);
+	}
+
+	public static com.liferay.portal.kernel.repository.LocalRepository getLocalRepositoryImpl(
+		long folderId, long fileEntryId, long fileVersionId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .getLocalRepositoryImpl(folderId, fileEntryId, fileVersionId);
+	}
+
+	public static com.liferay.portal.kernel.repository.LocalRepository getLocalRepositoryImpl(
+		long repositoryId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getLocalRepositoryImpl(repositoryId);
 	}
 
 	public static com.liferay.portal.model.PersistedModel getPersistedModel(
@@ -231,32 +283,8 @@ public class RepositoryLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
-	/**
-	* Returns the repository with the matching UUID and company.
-	*
-	* @param uuid the repository's UUID
-	* @param companyId the primary key of the company
-	* @return the matching repository
-	* @throws PortalException if a matching repository could not be found
-	*/
-	public static com.liferay.portal.model.Repository getRepositoryByUuidAndCompanyId(
-		java.lang.String uuid, long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getRepositoryByUuidAndCompanyId(uuid, companyId);
-	}
-
-	/**
-	* Returns the repository matching the UUID and group.
-	*
-	* @param uuid the repository's UUID
-	* @param groupId the primary key of the group
-	* @return the matching repository
-	* @throws PortalException if a matching repository could not be found
-	*/
-	public static com.liferay.portal.model.Repository getRepositoryByUuidAndGroupId(
-		java.lang.String uuid, long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getRepositoryByUuidAndGroupId(uuid, groupId);
+	public static java.lang.String getRegistryName() {
+		return getService().getRegistryName();
 	}
 
 	/**
@@ -276,6 +304,36 @@ public class RepositoryLocalServiceUtil {
 	}
 
 	/**
+	* Returns all the repositories matching the UUID and company.
+	*
+	* @param uuid the UUID of the repositories
+	* @param companyId the primary key of the company
+	* @return the matching repositories, or an empty list if no matches were found
+	*/
+	public static java.util.List<com.liferay.portal.model.Repository> getRepositoriesByUuidAndCompanyId(
+		java.lang.String uuid, long companyId) {
+		return getService().getRepositoriesByUuidAndCompanyId(uuid, companyId);
+	}
+
+	/**
+	* Returns a range of repositories matching the UUID and company.
+	*
+	* @param uuid the UUID of the repositories
+	* @param companyId the primary key of the company
+	* @param start the lower bound of the range of repositories
+	* @param end the upper bound of the range of repositories (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the range of matching repositories, or an empty list if no matches were found
+	*/
+	public static java.util.List<com.liferay.portal.model.Repository> getRepositoriesByUuidAndCompanyId(
+		java.lang.String uuid, long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Repository> orderByComparator) {
+		return getService()
+				   .getRepositoriesByUuidAndCompanyId(uuid, companyId, start,
+			end, orderByComparator);
+	}
+
+	/**
 	* Returns the number of repositories.
 	*
 	* @return the number of repositories
@@ -284,24 +342,66 @@ public class RepositoryLocalServiceUtil {
 		return getService().getRepositoriesCount();
 	}
 
-	/**
-	* Updates the repository in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
-	*
-	* @param repository the repository
-	* @return the repository that was updated
-	*/
-	public static com.liferay.portal.model.Repository updateRepository(
-		com.liferay.portal.model.Repository repository) {
-		return getService().updateRepository(repository);
+	public static com.liferay.portal.model.Repository getRepository(
+		long groupId, java.lang.String name, java.lang.String portletId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getRepository(groupId, name, portletId);
+	}
+
+	public static com.liferay.portal.model.Repository getRepository(
+		long groupId, java.lang.String portletId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getRepository(groupId, portletId);
 	}
 
 	/**
-	* Returns the Spring bean ID for this bean.
+	* Returns the repository with the primary key.
 	*
-	* @return the Spring bean ID for this bean
+	* @param repositoryId the primary key of the repository
+	* @return the repository
+	* @throws PortalException if a repository with the primary key could not be found
 	*/
-	public static java.lang.String getBeanIdentifier() {
-		return getService().getBeanIdentifier();
+	public static com.liferay.portal.model.Repository getRepository(
+		long repositoryId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getRepository(repositoryId);
+	}
+
+	/**
+	* Returns the repository matching the UUID and group.
+	*
+	* @param uuid the repository's UUID
+	* @param groupId the primary key of the group
+	* @return the matching repository
+	* @throws PortalException if a matching repository could not be found
+	*/
+	public static com.liferay.portal.model.Repository getRepositoryByUuidAndGroupId(
+		java.lang.String uuid, long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getRepositoryByUuidAndGroupId(uuid, groupId);
+	}
+
+	public static com.liferay.portal.kernel.repository.Repository getRepositoryImpl(
+		long folderId, long fileEntryId, long fileVersionId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .getRepositoryImpl(folderId, fileEntryId, fileVersionId);
+	}
+
+	public static com.liferay.portal.kernel.repository.Repository getRepositoryImpl(
+		long repositoryId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getRepositoryImpl(repositoryId);
+	}
+
+	public static com.liferay.portal.kernel.util.UnicodeProperties getTypeSettingsProperties(
+		long repositoryId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getTypeSettingsProperties(repositoryId);
+	}
+
+	public static void invalidate() {
+		getService().invalidate();
 	}
 
 	/**
@@ -313,112 +413,15 @@ public class RepositoryLocalServiceUtil {
 		getService().setBeanIdentifier(beanIdentifier);
 	}
 
-	public static com.liferay.portal.model.Repository addRepository(
-		long userId, long groupId, long classNameId, long parentFolderId,
-		java.lang.String name, java.lang.String description,
-		java.lang.String portletId,
-		com.liferay.portal.kernel.util.UnicodeProperties typeSettingsProperties,
-		boolean hidden, com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService()
-				   .addRepository(userId, groupId, classNameId, parentFolderId,
-			name, description, portletId, typeSettingsProperties, hidden,
-			serviceContext);
-	}
-
 	/**
-	* @deprecated As of 6.2.0, replaced by {@link #addRepository(long, long,
-	long, long, String, String, String, UnicodeProperties,
-	boolean, ServiceContext)}
+	* Updates the repository in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	*
+	* @param repository the repository
+	* @return the repository that was updated
 	*/
-	@Deprecated
-	public static com.liferay.portal.model.Repository addRepository(
-		long userId, long groupId, long classNameId, long parentFolderId,
-		java.lang.String name, java.lang.String description,
-		java.lang.String portletId,
-		com.liferay.portal.kernel.util.UnicodeProperties typeSettingsProperties,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService()
-				   .addRepository(userId, groupId, classNameId, parentFolderId,
-			name, description, portletId, typeSettingsProperties, serviceContext);
-	}
-
-	public static void checkRepository(long repositoryId) {
-		getService().checkRepository(repositoryId);
-	}
-
-	public static void deleteRepositories(long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		getService().deleteRepositories(groupId);
-	}
-
-	public static com.liferay.portal.model.Repository fetchRepository(
-		long groupId, java.lang.String portletId) {
-		return getService().fetchRepository(groupId, portletId);
-	}
-
-	public static com.liferay.portal.model.Repository fetchRepository(
-		long groupId, java.lang.String name, java.lang.String portletId) {
-		return getService().fetchRepository(groupId, name, portletId);
-	}
-
-	public static java.util.List<com.liferay.portal.kernel.repository.LocalRepository> getGroupLocalRepositoryImpl(
-		long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getGroupLocalRepositoryImpl(groupId);
-	}
-
-	public static com.liferay.portal.kernel.repository.LocalRepository getLocalRepositoryImpl(
-		long repositoryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getLocalRepositoryImpl(repositoryId);
-	}
-
-	public static com.liferay.portal.kernel.repository.LocalRepository getLocalRepositoryImpl(
-		long folderId, long fileEntryId, long fileVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService()
-				   .getLocalRepositoryImpl(folderId, fileEntryId, fileVersionId);
-	}
-
-	public static java.lang.String getRegistryName() {
-		return getService().getRegistryName();
-	}
-
-	public static com.liferay.portal.model.Repository getRepository(
-		long groupId, java.lang.String portletId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getRepository(groupId, portletId);
-	}
-
-	public static com.liferay.portal.model.Repository getRepository(
-		long groupId, java.lang.String name, java.lang.String portletId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getRepository(groupId, name, portletId);
-	}
-
-	public static com.liferay.portal.kernel.repository.Repository getRepositoryImpl(
-		long repositoryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getRepositoryImpl(repositoryId);
-	}
-
-	public static com.liferay.portal.kernel.repository.Repository getRepositoryImpl(
-		long folderId, long fileEntryId, long fileVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService()
-				   .getRepositoryImpl(folderId, fileEntryId, fileVersionId);
-	}
-
-	public static com.liferay.portal.kernel.util.UnicodeProperties getTypeSettingsProperties(
-		long repositoryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getTypeSettingsProperties(repositoryId);
-	}
-
-	public static void invalidate() {
-		getService().invalidate();
+	public static com.liferay.portal.model.Repository updateRepository(
+		com.liferay.portal.model.Repository repository) {
+		return getService().updateRepository(repository);
 	}
 
 	public static void updateRepository(long repositoryId,

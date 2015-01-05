@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.messageboards.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -24,17 +26,13 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
 import com.liferay.portlet.messageboards.NoSuchBanException;
@@ -45,7 +43,6 @@ import com.liferay.portlet.messageboards.service.persistence.MBBanPersistence;
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -66,6 +63,7 @@ import java.util.Set;
  * @see MBBanUtil
  * @generated
  */
+@ProviderType
 public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	implements MBBanPersistence {
 	/*
@@ -3846,25 +3844,6 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * Initializes the message boards ban persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portlet.messageboards.model.MBBan")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<MBBan>> listenersList = new ArrayList<ModelListener<MBBan>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<MBBan>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
 	}
 
 	public void destroy() {
@@ -3883,11 +3862,11 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No MBBan exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No MBBan exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(MBBanPersistenceImpl.class);
-	private static Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+	private static final Log _log = LogFactoryUtil.getLog(MBBanPersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"uuid"
 			});
-	private static MBBan _nullMBBan = new MBBanImpl() {
+	private static final MBBan _nullMBBan = new MBBanImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -3899,7 +3878,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 			}
 		};
 
-	private static CacheModel<MBBan> _nullMBBanCacheModel = new CacheModel<MBBan>() {
+	private static final CacheModel<MBBan> _nullMBBanCacheModel = new CacheModel<MBBan>() {
 			@Override
 			public MBBan toEntityModel() {
 				return _nullMBBan;

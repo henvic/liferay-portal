@@ -199,10 +199,6 @@ public class LoginUtil {
 			LanguageUtil.get(
 				themeDisplay.getLocale(), "the-name-of-the-email-recipient"));
 		definitionTerms.put(
-			"[$USER_AGENT$]",
-			LanguageUtil.get(
-				themeDisplay.getLocale(), "the-browser's-user-agent"));
-		definitionTerms.put(
 			"[$USER_ID$]",
 			LanguageUtil.get(themeDisplay.getLocale(), "the-user-id"));
 
@@ -557,6 +553,6 @@ public class LoginUtil {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(LoginUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(LoginUtil.class);
 
 }

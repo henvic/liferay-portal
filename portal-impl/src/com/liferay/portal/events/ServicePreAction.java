@@ -662,6 +662,10 @@ public class ServicePreAction extends Action {
 
 		long scopeGroupId = PortalUtil.getScopeGroupId(request);
 
+		if (group.isInheritContent()) {
+			scopeGroupId = group.getParentGroupId();
+		}
+
 		if ((scopeGroupId <= 0) && (doAsGroupId > 0)) {
 			scopeGroupId = doAsGroupId;
 		}
@@ -707,10 +711,20 @@ public class ServicePreAction extends Action {
 			request.setAttribute(WebKeys.COLOR_SCHEME, colorScheme);
 		}
 
-		boolean themeCssFastLoad = SessionParamUtil.getBoolean(
-			request, "css_fast_load", PropsValues.THEME_CSS_FAST_LOAD);
-		boolean themeImagesFastLoad = SessionParamUtil.getBoolean(
-			request, "images_fast_load", PropsValues.THEME_IMAGES_FAST_LOAD);
+		boolean themeCssFastLoad = PropsValues.THEME_CSS_FAST_LOAD;
+
+		if (PropsValues.THEME_CSS_FAST_LOAD_CHECK_REQUEST_PARAMETER) {
+			themeCssFastLoad = SessionParamUtil.getBoolean(
+				request, "css_fast_load", PropsValues.THEME_CSS_FAST_LOAD);
+		}
+
+		boolean themeImagesFastLoad = PropsValues.THEME_IMAGES_FAST_LOAD;
+
+		if (PropsValues.THEME_IMAGES_FAST_LOAD_CHECK_REQUEST_PARAMETER) {
+			SessionParamUtil.getBoolean(
+				request, "images_fast_load",
+				PropsValues.THEME_IMAGES_FAST_LOAD);
+		}
 
 		boolean themeJsBarebone = PropsValues.JAVASCRIPT_BAREBONE_ENABLED;
 
@@ -974,12 +988,12 @@ public class ServicePreAction extends Action {
 				themeDisplay.setShowPageSettingsIcon(true);
 
 				LiferayPortletURL pageSettingsURL = new PortletURLImpl(
-					request, PortletKeys.LAYOUTS_ADMIN, controlPanelPlid,
+					request, PortletKeys.GROUP_PAGES, controlPanelPlid,
 					PortletRequest.RENDER_PHASE);
 
 				pageSettingsURL.setDoAsGroupId(scopeGroupId);
 				pageSettingsURL.setParameter(
-					"struts_action", "/layouts_admin/edit_layouts");
+					"struts_action", "/group_pages/edit_layouts");
 
 				if (layout.isPrivateLayout()) {
 					pageSettingsURL.setParameter("tabs1", "private-pages");
@@ -996,7 +1010,6 @@ public class ServicePreAction extends Action {
 				if (PropsValues.DOCKBAR_ADMINISTRATIVE_LINKS_SHOW_IN_POP_UP) {
 					pageSettingsURL.setControlPanelCategory(
 						PortletCategoryKeys.PORTLET);
-					pageSettingsURL.setParameter("closeRedirect", currentURL);
 					pageSettingsURL.setWindowState(LiferayWindowState.POP_UP);
 				}
 				else {
@@ -1125,12 +1138,12 @@ public class ServicePreAction extends Action {
 				themeDisplay.setShowSiteMapSettingsIcon(true);
 
 				LiferayPortletURL siteMapSettingsURL = new PortletURLImpl(
-					request, PortletKeys.LAYOUTS_ADMIN, controlPanelPlid,
+					request, PortletKeys.GROUP_PAGES, controlPanelPlid,
 					PortletRequest.RENDER_PHASE);
 
 				siteMapSettingsURL.setDoAsGroupId(scopeGroupId);
 				siteMapSettingsURL.setParameter(
-					"struts_action", "/layouts_admin/edit_layouts");
+					"struts_action", "/group_pages/edit_layouts");
 
 				if (layout.isPrivateLayout()) {
 					siteMapSettingsURL.setParameter("tabs1", "private-pages");
@@ -1215,8 +1228,8 @@ public class ServicePreAction extends Action {
 
 			if (myAccountPortlet != null) {
 				PortletURLImpl myAccountURL = new PortletURLImpl(
-					request, myAccountPortlet.getPortletName(),
-					controlPanelPlid, PortletRequest.RENDER_PHASE);
+					request, myAccountPortlet.getPortletId(), controlPanelPlid,
+					PortletRequest.RENDER_PHASE);
 
 				if (scopeGroupId > 0) {
 					myAccountURL.setDoAsGroupId(scopeGroupId);
@@ -1593,7 +1606,55 @@ public class ServicePreAction extends Action {
 		Layout layout = null;
 		List<Layout> layouts = null;
 
-		if (signedIn) {
+		// Check the virtual host
+
+		LayoutSet layoutSet = (LayoutSet)request.getAttribute(
+			WebKeys.VIRTUAL_HOST_LAYOUT_SET);
+
+		if (layoutSet != null) {
+			layouts = LayoutLocalServiceUtil.getLayouts(
+				layoutSet.getGroupId(), layoutSet.isPrivateLayout(),
+				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
+
+			Group group = null;
+
+			if (!layouts.isEmpty()) {
+				layout = layouts.get(0);
+
+				group = layout.getGroup();
+			}
+
+			if ((layout != null) && layout.isPrivateLayout()) {
+				layouts = LayoutLocalServiceUtil.getLayouts(
+					group.getGroupId(), false,
+					LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
+
+				if (!layouts.isEmpty()) {
+					layout = layouts.get(0);
+				}
+				else {
+					group = null;
+					layout = null;
+				}
+			}
+
+			if ((group != null) && group.isStagingGroup()) {
+				Group liveGroup = group.getLiveGroup();
+
+				layouts = LayoutLocalServiceUtil.getLayouts(
+					liveGroup.getGroupId(), false,
+					LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
+
+				if (!layouts.isEmpty()) {
+					layout = layouts.get(0);
+				}
+				else {
+					layout = null;
+				}
+			}
+		}
+
+		if ((layout == null) && signedIn) {
 
 			// Check the user's personal layouts
 
@@ -1640,56 +1701,6 @@ public class ServicePreAction extends Action {
 						layout = layouts.get(0);
 
 						break;
-					}
-				}
-			}
-		}
-		else {
-
-			// Check the virtual host
-
-			LayoutSet layoutSet = (LayoutSet)request.getAttribute(
-				WebKeys.VIRTUAL_HOST_LAYOUT_SET);
-
-			if (layoutSet != null) {
-				layouts = LayoutLocalServiceUtil.getLayouts(
-					layoutSet.getGroupId(), layoutSet.isPrivateLayout(),
-					LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
-
-				Group group = null;
-
-				if (!layouts.isEmpty()) {
-					layout = layouts.get(0);
-
-					group = layout.getGroup();
-				}
-
-				if ((layout != null) && layout.isPrivateLayout()) {
-					layouts = LayoutLocalServiceUtil.getLayouts(
-						group.getGroupId(), false,
-						LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
-
-					if (!layouts.isEmpty()) {
-						layout = layouts.get(0);
-					}
-					else {
-						group = null;
-						layout = null;
-					}
-				}
-
-				if ((group != null) && group.isStagingGroup()) {
-					Group liveGroup = group.getLiveGroup();
-
-					layouts = LayoutLocalServiceUtil.getLayouts(
-						liveGroup.getGroupId(), false,
-						LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
-
-					if (!layouts.isEmpty()) {
-						layout = layouts.get(0);
-					}
-					else {
-						layout = null;
 					}
 				}
 			}

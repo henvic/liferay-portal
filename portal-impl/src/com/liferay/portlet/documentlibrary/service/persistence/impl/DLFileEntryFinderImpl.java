@@ -264,6 +264,8 @@ public class DLFileEntryFinderImpl
 
 			q.addEntity(DLFileEntryImpl.TABLE_NAME, DLFileEntryImpl.class);
 
+			q.setMaxResults(1);
+
 			QueryPos qPos = QueryPos.getInstance(q);
 
 			qPos.add(imageId);
@@ -558,6 +560,16 @@ public class DLFileEntryFinderImpl
 		QueryDefinition<DLFileEntry> queryDefinition) {
 
 		List<Long> repositoryIds = Collections.emptyList();
+
+		return doFindByG_U_R_F_M(
+			groupId, userId, repositoryIds, folderIds, null, queryDefinition,
+			false);
+	}
+
+	@Override
+	public List<DLFileEntry> findByG_U_R_F(
+		long groupId, long userId, List<Long> repositoryIds,
+		List<Long> folderIds, QueryDefinition<DLFileEntry> queryDefinition) {
 
 		return doFindByG_U_R_F_M(
 			groupId, userId, repositoryIds, folderIds, null, queryDefinition,

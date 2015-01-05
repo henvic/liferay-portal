@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.softwarecatalog.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -26,15 +28,11 @@ import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.service.persistence.impl.TableMapper;
@@ -49,7 +47,6 @@ import com.liferay.portlet.softwarecatalog.service.persistence.SCProductVersionP
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -70,6 +67,7 @@ import java.util.Set;
  * @see SCFrameworkVersionUtil
  * @generated
  */
+@ProviderType
 public class SCFrameworkVersionPersistenceImpl extends BasePersistenceImpl<SCFrameworkVersion>
 	implements SCFrameworkVersionPersistence {
 	/*
@@ -3287,26 +3285,6 @@ public class SCFrameworkVersionPersistenceImpl extends BasePersistenceImpl<SCFra
 	 * Initializes the s c framework version persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portlet.softwarecatalog.model.SCFrameworkVersion")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<SCFrameworkVersion>> listenersList = new ArrayList<ModelListener<SCFrameworkVersion>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<SCFrameworkVersion>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
-
 		scFrameworkVersionToSCProductVersionTableMapper = TableMapperFactory.getTableMapper("SCFrameworkVersi_SCProductVers",
 				"frameworkVersionId", "productVersionId", this,
 				scProductVersionPersistence);
@@ -3343,11 +3321,11 @@ public class SCFrameworkVersionPersistenceImpl extends BasePersistenceImpl<SCFra
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No SCFrameworkVersion exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No SCFrameworkVersion exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(SCFrameworkVersionPersistenceImpl.class);
-	private static Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+	private static final Log _log = LogFactoryUtil.getLog(SCFrameworkVersionPersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"active"
 			});
-	private static SCFrameworkVersion _nullSCFrameworkVersion = new SCFrameworkVersionImpl() {
+	private static final SCFrameworkVersion _nullSCFrameworkVersion = new SCFrameworkVersionImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -3359,7 +3337,7 @@ public class SCFrameworkVersionPersistenceImpl extends BasePersistenceImpl<SCFra
 			}
 		};
 
-	private static CacheModel<SCFrameworkVersion> _nullSCFrameworkVersionCacheModel =
+	private static final CacheModel<SCFrameworkVersion> _nullSCFrameworkVersionCacheModel =
 		new CacheModel<SCFrameworkVersion>() {
 			@Override
 			public SCFrameworkVersion toEntityModel() {

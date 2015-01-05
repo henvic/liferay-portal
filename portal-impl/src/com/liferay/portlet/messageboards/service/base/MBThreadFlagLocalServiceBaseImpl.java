@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.messageboards.service.base;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -65,6 +67,7 @@ import javax.sql.DataSource;
  * @see com.liferay.portlet.messageboards.service.MBThreadFlagLocalServiceUtil
  * @generated
  */
+@ProviderType
 public abstract class MBThreadFlagLocalServiceBaseImpl
 	extends BaseLocalServiceImpl implements MBThreadFlagLocalService,
 		IdentifiableBean {
@@ -184,10 +187,10 @@ public abstract class MBThreadFlagLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
@@ -195,11 +198,11 @@ public abstract class MBThreadFlagLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
@@ -211,19 +214,6 @@ public abstract class MBThreadFlagLocalServiceBaseImpl
 	@Override
 	public MBThreadFlag fetchMBThreadFlag(long threadFlagId) {
 		return mbThreadFlagPersistence.fetchByPrimaryKey(threadFlagId);
-	}
-
-	/**
-	 * Returns the message boards thread flag with the matching UUID and company.
-	 *
-	 * @param uuid the message boards thread flag's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching message boards thread flag, or <code>null</code> if a matching message boards thread flag could not be found
-	 */
-	@Override
-	public MBThreadFlag fetchMBThreadFlagByUuidAndCompanyId(String uuid,
-		long companyId) {
-		return mbThreadFlagPersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
 	/**
@@ -345,17 +335,34 @@ public abstract class MBThreadFlagLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the message boards thread flag with the matching UUID and company.
+	 * Returns all the message boards thread flags matching the UUID and company.
 	 *
-	 * @param uuid the message boards thread flag's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching message boards thread flag
-	 * @throws PortalException if a matching message boards thread flag could not be found
+	 * @param uuid the UUID of the message boards thread flags
+	 * @param companyId the primary key of the company
+	 * @return the matching message boards thread flags, or an empty list if no matches were found
 	 */
 	@Override
-	public MBThreadFlag getMBThreadFlagByUuidAndCompanyId(String uuid,
-		long companyId) throws PortalException {
-		return mbThreadFlagPersistence.findByUuid_C_First(uuid, companyId, null);
+	public List<MBThreadFlag> getMBThreadFlagsByUuidAndCompanyId(String uuid,
+		long companyId) {
+		return mbThreadFlagPersistence.findByUuid_C(uuid, companyId);
+	}
+
+	/**
+	 * Returns a range of message boards thread flags matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the message boards thread flags
+	 * @param companyId the primary key of the company
+	 * @param start the lower bound of the range of message boards thread flags
+	 * @param end the upper bound of the range of message boards thread flags (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the range of matching message boards thread flags, or an empty list if no matches were found
+	 */
+	@Override
+	public List<MBThreadFlag> getMBThreadFlagsByUuidAndCompanyId(String uuid,
+		long companyId, int start, int end,
+		OrderByComparator<MBThreadFlag> orderByComparator) {
+		return mbThreadFlagPersistence.findByUuid_C(uuid, companyId, start,
+			end, orderByComparator);
 	}
 
 	/**

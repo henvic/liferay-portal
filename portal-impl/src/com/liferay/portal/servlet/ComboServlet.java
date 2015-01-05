@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -51,6 +50,7 @@ import com.liferay.portlet.PortletConfigFactoryUtil;
 import java.io.IOException;
 import java.io.Serializable;
 
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -127,14 +127,11 @@ public class ComboServlet extends HttpServlet {
 
 		Set<String> modulePathsSet = new LinkedHashSet<String>();
 
-		Enumeration<String> enu = request.getParameterNames();
+		Map<String, String[]> parameterMap = HttpUtil.getParameterMap(
+			request.getQueryString());
 
-		if (ServerDetector.isWebSphere()) {
-			Map<String, String[]> parameterMap = HttpUtil.getParameterMap(
-				request.getQueryString());
-
-			enu = Collections.enumeration(parameterMap.keySet());
-		}
+		Enumeration<String> enu = Collections.enumeration(
+			parameterMap.keySet());
 
 		while (enu.hasMoreElements()) {
 			String name = enu.nextElement();
@@ -142,6 +139,8 @@ public class ComboServlet extends HttpServlet {
 			if (_protectedParameters.contains(name)) {
 				continue;
 			}
+
+			name = HttpUtil.decodePath(name);
 
 			modulePathsSet.add(name);
 		}
@@ -187,6 +186,10 @@ public class ComboServlet extends HttpServlet {
 
 				modulePathsString += ".rtl";
 			}
+			else if (minifierType.equals("js")) {
+				modulePathsString +=
+					StringPool.POUND + LanguageUtil.getLanguageId(request);
+			}
 
 			bytesArray = _bytesArrayPortalCache.get(modulePathsString);
 		}
@@ -209,7 +212,7 @@ public class ComboServlet extends HttpServlet {
 				byte[] bytes = new byte[0];
 
 				if (Validator.isNotNull(modulePath)) {
-					URL url = getResourceURL(modulePath);
+					URL url = getResourceURL(request, modulePath);
 
 					if (url == null) {
 						response.setHeader(
@@ -256,7 +259,9 @@ public class ComboServlet extends HttpServlet {
 
 		Portlet portlet = PortletLocalServiceUtil.getPortletById(portletId);
 
-		resourcePath = portlet.getContextPath().concat(resourcePath);
+		if (!resourcePath.startsWith(portlet.getContextPath())) {
+			resourcePath = portlet.getContextPath() + resourcePath;
+		}
 
 		String fileContentKey = resourcePath.concat(StringPool.QUESTION).concat(
 			minifierType);
@@ -359,7 +364,9 @@ public class ComboServlet extends HttpServlet {
 		return fileContentBag._fileContent;
 	}
 
-	protected URL getResourceURL(String modulePath) throws Exception {
+	protected URL getResourceURL(HttpServletRequest request, String modulePath)
+		throws Exception {
+
 		String portletId = getModulePortletId(modulePath);
 
 		Portlet portlet = PortletLocalServiceUtil.getPortletById(portletId);
@@ -374,15 +381,32 @@ public class ComboServlet extends HttpServlet {
 
 		String resourcePath = getResourcePath(modulePath);
 
-		URL url = servletContext.getResource(resourcePath);
+		String contextPath = servletContext.getContextPath();
 
-		if (url == null) {
-			throw new ServletException(
-				"Resource " + resourcePath + " does not exist in " +
-					portlet.getContextPath());
+		if (resourcePath.startsWith(contextPath)) {
+			resourcePath = resourcePath.substring(contextPath.length());
 		}
 
-		return url;
+		URL url = servletContext.getResource(resourcePath);
+
+		if (url != null) {
+			return url;
+		}
+
+		url = new URL(
+			request.getScheme(), request.getLocalAddr(), request.getLocalPort(),
+			contextPath + resourcePath);
+
+		HttpURLConnection urlConnection =
+			(HttpURLConnection)url.openConnection();
+
+		if (urlConnection.getResponseCode() == HttpServletResponse.SC_OK) {
+			return url;
+		}
+
+		throw new ServletException(
+			"Resource " + resourcePath + " does not exist in " +
+				portlet.getContextPath());
 	}
 
 	protected String translate(
@@ -413,6 +437,12 @@ public class ComboServlet extends HttpServlet {
 
 	protected boolean validateModuleExtension(String moduleName)
 		throws Exception {
+
+		int index = moduleName.indexOf(CharPool.QUESTION);
+
+		if (index != -1) {
+			moduleName = moduleName.substring(0, index);
+		}
 
 		boolean validModuleExtension = false;
 

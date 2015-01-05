@@ -14,6 +14,9 @@
 
 package com.liferay.portlet.documentlibrary.model.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -34,8 +37,33 @@ import java.util.Date;
  * @see DLFileShortcut
  * @generated
  */
+@ProviderType
 public class DLFileShortcutCacheModel implements CacheModel<DLFileShortcut>,
 	Externalizable {
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof DLFileShortcutCacheModel)) {
+			return false;
+		}
+
+		DLFileShortcutCacheModel dlFileShortcutCacheModel = (DLFileShortcutCacheModel)obj;
+
+		if (fileShortcutId == dlFileShortcutCacheModel.fileShortcutId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, fileShortcutId);
+	}
+
 	@Override
 	public String toString() {
 		StringBundler sb = new StringBundler(35);

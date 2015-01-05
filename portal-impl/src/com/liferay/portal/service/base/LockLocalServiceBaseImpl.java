@@ -14,6 +14,8 @@
 
 package com.liferay.portal.service.base;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -59,6 +61,7 @@ import javax.sql.DataSource;
  * @see com.liferay.portal.service.LockLocalServiceUtil
  * @generated
  */
+@ProviderType
 public abstract class LockLocalServiceBaseImpl extends BaseLocalServiceImpl
 	implements LockLocalService, IdentifiableBean {
 	/*
@@ -175,10 +178,10 @@ public abstract class LockLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
@@ -186,11 +189,11 @@ public abstract class LockLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
@@ -207,7 +210,7 @@ public abstract class LockLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * Returns the lock with the matching UUID and company.
 	 *
 	 * @param uuid the lock's UUID
-	 * @param  companyId the primary key of the company
+	 * @param companyId the primary key of the company
 	 * @return the matching lock, or <code>null</code> if a matching lock could not be found
 	 */
 	@Override
@@ -268,7 +271,7 @@ public abstract class LockLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * Returns the lock with the matching UUID and company.
 	 *
 	 * @param uuid the lock's UUID
-	 * @param  companyId the primary key of the company
+	 * @param companyId the primary key of the company
 	 * @return the matching lock
 	 * @throws PortalException if a matching lock could not be found
 	 */

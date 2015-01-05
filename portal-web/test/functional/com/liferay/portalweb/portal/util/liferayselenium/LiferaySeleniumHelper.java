@@ -30,13 +30,12 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portalweb.portal.BaseTestCase;
 import com.liferay.portalweb.portal.util.AntCommands;
 import com.liferay.portalweb.portal.util.EmailCommands;
-import com.liferay.portalweb.portal.util.RuntimeVariables;
-import com.liferay.portalweb.portal.util.TestPropsValues;
+import com.liferay.portalweb.util.RuntimeVariables;
+import com.liferay.portalweb.util.TestPropsValues;
 
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
-import java.awt.event.InputEvent;
 import java.awt.image.BufferedImage;
 
 import java.io.BufferedReader;
@@ -46,7 +45,14 @@ import java.io.InputStreamReader;
 
 import java.net.URL;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,6 +69,14 @@ import org.sikuli.script.Screen;
  */
 public class LiferaySeleniumHelper {
 
+	public static void addToJavaScriptExceptions(Exception exception) {
+		_javaScriptExceptions.add(exception);
+	}
+
+	public static void addToLiferayExceptions(Exception exception) {
+		_liferayExceptions.add(exception);
+	}
+
 	public static void antCommand(
 			LiferaySelenium liferaySelenium, String fileName, String target)
 		throws Exception {
@@ -70,9 +84,18 @@ public class LiferaySeleniumHelper {
 		AntCommands antCommands = new AntCommands(
 			liferaySelenium, fileName, target);
 
-		antCommands.start();
+		ExecutorService executorService = Executors.newCachedThreadPool();
 
-		antCommands.join(120000);
+		Future<Void> future = executorService.submit(antCommands);
+
+		try {
+			future.get(150, TimeUnit.SECONDS);
+		}
+		catch (ExecutionException ee) {
+			throw ee;
+		}
+		catch (TimeoutException te) {
+		}
 	}
 
 	public static void assertAlert(
@@ -213,6 +236,13 @@ public class LiferaySeleniumHelper {
 			String level = eventElement.attributeValue("level");
 
 			if (level.equals("ERROR")) {
+				String fileContent = FileUtil.read(fileName);
+
+				fileContent = fileContent.replaceFirst(
+					"level=\"ERROR\"", "level=\"ERROR_FOUND\"");
+
+				FileUtil.write(fileName, fileContent);
+
 				Element messageElement = eventElement.element("message");
 
 				String messageText = messageElement.getText();
@@ -221,16 +251,24 @@ public class LiferaySeleniumHelper {
 					continue;
 				}
 
-				FileUtil.write(fileName, "");
-
 				Element throwableElement = eventElement.element("throwable");
 
+				Exception exception;
+
 				if (throwableElement != null) {
-					throw new Exception(
+					exception = new Exception(
 						messageText + throwableElement.getText());
+
+					addToLiferayExceptions(exception);
+
+					throw exception;
 				}
 
-				throw new Exception(messageText);
+				exception = new Exception(messageText);
+
+				addToLiferayExceptions(exception);
+
+				throw exception;
 			}
 		}
 	}
@@ -239,6 +277,80 @@ public class LiferaySeleniumHelper {
 		LiferaySelenium liferaySelenium, String pattern) {
 
 		BaseTestCase.assertEquals(pattern, liferaySelenium.getLocation());
+	}
+
+	public static void assertNoJavaScriptExceptions() throws Exception {
+		if (!_javaScriptExceptions.isEmpty()) {
+			StringBundler sb = new StringBundler();
+
+			sb.append(_javaScriptExceptions.size());
+			sb.append(" Javascript Exception");
+
+			if (_javaScriptExceptions.size() > 1) {
+				sb.append("s were");
+			}
+			else {
+				sb.append(" was");
+			}
+
+			sb.append(" thrown");
+
+			System.out.println();
+			System.out.println("##");
+			System.out.println("## " + sb.toString());
+			System.out.println("##");
+
+			for (int i = 0; i < _javaScriptExceptions.size(); i++) {
+				Exception liferayException = _javaScriptExceptions.get(i);
+
+				System.out.println();
+				System.out.println("##");
+				System.out.println("## Javascript Exception #" + (i + 1));
+				System.out.println("##");
+				System.out.println();
+				System.out.println(liferayException.getMessage());
+				System.out.println();
+			}
+
+			throw new Exception(sb.toString());
+		}
+	}
+
+	public static void assertNoLiferayExceptions() throws Exception {
+		if (!_liferayExceptions.isEmpty()) {
+			StringBundler sb = new StringBundler();
+
+			sb.append(_liferayExceptions.size());
+			sb.append(" Liferay Exception");
+
+			if (_liferayExceptions.size() > 1) {
+				sb.append("s were");
+			}
+			else {
+				sb.append(" was");
+			}
+
+			sb.append(" thrown");
+
+			System.out.println();
+			System.out.println("##");
+			System.out.println("## " + sb.toString());
+			System.out.println("##");
+
+			for (int i = 0; i < _liferayExceptions.size(); i++) {
+				Exception liferayException = _liferayExceptions.get(i);
+
+				System.out.println();
+				System.out.println("##");
+				System.out.println("## Liferay Exception #" + (i + 1));
+				System.out.println("##");
+				System.out.println();
+				System.out.println(liferayException.getMessage());
+				System.out.println();
+			}
+
+			throw new Exception(sb.toString());
+		}
 	}
 
 	public static void assertNotAlert(
@@ -425,6 +537,22 @@ public class LiferaySeleniumHelper {
 			throw new Exception(
 				"Element is not visible at \"" + locator + "\"");
 		}
+	}
+
+	public static void captureScreen(String fileName) throws Exception {
+		File file = new File(fileName);
+
+		file.mkdirs();
+
+		Robot robot = new Robot();
+
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+
+		Rectangle rectangle = new Rectangle(toolkit.getScreenSize());
+
+		BufferedImage bufferedImage = robot.createScreenCapture(rectangle);
+
+		ImageIO.write(bufferedImage, "jpg", file);
 	}
 
 	public static void connectToEmailAccount(
@@ -690,6 +818,172 @@ public class LiferaySeleniumHelper {
 			return true;
 		}
 
+		// LPS-46161
+
+		if (line.matches(
+				".*The web application \\[\\] created a ThreadLocal with key " +
+					"of type.*")) {
+
+			if (line.contains(
+					"[com.google.javascript.jscomp.Tracer.ThreadTrace]")) {
+
+				return true;
+			}
+		}
+
+		// LPS-49204
+
+		if (line.matches(
+				".*The web application \\[\\] appears to have started a " +
+					"thread named \\[elasticsearch\\[.*")) {
+
+			return true;
+		}
+
+		if (line.matches(
+				".*The web application \\[\\] created a ThreadLocal with key " +
+					"of type.*")) {
+
+			if (line.contains("[org.elasticsearch.common.inject]")) {
+				return true;
+			}
+
+			if (line.contains("[org.elasticsearch.index.mapper]")) {
+				return true;
+			}
+		}
+
+		// LPS-49228
+
+		if (line.matches(
+				".*The web application \\[/sharepoint-hook\\] created a " +
+					"ThreadLocal with key of type.*")) {
+
+			if (line.contains(
+					"[org.apache.axis.utils.XMLUtils." +
+						"ThreadLocalDocumentBuilder]")) {
+
+				return true;
+			}
+		}
+
+		// LPS-49229
+
+		if (line.matches(
+				".*The web application \\[\\] created a ThreadLocal with key " +
+					"of type.*")) {
+
+			if (line.contains(
+					"[org.apache.xmlbeans.impl.schema." +
+						"SchemaTypeLoaderImpl$1]")) {
+
+				return true;
+			}
+
+			if (line.contains("[org.apache.xmlbeans.impl.store.CharUtil$1]")) {
+				return true;
+			}
+
+			if (line.contains("[org.apache.xmlbeans.impl.store.Locale$1]")) {
+				return true;
+			}
+		}
+
+		// LPS-49505
+
+		if (line.matches(
+				".*The web application \\[\\] created a ThreadLocal with key " +
+					"of type.*")) {
+
+			if (line.contains("[org.jruby.RubyEncoding$2]")) {
+				return true;
+			}
+		}
+
+		// LPS-49506
+
+		if (line.matches(
+				".*The web application \\[\\] created a ThreadLocal with key " +
+					"of type.*")) {
+
+			if (line.contains("[org.joni.StackMachine$1]")) {
+				return true;
+			}
+		}
+
+		// LPS-49628
+
+		if (line.matches(
+				".*The web application \\[\\] created a ThreadLocal with key " +
+					"of type.*")) {
+
+			if (line.contains(
+					"[org.apache.poi.extractor.ExtractorFactory$1]")) {
+
+				return true;
+			}
+		}
+
+		// LPS-49629
+
+		if (line.matches(
+				".*The web application \\[\\] created a ThreadLocal with key " +
+					"of type.*")) {
+
+			if (line.contains("[org.apache.xmlbeans.XmlBeans$1]")) {
+				return true;
+			}
+		}
+
+		// LPS-50047
+
+		if (line.matches(
+				".*The web application \\[\\] created a ThreadLocal with key " +
+					"of type.*")) {
+
+			if (line.contains(
+					"[com.sun.syndication.feed.impl.ToStringBean$1]")) {
+
+				return true;
+			}
+		}
+
+		// LPS-50936
+
+		if (line.matches(
+				"Liferay does not have the Xuggler native libraries " +
+					"installed.")) {
+
+			return true;
+		}
+
+		// LPS-51371
+
+		if (line.matches(
+				".*The web application \\[/jasperreports-web\\] created a " +
+					"ThreadLocal with key of type.*")) {
+
+			if (line.contains(
+					"[net.sf.jasperreports.engine.fonts.FontUtil$1]")) {
+
+				return true;
+			}
+		}
+
+		// LPS-52346
+
+		if (line.matches(
+				".*The web application \\[\\] created a ThreadLocal with key " +
+					"of type.*")) {
+
+			if (line.contains(
+					"[org.apache.jasper.runtime.JspWriterImpl." +
+						"CharBufferThreadLocalPool]")) {
+
+				return true;
+			}
+		}
+
 		if (Validator.equals(
 				TestPropsValues.LIFERAY_PORTAL_BUNDLE, "6.2.10.1") ||
 			Validator.equals(
@@ -739,6 +1033,10 @@ public class LiferaySeleniumHelper {
 		}
 
 		return false;
+	}
+
+	public static boolean isMobileDeviceEnabled() {
+		return TestPropsValues.MOBILE_DEVICE_ENABLED;
 	}
 
 	public static boolean isNotChecked(
@@ -799,21 +1097,24 @@ public class LiferaySeleniumHelper {
 
 		_screenshotCount++;
 
-		File file = new File(
-			liferaySelenium.getProjectDirName() + "portal-web/test-results/" +
-				"functional/screenshots/" + _screenshotCount + ".jpg");
+		captureScreen(
+			liferaySelenium.getProjectDirName() +
+				"portal-web/test-results/functional/screenshots/" +
+					_screenshotCount + ".jpg");
+	}
 
-		file.mkdirs();
+	public static void saveScreenshotBeforeAction(
+			LiferaySelenium liferaySelenium, boolean actionFailed)
+		throws Exception {
 
-		Robot robot = new Robot();
+		if (actionFailed) {
+			_screenshotErrorCount++;
+		}
 
-		Toolkit toolkit = Toolkit.getDefaultToolkit();
-
-		Rectangle rectangle = new Rectangle(toolkit.getScreenSize());
-
-		BufferedImage bufferedImage = robot.createScreenCapture(rectangle);
-
-		ImageIO.write(bufferedImage, "jpg", file);
+		captureScreen(
+			liferaySelenium.getProjectDirName() +
+				"portal-web/test-results/functional/screenshots/" +
+					"ScreenshotBeforeAction" + _screenshotErrorCount + ".jpg");
 	}
 
 	public static void sendEmail(
@@ -897,9 +1198,9 @@ public class LiferaySeleniumHelper {
 
 		robot.delay(1000);
 
-		robot.mousePress(InputEvent.BUTTON1_MASK);
+		_screen.mouseDown(Button.LEFT);
 
-		robot.delay(1000);
+		liferaySelenium.pause("2000");
 
 		String[] coords = coordString.split(",");
 
@@ -912,7 +1213,7 @@ public class LiferaySeleniumHelper {
 
 		robot.delay(1500);
 
-		robot.mouseRelease(InputEvent.BUTTON1_MASK);
+		_screen.mouseUp(Button.LEFT);
 	}
 
 	public static void sikuliLeftMouseDown(LiferaySelenium liferaySelenium)
@@ -986,12 +1287,35 @@ public class LiferaySeleniumHelper {
 
 		liferaySelenium.pause("1000");
 
-		_screen.type(value);
+		if (value.contains("${line.separator}")) {
+			String[] tokens = StringUtil.split(value, "${line.separator}");
+
+			for (int i = 0; i < tokens.length; i++) {
+				_screen.type(tokens[i]);
+
+				if ((i + 1) < tokens.length) {
+					_screen.type(Key.ENTER);
+				}
+			}
+
+			if (value.endsWith("${line.separator}")) {
+				_screen.type(Key.ENTER);
+			}
+		}
+		else {
+			_screen.type(value);
+		}
 	}
 
 	public static void sikuliUploadCommonFile(
 			LiferaySelenium liferaySelenium, String image, String value)
 		throws Exception {
+
+		_screen.click(
+			liferaySelenium.getProjectDirName() +
+			liferaySelenium.getSikuliImagesDirName() + image);
+
+		_screen.type("a", Key.CTRL);
 
 		sikuliType(
 			liferaySelenium, image,
@@ -1021,6 +1345,12 @@ public class LiferaySeleniumHelper {
 			LiferaySelenium liferaySelenium, String image, String value)
 		throws Exception {
 
+		_screen.click(
+			liferaySelenium.getProjectDirName() +
+			liferaySelenium.getSikuliImagesDirName() + image);
+
+		_screen.type("a", Key.CTRL);
+
 		String slash = "/";
 
 		if (OSDetector.isWindows()) {
@@ -1040,11 +1370,15 @@ public class LiferaySeleniumHelper {
 		int x = 0;
 		int y = value.indexOf("${line.separator}");
 
-		String line = value.substring(x, y);
+		String line = value;
 
-		liferaySelenium.typeKeys(locator, line.trim(), true);
+		if (y != -1) {
+			line = value.substring(x, y);
+		}
 
-		liferaySelenium.keyPress(locator, "\\13");
+		liferaySelenium.typeKeys(locator, line.trim());
+
+		liferaySelenium.keyPress(locator, "\\RETURN");
 
 		while (y != -1) {
 			x = value.indexOf("}", x) + 1;
@@ -1057,9 +1391,9 @@ public class LiferaySeleniumHelper {
 				line = value.substring(x, value.length());
 			}
 
-			liferaySelenium.typeKeys(locator, line.trim(), true);
+			liferaySelenium.typeKeys(locator, line.trim());
 
-			liferaySelenium.keyPress(locator, "\\13");
+			liferaySelenium.keyPress(locator, "\\RETURN");
 		}
 	}
 
@@ -1068,17 +1402,27 @@ public class LiferaySeleniumHelper {
 
 		StringBundler sb = new StringBundler();
 
-		String titleAttibute = liferaySelenium.getAttribute(locator + "@title");
+		String titleAttribute = liferaySelenium.getAttribute(
+			locator + "@title");
 
-		int x = titleAttibute.indexOf(",");
+		int x = titleAttribute.indexOf(",");
+		int y = titleAttribute.indexOf(",", x + 1);
 
-		sb.append(titleAttibute.substring(x + 1));
+		if (y == -1) {
+			y = titleAttribute.length();
+		}
+
+		sb.append(titleAttribute.substring(x + 1, y));
 
 		sb.append(".setHTML(\"");
 		sb.append(HtmlUtil.escapeJS(value.replace("\\", "\\\\")));
-		sb.append("\");");
+		sb.append("\")");
 
 		liferaySelenium.runScript(sb.toString());
+	}
+
+	public static void typeScreen(String value) {
+		_screen.type(value);
 	}
 
 	public static void waitForElementNotPresent(
@@ -1395,7 +1739,12 @@ public class LiferaySeleniumHelper {
 		}
 	}
 
+	private static List<Exception> _javaScriptExceptions =
+		new ArrayList<Exception>();
+	private static List<Exception> _liferayExceptions =
+		new ArrayList<Exception>();
 	private static Screen _screen = new Screen();
 	private static int _screenshotCount = 0;
+	private static int _screenshotErrorCount = 0;
 
 }

@@ -15,11 +15,16 @@
 package com.liferay.markdown.converter.internal.pegdown.serializer;
 
 import com.liferay.markdown.converter.internal.pegdown.ast.PicWithCaptionNode;
-import com.liferay.markdown.converter.internal.pegdown.ast.SidebarNode;
+
+import java.util.List;
 
 import org.pegdown.LinkRenderer;
 import org.pegdown.ToHtmlSerializer;
+import org.pegdown.ast.HeaderNode;
+import org.pegdown.ast.Node;
+import org.pegdown.ast.ParaNode;
 import org.pegdown.ast.SuperNode;
+import org.pegdown.ast.TextNode;
 
 /**
  * Provides a visitor implementation for printing HTML for pictures with
@@ -33,12 +38,75 @@ public class LiferayToHtmlSerializer extends ToHtmlSerializer {
 		super(linkRenderer);
 	}
 
-	public void visit(PicWithCaptionNode picWithCaptionNode) {
-		print(picWithCaptionNode);
+	@Override
+	public void visit(HeaderNode node) {
+		boolean anchorInserted = false;
+
+		if (node.getLevel() != 1) {
+			List<Node> childNodes = node.getChildren();
+
+			if (!childNodes.isEmpty()) {
+				Node childNode = childNodes.get(0);
+
+				if (childNode instanceof TextNode) {
+					TextNode textNode = (TextNode)childNodes.get(0);
+
+					String text = textNode.getText();
+
+					text = text.toLowerCase();
+
+					text = text.replaceAll("[^a-z0-9 ]", "");
+
+					text = text.trim();
+
+					text = text.replace(' ', '-');
+
+					printer.print(
+						"<a href=\"#" + text + "\" id=\"" + text + "\">");
+
+					anchorInserted = true;
+				}
+			}
+		}
+
+		super.visit(node);
+
+		if (anchorInserted) {
+			printer.print("</a>");
+		}
 	}
 
-	public void visit(SidebarNode sidebarNode) {
-		print(sidebarNode);
+	@Override
+	public void visit(ParaNode node) {
+		boolean printParagraphTag = true;
+
+		List<Node> childNodes = node.getChildren();
+
+		for (Node childNode : childNodes) {
+			List<Node> grandchildNodes = childNode.getChildren();
+
+			for (Node grandchildNode : grandchildNodes) {
+				if (grandchildNode instanceof TextNode) {
+					TextNode textNode = (TextNode)grandchildNode;
+
+					String text = textNode.getText();
+
+					if (text.equals("+$$$") || text.equals("$$$")) {
+						visitChildren(node);
+
+						printParagraphTag = false;
+					}
+				}
+			}
+		}
+
+		if (printParagraphTag) {
+			printTag(node, "p");
+		}
+	}
+
+	public void visit(PicWithCaptionNode picWithCaptionNode) {
+		print(picWithCaptionNode);
 	}
 
 	@Override
@@ -46,11 +114,28 @@ public class LiferayToHtmlSerializer extends ToHtmlSerializer {
 		if (superNode instanceof PicWithCaptionNode) {
 			visit((PicWithCaptionNode)superNode);
 		}
-		else if (superNode instanceof SidebarNode) {
-			visit((SidebarNode)superNode);
-		}
 		else {
 			visitChildren(superNode);
+		}
+	}
+
+	@Override
+	public void visit(TextNode node) {
+		String text = node.getText();
+
+		if (text.equals("+$$$")) {
+			printer.print("<div class=\"sidebar\">");
+			printer.print("<div class=\"sidebar-image\"></div>");
+			printer.print("<div class=\"sidebar-text\">");
+		}
+		else if (text.equals("$$$")) {
+			printer.print("</div></div>");
+		}
+		else if (abbreviations.isEmpty()) {
+			printer.print(text);
+		}
+		else {
+			printWithAbbreviations(text);
 		}
 	}
 
@@ -62,18 +147,6 @@ public class LiferayToHtmlSerializer extends ToHtmlSerializer {
 		printer.print("\" /><p class=\"caption\">");
 
 		visitChildren(picWithCaptionNode);
-
-		printer.print("</p></p>");
-	}
-
-	protected void print(SidebarNode sidebarNode) {
-		printer.print("<p><img src=\"");
-		printer.print(sidebarNode.getSrc());
-		printer.print("\" alt=\"");
-		printer.print(sidebarNode.getAlt());
-		printer.print("\" />");
-
-		visitChildren(sidebarNode);
 
 		printer.print("</p>");
 	}

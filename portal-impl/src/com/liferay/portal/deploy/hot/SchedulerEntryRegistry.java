@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
 import com.liferay.portal.kernel.scheduler.SchedulerEntry;
 import com.liferay.portal.kernel.scheduler.SchedulerException;
 import com.liferay.portal.kernel.scheduler.StorageType;
+import com.liferay.portal.kernel.scheduler.StorageTypeAware;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.registry.Filter;
 import com.liferay.registry.Registry;
@@ -35,6 +36,8 @@ public class SchedulerEntryRegistry {
 
 	public SchedulerEntryRegistry() {
 		if (!PropsValues.SCHEDULER_ENABLED) {
+			_serviceTracker = null;
+
 			return;
 		}
 
@@ -58,10 +61,11 @@ public class SchedulerEntryRegistry {
 		_serviceTracker.close();
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		SchedulerEntryRegistry.class);
 
-	private ServiceTracker<SchedulerEntry, SchedulerEntry> _serviceTracker;
+	private final ServiceTracker<SchedulerEntry, SchedulerEntry>
+		_serviceTracker;
 
 	private class SchedulerEntryServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer<SchedulerEntry, SchedulerEntry> {
@@ -75,12 +79,21 @@ public class SchedulerEntryRegistry {
 			SchedulerEntry schedulerEntry = registry.getService(
 				serviceReference);
 
+			StorageType storageType = StorageType.MEMORY_CLUSTERED;
+
+			if (schedulerEntry instanceof StorageTypeAware) {
+				StorageTypeAware storageTypeAware =
+					(StorageTypeAware)schedulerEntry;
+
+				storageType = storageTypeAware.getStorageType();
+			}
+
 			String portletId = (String)serviceReference.getProperty(
 				"javax.portlet.name");
 
 			try {
 				SchedulerEngineHelperUtil.schedule(
-					schedulerEntry, StorageType.MEMORY_CLUSTERED, portletId, 0);
+					schedulerEntry, storageType, portletId, 0);
 
 				return schedulerEntry;
 			}
@@ -106,9 +119,18 @@ public class SchedulerEntryRegistry {
 
 			registry.ungetService(serviceReference);
 
+			StorageType storageType = StorageType.MEMORY_CLUSTERED;
+
+			if (schedulerEntry instanceof StorageTypeAware) {
+				StorageTypeAware storageTypeAware =
+					(StorageTypeAware)schedulerEntry;
+
+				storageType = storageTypeAware.getStorageType();
+			}
+
 			try {
 				SchedulerEngineHelperUtil.unschedule(
-					schedulerEntry, StorageType.MEMORY_CLUSTERED);
+					schedulerEntry, storageType);
 			}
 			catch (SchedulerException e) {
 				_log.error(e, e);

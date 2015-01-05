@@ -18,6 +18,8 @@ import com.liferay.portal.kernel.bean.ClassLoaderBeanHandler;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.service.ServiceWrapper;
 
+import java.lang.reflect.InvocationHandler;
+
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.AdvisedSupport;
 import org.springframework.aop.target.SingletonTargetSource;
@@ -25,13 +27,29 @@ import org.springframework.aop.target.SingletonTargetSource;
 /**
  * @author Raymond Augé
  */
-public class ServiceBag {
+public class ServiceBag<V> {
 
 	public ServiceBag(
 		ClassLoader classLoader, AdvisedSupport advisedSupport,
-		Class<?> serviceTypeClass, final ServiceWrapper<?> serviceWrapper) {
+		Class<?> serviceTypeClass, final ServiceWrapper<V> serviceWrapper) {
 
 		_advisedSupport = advisedSupport;
+
+		Object previousService = serviceWrapper.getWrappedService();
+
+		if (!(previousService instanceof ServiceWrapper)) {
+			Class<?> previousServiceClass = previousService.getClass();
+
+			ClassLoader previousServiceClassLoader =
+				previousServiceClass.getClassLoader();
+
+			previousService = ProxyUtil.newProxyInstance(
+				previousServiceClassLoader, new Class<?>[] {serviceTypeClass},
+					new ClassLoaderBeanHandler(
+						previousService, previousServiceClassLoader));
+
+			serviceWrapper.setWrappedService((V)previousService);
+		}
 
 		Object nextTarget = ProxyUtil.newProxyInstance(
 			classLoader,
@@ -70,8 +88,25 @@ public class ServiceBag {
 
 				if (previousService == null) {
 
-					// There is no previous service, so we need to change the
-					// target source
+					// There is no previous service, so we need to unwrap the
+					// portal class loader bean handler and change the target
+					// source
+
+					if (!(wrappedService instanceof ServiceWrapper) &&
+						ProxyUtil.isProxyClass(wrappedService.getClass())) {
+
+						InvocationHandler invocationHandler =
+							ProxyUtil.getInvocationHandler(wrappedService);
+
+						if (invocationHandler instanceof
+								ClassLoaderBeanHandler) {
+
+							ClassLoaderBeanHandler classLoaderBeanHandler =
+								(ClassLoaderBeanHandler)invocationHandler;
+
+							wrappedService = classLoaderBeanHandler.getBean();
+						}
+					}
 
 					TargetSource previousTargetSource =
 						new SingletonTargetSource(wrappedService);
@@ -105,7 +140,7 @@ public class ServiceBag {
 		}
 	}
 
-	private AdvisedSupport _advisedSupport;
-	private ServiceWrapper<?> _serviceWrapper;
+	private final AdvisedSupport _advisedSupport;
+	private final ServiceWrapper<?> _serviceWrapper;
 
 }

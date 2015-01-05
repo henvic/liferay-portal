@@ -19,10 +19,12 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Repository;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFolder;
 import com.liferay.portal.service.RepositoryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
+import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 
@@ -31,11 +33,12 @@ import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
  */
 public class DLFileShortcutImpl extends DLFileShortcutBaseImpl {
 
-	public DLFileShortcutImpl() {
-	}
-
 	@Override
 	public String buildTreePath() throws PortalException {
+		if (getFolderId() == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			return StringPool.SLASH;
+		}
+
 		DLFolder dlFolder = getDLFolder();
 
 		return dlFolder.buildTreePath();
@@ -94,6 +97,7 @@ public class DLFileShortcutImpl extends DLFileShortcutBaseImpl {
 		return false;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(DLFileShortcutImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLFileShortcutImpl.class);
 
 }

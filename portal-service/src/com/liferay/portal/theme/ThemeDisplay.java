@@ -371,7 +371,7 @@ public class ThemeDisplay
 	 * Returns the site's page.
 	 *
 	 * <p>
-	 * Layout is Liferay's technical name for a page
+	 * Layout is Liferay's technical name for a page.
 	 * </p>
 	 *
 	 * @return the site's page
@@ -384,7 +384,7 @@ public class ThemeDisplay
 	 * Returns the site's top-level pages.
 	 *
 	 * <p>
-	 * Layout is Liferay's technical name for a page
+	 * Layout is Liferay's technical name for a page.
 	 * </p>
 	 *
 	 * @return the site's top-level pages
@@ -759,7 +759,7 @@ public class ThemeDisplay
 	 * @deprecated As of 6.2.0 renamed to {@link #getSiteGroupIdOrLiveGroupId}
 	 */
 	@Deprecated
-	public long getScopeGroupIdOrLiveGroupId() throws PortalException {
+	public long getScopeGroupIdOrLiveGroupId() {
 		return getSiteGroupIdOrLiveGroupId();
 	}
 
@@ -839,7 +839,7 @@ public class ThemeDisplay
 		return _siteGroupId;
 	}
 
-	public long getSiteGroupIdOrLiveGroupId() throws PortalException {
+	public long getSiteGroupIdOrLiveGroupId() {
 		return StagingUtil.getLiveGroupId(_siteGroupId);
 	}
 
@@ -1461,8 +1461,7 @@ public class ThemeDisplay
 		setPathThemeImages(
 			cdnBaseURL + themeStaticResourcePath + theme.getImagesPath());
 		setPathThemeJavaScript(
-			cdnBaseURL + themeStaticResourcePath +
-				theme.getJavaScriptPath());
+			cdnBaseURL + themeStaticResourcePath + theme.getJavaScriptPath());
 
 		String rootPath = theme.getRootPath();
 
@@ -1890,7 +1889,7 @@ public class ThemeDisplay
 		return LanguageUtil.format(getLocale(), pattern, arguments);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(ThemeDisplay.class);
+	private static final Log _log = LogFactoryUtil.getLog(ThemeDisplay.class);
 
 	private Account _account;
 	private boolean _addSessionIdToURL;

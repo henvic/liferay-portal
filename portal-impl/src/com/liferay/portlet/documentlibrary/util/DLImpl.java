@@ -28,6 +28,8 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
@@ -59,6 +61,7 @@ import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.PortletURLFactoryUtil;
 import com.liferay.portlet.documentlibrary.DLPortletInstanceSettings;
+import com.liferay.portlet.documentlibrary.action.EditFileEntryAction;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
@@ -201,11 +204,18 @@ public class DLImpl implements DL {
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
-		DLPortletInstanceSettings dlPortletInstanceSettings =
-			DLPortletInstanceSettings.getInstance(
-				themeDisplay.getLayout(), portletDisplay.getId());
+		long defaultFolderId = DLFolderConstants.DEFAULT_PARENT_FOLDER_ID;
 
-		long defaultFolderId = dlPortletInstanceSettings.getDefaultFolderId();
+		boolean ignoreRootFolder = ParamUtil.getBoolean(
+			request, "ignoreRootFolder");
+
+		if (!ignoreRootFolder) {
+			DLPortletInstanceSettings dlPortletInstanceSettings =
+				DLPortletInstanceSettings.getInstance(
+					themeDisplay.getLayout(), portletDisplay.getId());
+
+			defaultFolderId = dlPortletInstanceSettings.getDefaultFolderId();
+		}
 
 		List<Folder> ancestorFolders = Collections.emptyList();
 
@@ -275,6 +285,8 @@ public class DLImpl implements DL {
 		String strutsAction = ParamUtil.getString(request, "struts_action");
 
 		long groupId = ParamUtil.getLong(request, "groupId");
+		boolean ignoreRootFolder = ParamUtil.getBoolean(
+			request, "ignoreRootFolder");
 
 		PortletURL portletURL = renderResponse.createRenderURL();
 
@@ -289,6 +301,8 @@ public class DLImpl implements DL {
 
 			portletURL.setParameter("struts_action", strutsAction);
 			portletURL.setParameter("groupId", String.valueOf(groupId));
+			portletURL.setParameter(
+				"ignoreRootFolder", String.valueOf(ignoreRootFolder));
 			portletURL.setWindowState(LiferayWindowState.POP_UP);
 
 			PortalUtil.addPortletBreadcrumbEntry(
@@ -730,6 +744,49 @@ public class DLImpl implements DL {
 	}
 
 	@Override
+	public String getFileName(
+		long groupId, long folderId, String tempFileName) {
+
+		String extension = FileUtil.getExtension(tempFileName);
+
+		int pos = tempFileName.lastIndexOf(
+			EditFileEntryAction.TEMP_RANDOM_SUFFIX);
+
+		if (pos != -1) {
+			tempFileName = tempFileName.substring(0, pos);
+
+			if (Validator.isNotNull(extension)) {
+				tempFileName = tempFileName + StringPool.PERIOD + extension;
+			}
+		}
+
+		while (true) {
+			try {
+				DLAppLocalServiceUtil.getFileEntry(
+					groupId, folderId, tempFileName);
+
+				StringBundler sb = new StringBundler(5);
+
+				sb.append(FileUtil.stripExtension(tempFileName));
+				sb.append(StringPool.DASH);
+				sb.append(StringUtil.randomString());
+
+				if (Validator.isNotNull(extension)) {
+					sb.append(StringPool.PERIOD);
+					sb.append(extension);
+				}
+
+				tempFileName = sb.toString();
+			}
+			catch (Exception e) {
+				break;
+			}
+		}
+
+		return tempFileName;
+	}
+
+	@Override
 	public String getGenericName(String extension) {
 		String genericName = _genericNames.get(extension);
 
@@ -816,13 +873,13 @@ public class DLImpl implements DL {
 		sb.append(fileEntry.getFolderId());
 		sb.append(StringPool.SLASH);
 
-		String title = fileEntry.getTitle();
+		String fileName = fileEntry.getFileName();
 
 		if (fileEntry.isInTrash()) {
-			title = TrashUtil.getOriginalTitle(fileEntry.getTitle());
+			fileName = TrashUtil.getOriginalTitle(fileEntry.getFileName());
 		}
 
-		sb.append(HttpUtil.encodeURL(HtmlUtil.unescape(title)));
+		sb.append(HttpUtil.encodeURL(HtmlUtil.unescape(fileName)));
 
 		sb.append(StringPool.SLASH);
 		sb.append(HttpUtil.encodeURL(fileEntry.getUuid()));
@@ -907,6 +964,32 @@ public class DLImpl implements DL {
 	}
 
 	@Override
+	public String getSanitizedFileName(String title, String extension) {
+		String fileName = StringUtil.replace(
+			title, StringPool.SLASH, StringPool.UNDERLINE);
+
+		if (Validator.isNotNull(extension) &&
+			!StringUtil.endsWith(fileName, StringPool.PERIOD + extension)) {
+
+			fileName += StringPool.PERIOD + extension;
+		}
+
+		if (fileName.length() > 255) {
+			int x = fileName.length() - 1;
+
+			if (Validator.isNotNull(extension)) {
+				x = fileName.lastIndexOf(StringPool.PERIOD);
+			}
+
+			int y = x - (fileName.length() - 255);
+
+			fileName = fileName.substring(0, y) + fileName.substring(x);
+		}
+
+		return fileName;
+	}
+
+	@Override
 	public String getTempFileId(long id, String version) {
 		return getTempFileId(id, version, null);
 	}
@@ -928,6 +1011,11 @@ public class DLImpl implements DL {
 		return sb.toString();
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getThumbnailSrc(FileEntry,
+	 *             ThemeDisplay)}
+	 */
+	@Deprecated
 	@Override
 	public String getThumbnailSrc(
 			FileEntry fileEntry, DLFileShortcut dlFileShortcut,
@@ -935,14 +1023,27 @@ public class DLImpl implements DL {
 		throws Exception {
 
 		return getThumbnailSrc(
-			fileEntry, fileEntry.getFileVersion(), dlFileShortcut,
-			themeDisplay);
+			fileEntry, fileEntry.getFileVersion(), themeDisplay);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getThumbnailSrc(FileEntry,
+	 *             FileVersion, ThemeDisplay)}
+	 */
+	@Deprecated
+	@Override
+	public String getThumbnailSrc(
+			FileEntry fileEntry, FileVersion fileVersion,
+			DLFileShortcut dlFileShortcut, ThemeDisplay themeDisplay)
+		throws Exception {
+
+		return getThumbnailSrc(fileEntry, fileVersion, themeDisplay);
 	}
 
 	@Override
 	public String getThumbnailSrc(
 			FileEntry fileEntry, FileVersion fileVersion,
-			DLFileShortcut dlFileShortcut, ThemeDisplay themeDisplay)
+			ThemeDisplay themeDisplay)
 		throws Exception {
 
 		String thumbnailQueryString = null;
@@ -961,6 +1062,15 @@ public class DLImpl implements DL {
 
 		return getImageSrc(
 			fileEntry, fileVersion, themeDisplay, thumbnailQueryString);
+	}
+
+	@Override
+	public String getThumbnailSrc(
+			FileEntry fileEntry, ThemeDisplay themeDisplay)
+		throws Exception {
+
+		return getThumbnailSrc(
+			fileEntry, fileEntry.getFileVersion(), themeDisplay);
 	}
 
 	@Override
@@ -1065,22 +1175,12 @@ public class DLImpl implements DL {
 			webDavURL.append(MANUAL_CHECK_IN_REQUIRED_PATH);
 		}
 
-		String fileEntryTitle = null;
+		String fileEntryFileName = null;
 
 		Group group = null;
 
 		if (fileEntry != null) {
-			String extension = fileEntry.getExtension();
-
-			fileEntryTitle = HtmlUtil.unescape(fileEntry.getTitle());
-
-			if (openDocumentUrl && isOfficeExtension(extension) &&
-				!fileEntryTitle.endsWith(StringPool.PERIOD + extension)) {
-
-				webDavURL.append(OFFICE_EXTENSION_PATH);
-
-				fileEntryTitle += StringPool.PERIOD + extension;
-			}
+			fileEntryFileName = HtmlUtil.unescape(fileEntry.getFileName());
 
 			group = GroupLocalServiceUtil.getGroup(fileEntry.getGroupId());
 		}
@@ -1116,7 +1216,7 @@ public class DLImpl implements DL {
 
 		if (fileEntry != null) {
 			sb.append(StringPool.SLASH);
-			sb.append(HttpUtil.encodeURL(fileEntryTitle, true));
+			sb.append(HttpUtil.encodeURL(fileEntryFileName, true));
 		}
 
 		webDavURL.append(sb.toString());
@@ -1137,7 +1237,9 @@ public class DLImpl implements DL {
 				return false;
 			}
 
-			if (dlFolder.isOverrideFileEntryTypes()) {
+			if (dlFolder.getRestrictionType() !=
+					DLFolderConstants.RESTRICTION_TYPE_INHERIT) {
+
 				break;
 			}
 
@@ -1222,7 +1324,7 @@ public class DLImpl implements DL {
 		long[] folderIdsArray = ArrayUtil.toLongArray(ancestorFolderIds);
 
 		return SubscriptionLocalServiceUtil.isSubscribed(
-			companyId, userId, Folder.class.getName(), folderIdsArray);
+			companyId, userId, DLFolder.class.getName(), folderIdsArray);
 	}
 
 	@Override
@@ -1270,6 +1372,15 @@ public class DLImpl implements DL {
 	protected String getEntryURL(
 			DLFileVersion dlFileVersion, ServiceContext serviceContext)
 		throws PortalException {
+
+		if (Validator.equals(
+				serviceContext.getCommand(), Constants.ADD_WEBDAV) ||
+			Validator.equals(
+				serviceContext.getCommand(), Constants.UPDATE_WEBDAV)) {
+
+			return serviceContext.getPortalURL() +
+				serviceContext.getCurrentURL();
+		}
 
 		HttpServletRequest request = serviceContext.getRequest();
 

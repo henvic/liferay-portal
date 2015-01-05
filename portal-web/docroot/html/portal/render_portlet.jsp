@@ -184,6 +184,7 @@ boolean showPortletCssIcon = false;
 boolean showPortletIcon = (portletResourcePortlet != null) ? Validator.isNotNull(portletResourcePortlet.getIcon()) : Validator.isNotNull(portlet.getIcon());
 boolean showPrintIcon = portlet.hasPortletMode(responseContentType, LiferayPortletMode.PRINT);
 boolean showRefreshIcon = portlet.isAjaxable() && (portlet.getRenderWeight() == 0);
+boolean showStagingIcon = false;
 
 Boolean portletParallelRender = (Boolean)request.getAttribute(WebKeys.PORTLET_PARALLEL_RENDER);
 
@@ -199,7 +200,7 @@ if (!portletId.equals(PortletKeys.PORTLET_CONFIGURATION)) {
 
 		showConfigurationIcon = true;
 
-		boolean supportsConfigurationLAR = Validator.isNotNull(portlet.getConfigurationActionClass());
+		boolean supportsConfigurationLAR = portlet.getConfigurationActionInstance() != null;
 		boolean supportsDataLAR = !(portlet.getPortletDataHandlerInstance() instanceof DefaultConfigurationPortletDataHandler);
 
 		if (supportsConfigurationLAR || supportsDataLAR || !group.isControlPanel()) {
@@ -224,6 +225,10 @@ if (group.isLayoutPrototype()) {
 	showExportImportIcon = false;
 }
 
+if ((group.isStaged() || group.isStagedRemotely()) && !group.hasLocalOrRemoteStagingGroup()) {
+	showStagingIcon = true;
+}
+
 if (portlet.hasPortletMode(responseContentType, PortletMode.EDIT)) {
 	if (PortletPermissionUtil.contains(permissionChecker, layout, portletId, ActionKeys.PREFERENCES)) {
 		showEditIcon = true;
@@ -231,7 +236,7 @@ if (portlet.hasPortletMode(responseContentType, PortletMode.EDIT)) {
 }
 
 if (portlet.hasPortletMode(responseContentType, LiferayPortletMode.EDIT_DEFAULTS)) {
-	if (showEditIcon && !layout.isPrivateLayout() && themeDisplay.isShowAddContentIcon()) {
+	if (showEditIcon && themeDisplay.isShowAddContentIcon()) {
 		showEditDefaultsIcon = true;
 	}
 }
@@ -366,6 +371,7 @@ portletDisplay.setShowPortletCssIcon(showPortletCssIcon);
 portletDisplay.setShowPortletIcon(showPortletIcon);
 portletDisplay.setShowPrintIcon(showPrintIcon);
 portletDisplay.setShowRefreshIcon(showRefreshIcon);
+portletDisplay.setShowStagingIcon(showStagingIcon);
 portletDisplay.setStateExclusive(themeDisplay.isStateExclusive());
 portletDisplay.setStateMax(stateMax);
 portletDisplay.setStateMin(stateMin);
@@ -411,7 +417,7 @@ urlConfiguration.setWindowState(LiferayWindowState.POP_UP);
 
 urlConfiguration.setEscapeXml(false);
 
-if (Validator.isNotNull(portlet.getConfigurationActionClass())) {
+if (portlet.getConfigurationActionInstance() != null) {
 	urlConfiguration.setParameter("struts_action", "/portlet_configuration/edit_configuration");
 }
 else if (PortletPermissionUtil.contains(permissionChecker, layout, portletDisplay.getId(), ActionKeys.PERMISSIONS)) {
@@ -621,6 +627,22 @@ String urlRefresh = "javascript:;";
 
 portletDisplay.setURLRefresh(urlRefresh);
 
+// URL staging
+
+PortletURLImpl urlStaging = new PortletURLImpl(request, PortletKeys.PORTLET_CONFIGURATION, plid, PortletRequest.RENDER_PHASE);
+
+urlStaging.setWindowState(LiferayWindowState.POP_UP);
+
+urlStaging.setParameter("struts_action", "/portlet_configuration/staging");
+urlStaging.setParameter("cmd", Constants.PUBLISH_TO_LIVE);
+urlStaging.setParameter("redirect", currentURL);
+urlStaging.setParameter("returnToFullPageURL", currentURL);
+urlStaging.setParameter("portletResource", portletDisplay.getId());
+
+urlStaging.setEscapeXml(false);
+
+portletDisplay.setURLStaging(urlStaging.toString() + "&" + PortalUtil.getPortletNamespace(PortletKeys.PORTLET_CONFIGURATION));
+
 // URL back
 
 String urlBack = null;
@@ -684,7 +706,7 @@ if (group.isControlPanel()) {
 	portletDisplay.setShowMoveIcon(false);
 	portletDisplay.setShowPortletCssIcon(false);
 
-	if (!portlet.isPreferencesUniquePerLayout() && Validator.isNotNull(portlet.getConfigurationActionClass())) {
+	if (!portlet.isPreferencesUniquePerLayout() && (portlet.getConfigurationActionInstance() != null)) {
 		portletDisplay.setShowConfigurationIcon(true);
 	}
 }

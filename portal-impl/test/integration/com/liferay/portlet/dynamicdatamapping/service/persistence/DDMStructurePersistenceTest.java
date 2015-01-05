@@ -14,27 +14,23 @@
 
 package com.liferay.portlet.dynamicdatamapping.service.persistence;
 
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.ModelListener;
-import com.liferay.portal.service.persistence.BasePersistence;
-import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
-import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.LiferayIntegrationTestRule;
+import com.liferay.portal.test.PersistenceTestRule;
+import com.liferay.portal.test.TransactionalTestRule;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -45,58 +41,35 @@ import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUt
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-
-import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Brian Wing Shun Chan
+ * @generated
  */
-@ExecutionTestListeners(listeners =  {
-	PersistenceExecutionTestListener.class})
-@RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
 public class DDMStructurePersistenceTest {
-	@Before
-	public void setUp() {
-		_modelListeners = _persistence.getListeners();
-
-		for (ModelListener<DDMStructure> modelListener : _modelListeners) {
-			_persistence.unregisterListener(modelListener);
-		}
-	}
+	@Rule
+	public final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
+			PersistenceTestRule.INSTANCE,
+			new TransactionalTestRule(Propagation.REQUIRED));
 
 	@After
 	public void tearDown() throws Exception {
-		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
+		Iterator<DDMStructure> iterator = _ddmStructures.iterator();
 
-		Set<Serializable> primaryKeys = basePersistences.keySet();
+		while (iterator.hasNext()) {
+			_persistence.remove(iterator.next());
 
-		for (Serializable primaryKey : primaryKeys) {
-			BasePersistence<?> basePersistence = basePersistences.get(primaryKey);
-
-			try {
-				basePersistence.remove(primaryKey);
-			}
-			catch (Exception e) {
-				if (_log.isDebugEnabled()) {
-					_log.debug("The model with primary key " + primaryKey +
-						" was already deleted");
-				}
-			}
-		}
-
-		_transactionalPersistenceAdvice.reset();
-
-		for (ModelListener<DDMStructure> modelListener : _modelListeners) {
-			_persistence.registerListener(modelListener);
+			iterator.remove();
 		}
 	}
 
@@ -153,6 +126,8 @@ public class DDMStructurePersistenceTest {
 
 		newDDMStructure.setStructureKey(RandomTestUtil.randomString());
 
+		newDDMStructure.setVersion(RandomTestUtil.randomString());
+
 		newDDMStructure.setName(RandomTestUtil.randomString());
 
 		newDDMStructure.setDescription(RandomTestUtil.randomString());
@@ -163,7 +138,7 @@ public class DDMStructurePersistenceTest {
 
 		newDDMStructure.setType(RandomTestUtil.nextInt());
 
-		_persistence.update(newDDMStructure);
+		_ddmStructures.add(_persistence.update(newDDMStructure));
 
 		DDMStructure existingDDMStructure = _persistence.findByPrimaryKey(newDDMStructure.getPrimaryKey());
 
@@ -191,6 +166,8 @@ public class DDMStructurePersistenceTest {
 			newDDMStructure.getClassNameId());
 		Assert.assertEquals(existingDDMStructure.getStructureKey(),
 			newDDMStructure.getStructureKey());
+		Assert.assertEquals(existingDDMStructure.getVersion(),
+			newDDMStructure.getVersion());
 		Assert.assertEquals(existingDDMStructure.getName(),
 			newDDMStructure.getName());
 		Assert.assertEquals(existingDDMStructure.getDescription(),
@@ -436,8 +413,9 @@ public class DDMStructurePersistenceTest {
 			true, "structureId", true, "groupId", true, "companyId", true,
 			"userId", true, "userName", true, "createDate", true,
 			"modifiedDate", true, "parentStructureId", true, "classNameId",
-			true, "structureKey", true, "name", true, "description", true,
-			"definition", true, "storageType", true, "type", true);
+			true, "structureKey", true, "version", true, "name", true,
+			"description", true, "definition", true, "storageType", true,
+			"type", true);
 	}
 
 	@Test
@@ -686,6 +664,8 @@ public class DDMStructurePersistenceTest {
 
 		ddmStructure.setStructureKey(RandomTestUtil.randomString());
 
+		ddmStructure.setVersion(RandomTestUtil.randomString());
+
 		ddmStructure.setName(RandomTestUtil.randomString());
 
 		ddmStructure.setDescription(RandomTestUtil.randomString());
@@ -696,13 +676,11 @@ public class DDMStructurePersistenceTest {
 
 		ddmStructure.setType(RandomTestUtil.nextInt());
 
-		_persistence.update(ddmStructure);
+		_ddmStructures.add(_persistence.update(ddmStructure));
 
 		return ddmStructure;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(DDMStructurePersistenceTest.class);
-	private ModelListener<DDMStructure>[] _modelListeners;
-	private DDMStructurePersistence _persistence = (DDMStructurePersistence)PortalBeanLocatorUtil.locate(DDMStructurePersistence.class.getName());
-	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
+	private List<DDMStructure> _ddmStructures = new ArrayList<DDMStructure>();
+	private DDMStructurePersistence _persistence = DDMStructureUtil.getPersistence();
 }

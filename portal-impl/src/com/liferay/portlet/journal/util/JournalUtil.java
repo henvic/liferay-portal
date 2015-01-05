@@ -170,10 +170,6 @@ public class JournalUtil {
 
 		addReservedEl(
 			rootElement, tokens,
-			JournalStructureConstants.RESERVED_ARTICLE_TYPE, article.getType());
-
-		addReservedEl(
-			rootElement, tokens,
 			JournalStructureConstants.RESERVED_ARTICLE_CREATE_DATE,
 			article.getCreateDate());
 
@@ -507,18 +503,6 @@ public class JournalUtil {
 			new UnsyncStringReader(targetArticleDisplay.getContent()));
 	}
 
-	public static String doTransform(
-			ThemeDisplay themeDisplay, Map<String, String> tokens,
-			String viewMode, String languageId, Document document,
-			PortletRequestModel portletRequestModel, String script,
-			String langType)
-		throws Exception {
-
-		return _transformer.doTransform(
-			themeDisplay, tokens, viewMode, languageId, document,
-			portletRequestModel, script, langType);
-	}
-
 	public static String formatVM(String vm) {
 		return vm;
 	}
@@ -557,6 +541,24 @@ public class JournalUtil {
 		sb.append(folder.getName());
 
 		return sb.toString();
+	}
+
+	public static Layout getArticleLayout(String layoutUuid, long groupId) {
+		if (Validator.isNull(layoutUuid)) {
+			return null;
+		}
+
+		// The target page and the article must belong to the same group
+
+		Layout layout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
+			layoutUuid, groupId, false);
+
+		if (layout == null) {
+			layout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
+				layoutUuid, groupId, true);
+		}
+
+		return layout;
 	}
 
 	public static OrderByComparator<JournalArticle> getArticleOrderByComparator(
@@ -686,12 +688,7 @@ public class JournalUtil {
 				PropsValues.JOURNAL_DEFAULT_DISPLAY_VIEW);
 		}
 		else {
-			boolean saveDisplayStyle = ParamUtil.getBoolean(
-				liferayPortletRequest, "saveDisplayStyle");
-
-			if (saveDisplayStyle &&
-				ArrayUtil.contains(displayViews, displayStyle)) {
-
+			if (ArrayUtil.contains(displayViews, displayStyle)) {
 				portalPreferences.setValue(
 					PortletKeys.JOURNAL, "display-style", displayStyle);
 			}
@@ -840,8 +837,9 @@ public class JournalUtil {
 		}
 	}
 
-	public static Map<Locale, String> getEmailArticleApprovalRequestedSubjectMap(
-		PortletPreferences preferences) {
+	public static Map<Locale, String>
+		getEmailArticleApprovalRequestedSubjectMap(
+			PortletPreferences preferences) {
 
 		return LocalizationUtil.getLocalizationMap(
 			preferences, "emailArticleApprovalRequestedSubject",
@@ -1002,12 +1000,12 @@ public class JournalUtil {
 			JournalArticle article, ThemeDisplay themeDisplay)
 		throws Exception {
 
-		if ((article != null) && Validator.isNotNull(article.getLayoutUuid())) {
-			Layout layout =
-				LayoutLocalServiceUtil.getLayoutByUuidAndCompanyId(
-					article.getLayoutUuid(), themeDisplay.getCompanyId());
+		if (article != null) {
+			Layout layout = article.getLayout();
 
-			return layout.getPlid();
+			if (layout != null) {
+				return layout.getPlid();
+			}
 		}
 
 		Layout layout = LayoutLocalServiceUtil.fetchFirstLayout(
@@ -1498,9 +1496,21 @@ public class JournalUtil {
 			String langType)
 		throws Exception {
 
+		return transform(
+			themeDisplay, tokens, viewMode, languageId, document,
+			portletRequestModel, script, langType, false);
+	}
+
+	public static String transform(
+			ThemeDisplay themeDisplay, Map<String, String> tokens,
+			String viewMode, String languageId, Document document,
+			PortletRequestModel portletRequestModel, String script,
+			String langType, boolean propagateException)
+		throws Exception {
+
 		return _transformer.transform(
 			themeDisplay, tokens, viewMode, languageId, document,
-			portletRequestModel, script, langType);
+			portletRequestModel, script, langType, propagateException);
 	}
 
 	private static void _addElementOptions(

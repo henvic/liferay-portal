@@ -14,6 +14,9 @@
 
 package com.liferay.portlet.softwarecatalog.model.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -34,8 +37,33 @@ import java.util.Date;
  * @see SCProductEntry
  * @generated
  */
+@ProviderType
 public class SCProductEntryCacheModel implements CacheModel<SCProductEntry>,
 	Externalizable {
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof SCProductEntryCacheModel)) {
+			return false;
+		}
+
+		SCProductEntryCacheModel scProductEntryCacheModel = (SCProductEntryCacheModel)obj;
+
+		if (productEntryId == scProductEntryCacheModel.productEntryId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, productEntryId);
+	}
+
 	@Override
 	public String toString() {
 		StringBundler sb = new StringBundler(33);

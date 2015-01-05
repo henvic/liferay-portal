@@ -14,6 +14,8 @@
 
 package com.liferay.portal.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.NoSuchUserException;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
@@ -26,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -37,7 +37,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.MVCCModel;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.impl.UserImpl;
 import com.liferay.portal.model.impl.UserModelImpl;
@@ -52,7 +51,6 @@ import java.io.Serializable;
 
 import java.sql.Timestamp;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -74,6 +72,7 @@ import java.util.Set;
  * @see UserUtil
  * @generated
  */
+@ProviderType
 public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	implements UserPersistence {
 	/*
@@ -9273,26 +9272,6 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 * Initializes the user persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portal.model.User")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<User>> listenersList = new ArrayList<ModelListener<User>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<User>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
-
 		userToGroupTableMapper = TableMapperFactory.getTableMapper("Users_Groups",
 				"userId", "groupId", this, groupPersistence);
 
@@ -9346,11 +9325,11 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No User exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No User exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(UserPersistenceImpl.class);
-	private static Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+	private static final Log _log = LogFactoryUtil.getLog(UserPersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"uuid", "password"
 			});
-	private static User _nullUser = new UserImpl() {
+	private static final User _nullUser = new UserImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -9362,12 +9341,12 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			}
 		};
 
-	private static CacheModel<User> _nullUserCacheModel = new NullCacheModel();
+	private static final CacheModel<User> _nullUserCacheModel = new NullCacheModel();
 
 	private static class NullCacheModel implements CacheModel<User>, MVCCModel {
 		@Override
 		public long getMvccVersion() {
-			return 0;
+			return -1;
 		}
 
 		@Override

@@ -14,8 +14,11 @@
 
 package com.liferay.portlet.dynamicdatalists.model.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -29,6 +32,7 @@ import com.liferay.portal.service.UserLocalServiceUtil;
 
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordVersion;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordVersionModel;
+import com.liferay.portlet.dynamicdatalists.model.DDLRecordVersionSoap;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
@@ -36,8 +40,10 @@ import java.io.Serializable;
 
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,6 +59,8 @@ import java.util.Map;
  * @see com.liferay.portlet.dynamicdatalists.model.DDLRecordVersionModel
  * @generated
  */
+@JSON(strict = true)
+@ProviderType
 public class DDLRecordVersionModelImpl extends BaseModelImpl<DDLRecordVersion>
 	implements DDLRecordVersionModel {
 	/*
@@ -94,10 +102,64 @@ public class DDLRecordVersionModelImpl extends BaseModelImpl<DDLRecordVersion>
 	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.column.bitmask.enabled.com.liferay.portlet.dynamicdatalists.model.DDLRecordVersion"),
 			true);
-	public static long RECORDID_COLUMN_BITMASK = 1L;
-	public static long STATUS_COLUMN_BITMASK = 2L;
-	public static long VERSION_COLUMN_BITMASK = 4L;
-	public static long RECORDVERSIONID_COLUMN_BITMASK = 8L;
+	public static final long RECORDID_COLUMN_BITMASK = 1L;
+	public static final long STATUS_COLUMN_BITMASK = 2L;
+	public static final long VERSION_COLUMN_BITMASK = 4L;
+	public static final long RECORDVERSIONID_COLUMN_BITMASK = 8L;
+
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 */
+	public static DDLRecordVersion toModel(DDLRecordVersionSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		DDLRecordVersion model = new DDLRecordVersionImpl();
+
+		model.setRecordVersionId(soapModel.getRecordVersionId());
+		model.setGroupId(soapModel.getGroupId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setDDMStorageId(soapModel.getDDMStorageId());
+		model.setRecordSetId(soapModel.getRecordSetId());
+		model.setRecordId(soapModel.getRecordId());
+		model.setVersion(soapModel.getVersion());
+		model.setDisplayIndex(soapModel.getDisplayIndex());
+		model.setStatus(soapModel.getStatus());
+		model.setStatusByUserId(soapModel.getStatusByUserId());
+		model.setStatusByUserName(soapModel.getStatusByUserName());
+		model.setStatusDate(soapModel.getStatusDate());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 */
+	public static List<DDLRecordVersion> toModels(
+		DDLRecordVersionSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<DDLRecordVersion> models = new ArrayList<DDLRecordVersion>(soapModels.length);
+
+		for (DDLRecordVersionSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.dynamicdatalists.model.DDLRecordVersion"));
 
@@ -253,6 +315,7 @@ public class DDLRecordVersionModelImpl extends BaseModelImpl<DDLRecordVersion>
 		}
 	}
 
+	@JSON
 	@Override
 	public long getRecordVersionId() {
 		return _recordVersionId;
@@ -263,6 +326,7 @@ public class DDLRecordVersionModelImpl extends BaseModelImpl<DDLRecordVersion>
 		_recordVersionId = recordVersionId;
 	}
 
+	@JSON
 	@Override
 	public long getGroupId() {
 		return _groupId;
@@ -273,6 +337,7 @@ public class DDLRecordVersionModelImpl extends BaseModelImpl<DDLRecordVersion>
 		_groupId = groupId;
 	}
 
+	@JSON
 	@Override
 	public long getCompanyId() {
 		return _companyId;
@@ -283,6 +348,7 @@ public class DDLRecordVersionModelImpl extends BaseModelImpl<DDLRecordVersion>
 		_companyId = companyId;
 	}
 
+	@JSON
 	@Override
 	public long getUserId() {
 		return _userId;
@@ -309,6 +375,7 @@ public class DDLRecordVersionModelImpl extends BaseModelImpl<DDLRecordVersion>
 	public void setUserUuid(String userUuid) {
 	}
 
+	@JSON
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
@@ -324,6 +391,7 @@ public class DDLRecordVersionModelImpl extends BaseModelImpl<DDLRecordVersion>
 		_userName = userName;
 	}
 
+	@JSON
 	@Override
 	public Date getCreateDate() {
 		return _createDate;
@@ -334,6 +402,7 @@ public class DDLRecordVersionModelImpl extends BaseModelImpl<DDLRecordVersion>
 		_createDate = createDate;
 	}
 
+	@JSON
 	@Override
 	public long getDDMStorageId() {
 		return _DDMStorageId;
@@ -344,6 +413,7 @@ public class DDLRecordVersionModelImpl extends BaseModelImpl<DDLRecordVersion>
 		_DDMStorageId = DDMStorageId;
 	}
 
+	@JSON
 	@Override
 	public long getRecordSetId() {
 		return _recordSetId;
@@ -354,6 +424,7 @@ public class DDLRecordVersionModelImpl extends BaseModelImpl<DDLRecordVersion>
 		_recordSetId = recordSetId;
 	}
 
+	@JSON
 	@Override
 	public long getRecordId() {
 		return _recordId;
@@ -376,6 +447,7 @@ public class DDLRecordVersionModelImpl extends BaseModelImpl<DDLRecordVersion>
 		return _originalRecordId;
 	}
 
+	@JSON
 	@Override
 	public String getVersion() {
 		if (_version == null) {
@@ -401,6 +473,7 @@ public class DDLRecordVersionModelImpl extends BaseModelImpl<DDLRecordVersion>
 		return GetterUtil.getString(_originalVersion);
 	}
 
+	@JSON
 	@Override
 	public int getDisplayIndex() {
 		return _displayIndex;
@@ -411,6 +484,7 @@ public class DDLRecordVersionModelImpl extends BaseModelImpl<DDLRecordVersion>
 		_displayIndex = displayIndex;
 	}
 
+	@JSON
 	@Override
 	public int getStatus() {
 		return _status;
@@ -433,6 +507,7 @@ public class DDLRecordVersionModelImpl extends BaseModelImpl<DDLRecordVersion>
 		return _originalStatus;
 	}
 
+	@JSON
 	@Override
 	public long getStatusByUserId() {
 		return _statusByUserId;
@@ -459,6 +534,7 @@ public class DDLRecordVersionModelImpl extends BaseModelImpl<DDLRecordVersion>
 	public void setStatusByUserUuid(String statusByUserUuid) {
 	}
 
+	@JSON
 	@Override
 	public String getStatusByUserName() {
 		if (_statusByUserName == null) {
@@ -474,6 +550,7 @@ public class DDLRecordVersionModelImpl extends BaseModelImpl<DDLRecordVersion>
 		_statusByUserName = statusByUserName;
 	}
 
+	@JSON
 	@Override
 	public Date getStatusDate() {
 		return _statusDate;
@@ -876,8 +953,8 @@ public class DDLRecordVersionModelImpl extends BaseModelImpl<DDLRecordVersion>
 		return sb.toString();
 	}
 
-	private static ClassLoader _classLoader = DDLRecordVersion.class.getClassLoader();
-	private static Class<?>[] _escapedModelInterfaces = new Class[] {
+	private static final ClassLoader _classLoader = DDLRecordVersion.class.getClassLoader();
+	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
 			DDLRecordVersion.class
 		};
 	private long _recordVersionId;

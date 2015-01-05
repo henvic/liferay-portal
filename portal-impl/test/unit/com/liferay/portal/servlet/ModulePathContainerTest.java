@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.cache.SingleVMPoolUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.util.PortletKeys;
 
-import java.io.Serializable;
-
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -34,15 +32,11 @@ public class ModulePathContainerTest {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		MemoryPortalCacheManager<Serializable, Serializable>
-			memoryPortalCacheManager =
-				new MemoryPortalCacheManager<Serializable, Serializable>();
-
-		memoryPortalCacheManager.afterPropertiesSet();
-
 		SingleVMPoolImpl singleVMPoolImpl = new SingleVMPoolImpl();
 
-		singleVMPoolImpl.setPortalCacheManager(memoryPortalCacheManager);
+		singleVMPoolImpl.setPortalCacheManager(
+			MemoryPortalCacheManager.createMemoryPortalCacheManager(
+				ModulePathContainerTest.class.getName()));
 
 		SingleVMPoolUtil singleVMPoolUtil = new SingleVMPoolUtil();
 
@@ -61,22 +55,20 @@ public class ModulePathContainerTest {
 
 	@Test
 	public void testModulePathWithPortletId() {
-		String modulePath = PortletKeys.ACTIVITIES + ":/js/javascript.js";
+		String modulePath = PortletKeys.PORTAL + ":/js/javascript.js";
 
 		Assert.assertEquals(
-			PortletKeys.ACTIVITIES,
-			ComboServlet.getModulePortletId(modulePath));
+			PortletKeys.PORTAL, ComboServlet.getModulePortletId(modulePath));
 		Assert.assertEquals(
 			"/js/javascript.js", ComboServlet.getResourcePath(modulePath));
 	}
 
 	@Test
 	public void testModulePathWithPortletIdAndNoResourcePath() {
-		String modulePath = PortletKeys.ACTIVITIES + ":";
+		String modulePath = PortletKeys.PORTAL + ":";
 
 		Assert.assertEquals(
-			PortletKeys.ACTIVITIES,
-			ComboServlet.getModulePortletId(modulePath));
+			PortletKeys.PORTAL, ComboServlet.getModulePortletId(modulePath));
 		Assert.assertEquals(
 			StringPool.BLANK, ComboServlet.getResourcePath(modulePath));
 	}

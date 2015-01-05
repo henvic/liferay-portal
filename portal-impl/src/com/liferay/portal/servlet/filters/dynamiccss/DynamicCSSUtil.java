@@ -67,6 +67,10 @@ public class DynamicCSSUtil {
 
 	public static void init() {
 		try {
+			if (_initialized) {
+				return;
+			}
+
 			RubyExecutor rubyExecutor = new RubyExecutor();
 
 			_scriptingContainer = rubyExecutor.getScriptingContainer();
@@ -79,6 +83,8 @@ public class DynamicCSSUtil {
 			_scriptObject = _scriptingContainer.runScriptlet(rubyScript);
 
 			RTLCSSUtil.init();
+
+			_initialized = true;
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -122,7 +128,7 @@ public class DynamicCSSUtil {
 				if (PortalUtil.isRightToLeft(request) &&
 					!RTLCSSUtil.isExcludedPath(resourcePath)) {
 
-					content = RTLCSSUtil.getRtlCss(content);
+					content = RTLCSSUtil.getRtlCss(resourcePath, content);
 				}
 
 				return content;
@@ -133,14 +139,6 @@ public class DynamicCSSUtil {
 
 		boolean themeCssFastLoad = _isThemeCssFastLoad(request, themeDisplay);
 
-		URLConnection resourceURLConnection = null;
-
-		URL resourceURL = servletContext.getResource(resourcePath);
-
-		if (resourceURL != null) {
-			resourceURLConnection = resourceURL.openConnection();
-		}
-
 		URLConnection cacheResourceURLConnection = null;
 
 		URL cacheResourceURL = _getCacheResourceURL(
@@ -148,13 +146,25 @@ public class DynamicCSSUtil {
 
 		if (cacheResourceURL != null) {
 			cacheResourceURLConnection = cacheResourceURL.openConnection();
+
+			if (!themeCssFastLoad) {
+				URL resourceURL = servletContext.getResource(resourcePath);
+
+				if (resourceURL != null) {
+					URLConnection resourceURLConnection =
+						resourceURL.openConnection();
+
+					if (cacheResourceURLConnection.getLastModified() <
+							resourceURLConnection.getLastModified()) {
+
+						cacheResourceURLConnection = null;
+					}
+				}
+			}
 		}
 
 		if ((themeCssFastLoad || !content.contains(_CSS_IMPORT_BEGIN)) &&
-			(cacheResourceURLConnection != null) &&
-			(resourceURLConnection != null) &&
-			(cacheResourceURLConnection.getLastModified() >=
-				resourceURLConnection.getLastModified())) {
+			(cacheResourceURLConnection != null)) {
 
 			parsedContent = StringUtil.read(
 				cacheResourceURLConnection.getInputStream());
@@ -186,7 +196,8 @@ public class DynamicCSSUtil {
 			if (PortalUtil.isRightToLeft(request) &&
 				!RTLCSSUtil.isExcludedPath(resourcePath)) {
 
-				parsedContent = RTLCSSUtil.getRtlCss(parsedContent);
+				parsedContent = RTLCSSUtil.getRtlCss(
+					resourcePath, parsedContent);
 
 				// Append custom CSS for RTL
 
@@ -245,6 +256,71 @@ public class DynamicCSSUtil {
 			});
 
 		return parsedContent;
+	}
+
+	/**
+	 * @see com.liferay.portal.servlet.filters.aggregate.AggregateFilter#aggregateCss(
+	 *      com.liferay.portal.servlet.filters.aggregate.ServletPaths, String)
+	 */
+	protected static String propagateQueryString(
+		String content, String queryString) {
+
+		StringBuilder sb = new StringBuilder(content.length());
+
+		int pos = 0;
+
+		while (true) {
+			int importX = content.indexOf(_CSS_IMPORT_BEGIN, pos);
+			int importY = content.indexOf(
+				_CSS_IMPORT_END, importX + _CSS_IMPORT_BEGIN.length());
+
+			if ((importX == -1) || (importY == -1)) {
+				sb.append(content.substring(pos));
+
+				break;
+			}
+
+			sb.append(content.substring(pos, importX));
+			sb.append(_CSS_IMPORT_BEGIN);
+
+			String url = content.substring(
+				importX + _CSS_IMPORT_BEGIN.length(), importY);
+
+			char firstChar = url.charAt(0);
+
+			if (firstChar == CharPool.APOSTROPHE) {
+				sb.append(CharPool.APOSTROPHE);
+			}
+			else if (firstChar == CharPool.QUOTE) {
+				sb.append(CharPool.QUOTE);
+			}
+
+			url = StringUtil.unquote(url);
+
+			sb.append(url);
+
+			if (url.indexOf(CharPool.QUESTION) != -1) {
+				sb.append(CharPool.AMPERSAND);
+			}
+			else {
+				sb.append(CharPool.QUESTION);
+			}
+
+			sb.append(queryString);
+
+			if (firstChar == CharPool.APOSTROPHE) {
+				sb.append(CharPool.APOSTROPHE);
+			}
+			else if (firstChar == CharPool.QUOTE) {
+				sb.append(CharPool.QUOTE);
+			}
+
+			sb.append(_CSS_IMPORT_END);
+
+			pos = importY + _CSS_IMPORT_END.length();
+		}
+
+		return sb.toString();
 	}
 
 	private static URL _getCacheResourceURL(
@@ -440,6 +516,10 @@ public class DynamicCSSUtil {
 	private static boolean _isThemeCssFastLoad(
 		HttpServletRequest request, ThemeDisplay themeDisplay) {
 
+		if (!PropsValues.THEME_CSS_FAST_LOAD_CHECK_REQUEST_PARAMETER) {
+			return PropsValues.THEME_CSS_FAST_LOAD;
+		}
+
 		if (themeDisplay != null) {
 			return themeDisplay.isThemeCssFastLoad();
 		}
@@ -514,39 +594,6 @@ public class DynamicCSSUtil {
 		return content;
 	}
 
-	/**
-	 * @see com.liferay.portal.servlet.filters.aggregate.AggregateFilter#aggregateCss(
-	 *      com.liferay.portal.servlet.filters.aggregate.ServletPaths, String)
-	 */
-	private static String propagateQueryString(
-		String content, String queryString) {
-
-		StringBuilder sb = new StringBuilder(content.length());
-
-		int pos = 0;
-
-		while (true) {
-			int importX = content.indexOf(_CSS_IMPORT_BEGIN, pos);
-			int importY = content.indexOf(
-				_CSS_IMPORT_END, importX + _CSS_IMPORT_BEGIN.length());
-
-			if ((importX == -1) || (importY == -1)) {
-				sb.append(content.substring(pos));
-
-				break;
-			}
-
-			sb.append(content.substring(pos, importY));
-			sb.append(CharPool.QUESTION);
-			sb.append(queryString);
-			sb.append(_CSS_IMPORT_END);
-
-			pos = importY + _CSS_IMPORT_END.length();
-		}
-
-		return sb.toString();
-	}
-
 	private static final String _CSS_IMPORT_BEGIN = "@import url(";
 
 	private static final String _CSS_IMPORT_END = ");";
@@ -560,6 +607,7 @@ public class DynamicCSSUtil {
 
 	private static Log _log = LogFactoryUtil.getLog(DynamicCSSUtil.class);
 
+	private static boolean _initialized;
 	private static Pattern _pluginThemePattern = Pattern.compile(
 		"\\/([^\\/]+)-theme\\/", Pattern.CASE_INSENSITIVE);
 	private static Pattern _portalThemePattern = Pattern.compile(

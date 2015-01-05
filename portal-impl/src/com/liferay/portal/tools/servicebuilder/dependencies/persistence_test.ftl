@@ -16,7 +16,12 @@ package ${packagePath}.service.persistence;
 
 <#assign noSuchEntity = serviceBuilder.getNoSuchEntityException(entity)>
 
-import ${packagePath}.${noSuchEntity}Exception;
+<#if osgiModule>
+	import ${packagePath}.exception.${noSuchEntity}Exception;
+<#else>
+	import ${packagePath}.${noSuchEntity}Exception;
+</#if>
+
 import ${packagePath}.model.${entity.name};
 import ${packagePath}.model.impl.${entity.name}ModelImpl;
 import ${packagePath}.service.${entity.name}LocalServiceUtil;
@@ -29,22 +34,19 @@ import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.test.AssertUtils;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.ModelListener;
-import com.liferay.portal.service.persistence.BasePersistence;
-import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
-import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.LiferayIntegrationTestRule;
+import com.liferay.portal.test.PersistenceTestRule;
+import com.liferay.portal.test.TransactionalTestRule;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -55,55 +57,47 @@ import java.sql.SQLException;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jboss.arquillian.junit.Arquillian;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-@ExecutionTestListeners(listeners = {PersistenceExecutionTestListener.class})
-@RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
+/**
+ * @generated
+ */
+<#if osgiModule>
+	@RunWith(Arquillian.class)
+</#if>
 public class ${entity.name}PersistenceTest {
 
-	@Before
-	public void setUp() {
-		_modelListeners = _persistence.getListeners();
-
-		for (ModelListener<${entity.name}> modelListener : _modelListeners) {
-			_persistence.unregisterListener(modelListener);
-		}
-	}
+	@Rule
+	public final AggregateTestRule aggregateTestRule = new AggregateTestRule(
+		<#if !osgiModule>
+			new LiferayIntegrationTestRule(),
+		</#if>
+		PersistenceTestRule.INSTANCE, new TransactionalTestRule(Propagation.REQUIRED));
 
 	@After
 	public void tearDown() throws Exception {
-		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
+		Iterator<${entity.name}> iterator = _${entity.varNames}.iterator();
 
-		Set<Serializable> primaryKeys = basePersistences.keySet();
+		while (iterator.hasNext()) {
+			_persistence.remove(iterator.next());
 
-		for (Serializable primaryKey : primaryKeys) {
-			BasePersistence<?> basePersistence = basePersistences.get(primaryKey);
-
-			try {
-				basePersistence.remove(primaryKey);
-			}
-			catch (Exception e) {
-				if (_log.isDebugEnabled()) {
-					_log.debug("The model with primary key " + primaryKey + " was already deleted");
-				}
-			}
-		}
-
-		_transactionalPersistenceAdvice.reset();
-
-		for (ModelListener<${entity.name}> modelListener : _modelListeners) {
-			_persistence.registerListener(modelListener);
+			iterator.remove();
 		}
 	}
 
@@ -229,7 +223,7 @@ public class ${entity.name}PersistenceTest {
 				<#elseif column.type == "Blob">
 					 new${column.methodName}Blob
 				<#elseif column.type == "Map">
-					new HashMap()
+					new HashMap<String, Serializable>()
 				<#elseif column.type == "String">
 					RandomTestUtil.randomString()
 				</#if>
@@ -238,7 +232,7 @@ public class ${entity.name}PersistenceTest {
 			</#if>
 		</#list>
 
-		_persistence.update(new${entity.name});
+		_${entity.varNames}.add(_persistence.update(new${entity.name}));
 
 		${entity.name} existing${entity.name} = _persistence.findByPrimaryKey(new${entity.name}.getPrimaryKey());
 
@@ -966,7 +960,7 @@ public class ${entity.name}PersistenceTest {
 				<#elseif column.type == "Date">
 					RandomTestUtil.nextDate()
 				<#elseif column.type == "Map">
-					new HashMap()
+					new HashMap<String, Serializable>()
 				<#elseif column.type == "String">
 	                RandomTestUtil.randomString()
 				</#if>
@@ -975,7 +969,7 @@ public class ${entity.name}PersistenceTest {
 			</#if>
 		</#list>
 
-		_persistence.update(${entity.varName});
+		_${entity.varNames}.add(_persistence.update(${entity.varName}));
 
 		return ${entity.varName};
 	}
@@ -1233,10 +1227,7 @@ public class ${entity.name}PersistenceTest {
 		}
 	</#if>
 
-	private static Log _log = LogFactoryUtil.getLog(${entity.name}PersistenceTest.class);
-
-	private ModelListener<${entity.name}>[] _modelListeners;
-	private ${entity.name}Persistence _persistence = (${entity.name}Persistence)${beanLocatorUtilShortName}.locate(${entity.name}Persistence.class.getName());
-	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)${beanLocatorUtilShortName}.locate(TransactionalPersistenceAdvice.class.getName());
+	private List<${entity.name}> _${entity.varNames} = new ArrayList<${entity.name}>();
+	private ${entity.name}Persistence _persistence = ${entity.name}Util.getPersistence();
 
 }

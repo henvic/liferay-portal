@@ -37,12 +37,20 @@ public class UserStagedModelDataHandler
 
 		Group group = GroupLocalServiceUtil.getGroup(groupId);
 
-		User user = UserLocalServiceUtil.fetchUserByUuidAndCompanyId(
+		User user = fetchStagedModelByUuidAndCompanyId(
 			uuid, group.getCompanyId());
 
 		if (user != null) {
 			UserLocalServiceUtil.deleteUser(user);
 		}
+	}
+
+	@Override
+	public User fetchStagedModelByUuidAndCompanyId(
+		String uuid, long companyId) {
+
+		return UserLocalServiceUtil.fetchUserByUuidAndCompanyId(
+			uuid, companyId);
 	}
 
 	@Override
@@ -57,33 +65,12 @@ public class UserStagedModelDataHandler
 
 	@Override
 	protected void doExportStagedModel(
-			PortletDataContext portletDataContext, User user)
-		throws Exception {
-
-		return;
+		PortletDataContext portletDataContext, User user) {
 	}
 
 	@Override
 	protected void doImportStagedModel(
-			PortletDataContext portletDataContext, User user)
-		throws Exception {
-
-		return;
-	}
-
-	@Override
-	protected boolean validateMissingReference(
-			String uuid, long companyId, long groupId)
-		throws Exception {
-
-		User user = UserLocalServiceUtil.fetchUserByUuidAndCompanyId(
-			uuid, companyId);
-
-		if (user == null) {
-			return false;
-		}
-
-		return true;
+		PortletDataContext portletDataContext, User user) {
 	}
 
 }

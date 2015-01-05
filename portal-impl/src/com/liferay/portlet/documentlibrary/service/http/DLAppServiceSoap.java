@@ -529,17 +529,17 @@ public class DLAppServiceSoap {
 	* @param groupId the primary key of the group
 	* @param folderId the primary key of the folder where the file entry was
 	eventually to reside
+	* @param folderName the temporary folder's name
 	* @param fileName the file's original name
-	* @param tempFolderName the temporary folder's name
 	* @throws PortalException if the file name was invalid
-	* @see com.liferay.portal.kernel.util.TempFileUtil
+	* @see com.liferay.portal.kernel.util.TempFileEntryUtil
 	*/
 	public static void deleteTempFileEntry(long groupId, long folderId,
-		java.lang.String fileName, java.lang.String tempFolderName)
+		java.lang.String folderName, java.lang.String fileName)
 		throws RemoteException {
 		try {
-			DLAppServiceUtil.deleteTempFileEntry(groupId, folderId, fileName,
-				tempFolderName);
+			DLAppServiceUtil.deleteTempFileEntry(groupId, folderId, folderName,
+				fileName);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -755,6 +755,25 @@ public class DLAppServiceSoap {
 		}
 	}
 
+	public static com.liferay.portal.kernel.repository.model.FileEntrySoap[] getFileEntries(
+		long repositoryId, long folderId, java.lang.String[] mimeTypes,
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.repository.model.FileEntry> obc)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.portal.kernel.repository.model.FileEntry> returnValue =
+				DLAppServiceUtil.getFileEntries(repositoryId, folderId,
+					mimeTypes, start, end, obc);
+
+			return com.liferay.portal.kernel.repository.model.FileEntrySoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	/**
 	* Returns the number of file entries and shortcuts in the folder.
 	*
@@ -843,6 +862,21 @@ public class DLAppServiceSoap {
 		try {
 			int returnValue = DLAppServiceUtil.getFileEntriesCount(repositoryId,
 					folderId, fileEntryTypeId);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static int getFileEntriesCount(long repositoryId, long folderId,
+		java.lang.String[] mimeTypes) throws RemoteException {
+		try {
+			int returnValue = DLAppServiceUtil.getFileEntriesCount(repositoryId,
+					folderId, mimeTypes);
 
 			return returnValue;
 		}
@@ -1877,18 +1911,17 @@ public class DLAppServiceSoap {
 	* @param groupId the primary key of the group
 	* @param folderId the primary key of the folder where the file entry will
 	eventually reside
-	* @param tempFolderName the temporary folder's name
+	* @param folderName the temporary folder's name
 	* @return the temporary file entry names
 	* @throws PortalException if the folder was invalid
 	* @see #addTempFileEntry(long, long, String, String, File, String)
-	* @see com.liferay.portal.kernel.util.TempFileUtil
+	* @see com.liferay.portal.kernel.util.TempFileEntryUtil
 	*/
-	public static java.lang.String[] getTempFileEntryNames(long groupId,
-		long folderId, java.lang.String tempFolderName)
-		throws RemoteException {
+	public static java.lang.String[] getTempFileNames(long groupId,
+		long folderId, java.lang.String folderName) throws RemoteException {
 		try {
-			java.lang.String[] returnValue = DLAppServiceUtil.getTempFileEntryNames(groupId,
-					folderId, tempFolderName);
+			java.lang.String[] returnValue = DLAppServiceUtil.getTempFileNames(groupId,
+					folderId, folderName);
 
 			return returnValue;
 		}
@@ -2435,13 +2468,13 @@ public class DLAppServiceSoap {
 	the file entry type to default all Liferay file entries to </li>
 	<li> dlFileEntryTypesSearchContainerPrimaryKeys - a
 	comma-delimited list of file entry type primary keys allowed in
-	the given folder and all descendants </li> <li>
-	overrideFileEntryTypes - boolean specifying whether to override
-	ancestral folder's restriction of file entry types allowed </li>
+	the given folder and all descendants </li> <li> restrictionType -
+	specifying restriction type of file entry types allowed </li>
 	<li> workflowDefinitionXYZ - the workflow definition name
 	specified per file entry type. The parameter name must be the
-	string <code>workflowDefinition</code> appended by the <code>
-	fileEntryTypeId</code> (optionally <code>0</code>). </li> </ul>
+	string <code>workflowDefinition</code> appended by the
+	<code>fileEntryTypeId</code> (optionally <code>0</code>).</li>
+	</ul>
 	* @return the folder
 	* @throws PortalException if the current or new parent folder could not be
 	found or if the new parent folder's information was invalid

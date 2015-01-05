@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.log.SanitizerLogWrapper;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.JavaDetector;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -161,20 +162,18 @@ public class InitUtil {
 		_initialized = true;
 	}
 
-	public synchronized static void initWithSpring() {
-		initWithSpring(false, null);
-	}
+	public synchronized static void initWithSpring(
+		boolean initModuleFramework) {
 
-	public synchronized static void initWithSpring(boolean force) {
-		initWithSpring(force, null);
+		List<String> configLocations = ListUtil.fromArray(
+			PropsUtil.getArray(
+				com.liferay.portal.kernel.util.PropsKeys.SPRING_CONFIGS));
+
+		initWithSpring(configLocations, initModuleFramework);
 	}
 
 	public synchronized static void initWithSpring(
-		boolean force, List<String> extraConfigLocations) {
-
-		if (force) {
-			_initialized = false;
-		}
+		List<String> configLocations, boolean initModuleFramework) {
 
 		if (_initialized) {
 			return;
@@ -189,68 +188,31 @@ public class InitUtil {
 
 		init();
 
-		SpringUtil.loadContext(extraConfigLocations);
-
-		_initialized = true;
-	}
-
-	public synchronized static void initWithSpring(
-		List<String> extraConfigLocations) {
-
-		initWithSpring(false, extraConfigLocations);
-	}
-
-	public synchronized static void initWithSpringAndModuleFramework() {
-		initWithSpringAndModuleFramework(false, null);
-	}
-
-	public synchronized static void initWithSpringAndModuleFramework(
-		boolean force, List<String> extraConfigLocations) {
-
-		if (force) {
-			_initialized = false;
-		}
-
-		if (_initialized) {
-			return;
-		}
-
-		if (!_neverInitialized) {
-			PropsUtil.reload();
-		}
-		else {
-			_neverInitialized = false;
-		}
-
 		try {
-			PropsValues.LIFERAY_WEB_PORTAL_CONTEXT_TEMPDIR = System.getProperty(
-				SystemProperties.TMP_DIR);
+			if (initModuleFramework) {
+				PropsValues.LIFERAY_WEB_PORTAL_CONTEXT_TEMPDIR =
+					System.getProperty(SystemProperties.TMP_DIR);
 
-			init();
+				ModuleFrameworkUtilAdapter.startFramework();
+			}
 
-			ModuleFrameworkUtilAdapter.startFramework();
+			SpringUtil.loadContext(configLocations);
 
-			SpringUtil.loadContext(extraConfigLocations);
+			if (initModuleFramework) {
+				BeanLocatorImpl beanLocatorImpl =
+					(BeanLocatorImpl)PortalBeanLocatorUtil.getBeanLocator();
 
-			BeanLocatorImpl beanLocatorImpl =
-				(BeanLocatorImpl)PortalBeanLocatorUtil.getBeanLocator();
+				ModuleFrameworkUtilAdapter.registerContext(
+					beanLocatorImpl.getApplicationContext());
 
-			ModuleFrameworkUtilAdapter.registerContext(
-				beanLocatorImpl.getApplicationContext());
-
-			ModuleFrameworkUtilAdapter.startRuntime();
+				ModuleFrameworkUtilAdapter.startRuntime();
+			}
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 
 		_initialized = true;
-	}
-
-	public synchronized static void initWithSpringAndModuleFramework(
-		List<String> extraConfigLocations) {
-
-		initWithSpringAndModuleFramework(false, extraConfigLocations);
 	}
 
 	public synchronized static void stopModuleFramework() {

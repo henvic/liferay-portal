@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.dynamicdatalists.service.base;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -74,6 +76,7 @@ import javax.sql.DataSource;
  * @see com.liferay.portlet.dynamicdatalists.service.DDLRecordLocalServiceUtil
  * @generated
  */
+@ProviderType
 public abstract class DDLRecordLocalServiceBaseImpl extends BaseLocalServiceImpl
 	implements DDLRecordLocalService, IdentifiableBean {
 	/*
@@ -191,10 +194,10 @@ public abstract class DDLRecordLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
@@ -202,11 +205,11 @@ public abstract class DDLRecordLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
@@ -218,19 +221,6 @@ public abstract class DDLRecordLocalServiceBaseImpl extends BaseLocalServiceImpl
 	@Override
 	public DDLRecord fetchDDLRecord(long recordId) {
 		return ddlRecordPersistence.fetchByPrimaryKey(recordId);
-	}
-
-	/**
-	 * Returns the d d l record with the matching UUID and company.
-	 *
-	 * @param uuid the d d l record's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching d d l record, or <code>null</code> if a matching d d l record could not be found
-	 */
-	@Override
-	public DDLRecord fetchDDLRecordByUuidAndCompanyId(String uuid,
-		long companyId) {
-		return ddlRecordPersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
 	/**
@@ -350,17 +340,34 @@ public abstract class DDLRecordLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the d d l record with the matching UUID and company.
+	 * Returns all the d d l records matching the UUID and company.
 	 *
-	 * @param uuid the d d l record's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching d d l record
-	 * @throws PortalException if a matching d d l record could not be found
+	 * @param uuid the UUID of the d d l records
+	 * @param companyId the primary key of the company
+	 * @return the matching d d l records, or an empty list if no matches were found
 	 */
 	@Override
-	public DDLRecord getDDLRecordByUuidAndCompanyId(String uuid, long companyId)
-		throws PortalException {
-		return ddlRecordPersistence.findByUuid_C_First(uuid, companyId, null);
+	public List<DDLRecord> getDDLRecordsByUuidAndCompanyId(String uuid,
+		long companyId) {
+		return ddlRecordPersistence.findByUuid_C(uuid, companyId);
+	}
+
+	/**
+	 * Returns a range of d d l records matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the d d l records
+	 * @param companyId the primary key of the company
+	 * @param start the lower bound of the range of d d l records
+	 * @param end the upper bound of the range of d d l records (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the range of matching d d l records, or an empty list if no matches were found
+	 */
+	@Override
+	public List<DDLRecord> getDDLRecordsByUuidAndCompanyId(String uuid,
+		long companyId, int start, int end,
+		OrderByComparator<DDLRecord> orderByComparator) {
+		return ddlRecordPersistence.findByUuid_C(uuid, companyId, start, end,
+			orderByComparator);
 	}
 
 	/**
@@ -847,6 +854,44 @@ public abstract class DDLRecordLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
+	 * Returns the d d l record version local service.
+	 *
+	 * @return the d d l record version local service
+	 */
+	public com.liferay.portlet.dynamicdatalists.service.DDLRecordVersionLocalService getDDLRecordVersionLocalService() {
+		return ddlRecordVersionLocalService;
+	}
+
+	/**
+	 * Sets the d d l record version local service.
+	 *
+	 * @param ddlRecordVersionLocalService the d d l record version local service
+	 */
+	public void setDDLRecordVersionLocalService(
+		com.liferay.portlet.dynamicdatalists.service.DDLRecordVersionLocalService ddlRecordVersionLocalService) {
+		this.ddlRecordVersionLocalService = ddlRecordVersionLocalService;
+	}
+
+	/**
+	 * Returns the d d l record version remote service.
+	 *
+	 * @return the d d l record version remote service
+	 */
+	public com.liferay.portlet.dynamicdatalists.service.DDLRecordVersionService getDDLRecordVersionService() {
+		return ddlRecordVersionService;
+	}
+
+	/**
+	 * Sets the d d l record version remote service.
+	 *
+	 * @param ddlRecordVersionService the d d l record version remote service
+	 */
+	public void setDDLRecordVersionService(
+		com.liferay.portlet.dynamicdatalists.service.DDLRecordVersionService ddlRecordVersionService) {
+		this.ddlRecordVersionService = ddlRecordVersionService;
+	}
+
+	/**
 	 * Returns the d d l record version persistence.
 	 *
 	 * @return the d d l record version persistence
@@ -973,6 +1018,10 @@ public abstract class DDLRecordLocalServiceBaseImpl extends BaseLocalServiceImpl
 	protected DDLRecordSetPersistence ddlRecordSetPersistence;
 	@BeanReference(type = DDLRecordSetFinder.class)
 	protected DDLRecordSetFinder ddlRecordSetFinder;
+	@BeanReference(type = com.liferay.portlet.dynamicdatalists.service.DDLRecordVersionLocalService.class)
+	protected com.liferay.portlet.dynamicdatalists.service.DDLRecordVersionLocalService ddlRecordVersionLocalService;
+	@BeanReference(type = com.liferay.portlet.dynamicdatalists.service.DDLRecordVersionService.class)
+	protected com.liferay.portlet.dynamicdatalists.service.DDLRecordVersionService ddlRecordVersionService;
 	@BeanReference(type = DDLRecordVersionPersistence.class)
 	protected DDLRecordVersionPersistence ddlRecordVersionPersistence;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)

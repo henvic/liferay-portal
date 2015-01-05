@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.documentlibrary.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -24,15 +26,11 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
 import com.liferay.portlet.documentlibrary.NoSuchSyncEventException;
@@ -43,7 +41,6 @@ import com.liferay.portlet.documentlibrary.service.persistence.DLSyncEventPersis
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,6 +61,7 @@ import java.util.Set;
  * @see DLSyncEventUtil
  * @generated
  */
+@ProviderType
 public class DLSyncEventPersistenceImpl extends BasePersistenceImpl<DLSyncEvent>
 	implements DLSyncEventPersistence {
 	/*
@@ -1416,25 +1414,6 @@ public class DLSyncEventPersistenceImpl extends BasePersistenceImpl<DLSyncEvent>
 	 * Initializes the d l sync event persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portlet.documentlibrary.model.DLSyncEvent")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<DLSyncEvent>> listenersList = new ArrayList<ModelListener<DLSyncEvent>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<DLSyncEvent>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
 	}
 
 	public void destroy() {
@@ -1453,11 +1432,11 @@ public class DLSyncEventPersistenceImpl extends BasePersistenceImpl<DLSyncEvent>
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No DLSyncEvent exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No DLSyncEvent exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(DLSyncEventPersistenceImpl.class);
-	private static Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+	private static final Log _log = LogFactoryUtil.getLog(DLSyncEventPersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"type"
 			});
-	private static DLSyncEvent _nullDLSyncEvent = new DLSyncEventImpl() {
+	private static final DLSyncEvent _nullDLSyncEvent = new DLSyncEventImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -1469,7 +1448,7 @@ public class DLSyncEventPersistenceImpl extends BasePersistenceImpl<DLSyncEvent>
 			}
 		};
 
-	private static CacheModel<DLSyncEvent> _nullDLSyncEventCacheModel = new CacheModel<DLSyncEvent>() {
+	private static final CacheModel<DLSyncEvent> _nullDLSyncEventCacheModel = new CacheModel<DLSyncEvent>() {
 			@Override
 			public DLSyncEvent toEntityModel() {
 				return _nullDLSyncEvent;

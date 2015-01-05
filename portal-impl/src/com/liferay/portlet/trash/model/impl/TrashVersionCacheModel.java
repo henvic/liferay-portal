@@ -14,6 +14,9 @@
 
 package com.liferay.portlet.trash.model.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -32,8 +35,33 @@ import java.io.ObjectOutput;
  * @see TrashVersion
  * @generated
  */
+@ProviderType
 public class TrashVersionCacheModel implements CacheModel<TrashVersion>,
 	Externalizable {
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof TrashVersionCacheModel)) {
+			return false;
+		}
+
+		TrashVersionCacheModel trashVersionCacheModel = (TrashVersionCacheModel)obj;
+
+		if (versionId == trashVersionCacheModel.versionId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, versionId);
+	}
+
 	@Override
 	public String toString() {
 		StringBundler sb = new StringBundler(13);

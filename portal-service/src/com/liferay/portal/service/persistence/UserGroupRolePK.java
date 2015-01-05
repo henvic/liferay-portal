@@ -14,6 +14,9 @@
 
 package com.liferay.portal.service.persistence;
 
+import aQute.bnd.annotation.ProviderType;
+
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 
@@ -23,6 +26,7 @@ import java.io.Serializable;
  * @author Brian Wing Shun Chan
  * @generated
  */
+@ProviderType
 public class UserGroupRolePK implements Comparable<UserGroupRolePK>,
 	Serializable {
 	public long userId;
@@ -138,8 +142,13 @@ public class UserGroupRolePK implements Comparable<UserGroupRolePK>,
 
 	@Override
 	public int hashCode() {
-		return (String.valueOf(userId) + String.valueOf(groupId) +
-		String.valueOf(roleId)).hashCode();
+		int hashCode = 0;
+
+		hashCode = HashUtil.hash(hashCode, userId);
+		hashCode = HashUtil.hash(hashCode, groupId);
+		hashCode = HashUtil.hash(hashCode, roleId);
+
+		return hashCode;
 	}
 
 	@Override

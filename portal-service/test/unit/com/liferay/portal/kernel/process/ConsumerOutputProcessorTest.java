@@ -27,16 +27,16 @@ import org.junit.Test;
 public class ConsumerOutputProcessorTest extends BaseOutputProcessorTestCase {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	public static final CodeCoverageAssertor codeCoverageAssertor =
+		CodeCoverageAssertor.INSTANCE;
 
 	@Test
-	public void testConsumeFail() throws Exception {
+	public void testConsumeFail() {
 		testFailToRead(new ConsumerOutputProcessor());
 	}
 
 	@Test
-	public void testConsumeSuccess() throws Exception {
+	public void testConsumeSuccess() throws ProcessException {
 		ConsumerOutputProcessor consumerOutputProcessor =
 			new ConsumerOutputProcessor();
 

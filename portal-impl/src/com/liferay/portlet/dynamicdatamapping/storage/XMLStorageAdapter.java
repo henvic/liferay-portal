@@ -54,6 +54,11 @@ import java.util.Map;
 public class XMLStorageAdapter extends BaseStorageAdapter {
 
 	@Override
+	public String getStorageType() {
+		return StorageType.XML.toString();
+	}
+
+	@Override
 	protected long doCreate(
 			long companyId, long ddmStructureId, Fields fields,
 			ServiceContext serviceContext)
@@ -153,7 +158,7 @@ public class XMLStorageAdapter extends BaseStorageAdapter {
 			DDMContent ddmContent = DDMContentLocalServiceUtil.getContent(
 				classPK);
 
-			Document document = SAXReaderUtil.read(ddmContent.getXml());
+			Document document = SAXReaderUtil.read(ddmContent.getData());
 
 			if ((conditionXPath == null) ||
 				((conditionXPath != null) &&
@@ -180,11 +185,11 @@ public class XMLStorageAdapter extends BaseStorageAdapter {
 			fields = DDMUtil.mergeFields(fields, getFields(classPK));
 		}
 
-		ddmContent.setXml(DDMXMLUtil.getXML(fields));
+		ddmContent.setData(DDMXMLUtil.getXML(fields));
 
 		DDMContentLocalServiceUtil.updateContent(
 			ddmContent.getPrimaryKey(), ddmContent.getName(),
-			ddmContent.getDescription(), ddmContent.getXml(), serviceContext);
+			ddmContent.getDescription(), ddmContent.getData(), serviceContext);
 	}
 
 	private List<Fields> _doQuery(
@@ -236,7 +241,7 @@ public class XMLStorageAdapter extends BaseStorageAdapter {
 				classPK);
 
 			Fields fields = DDMXMLUtil.getFields(
-				ddmStructure, conditionXPath, ddmContent.getXml(), fieldNames);
+				ddmStructure, conditionXPath, ddmContent.getData(), fieldNames);
 
 			fieldsList.add(fields);
 		}

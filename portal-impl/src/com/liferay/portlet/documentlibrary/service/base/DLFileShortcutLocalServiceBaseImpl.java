@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.documentlibrary.service.base;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -77,6 +79,7 @@ import javax.sql.DataSource;
  * @see com.liferay.portlet.documentlibrary.service.DLFileShortcutLocalServiceUtil
  * @generated
  */
+@ProviderType
 public abstract class DLFileShortcutLocalServiceBaseImpl
 	extends BaseLocalServiceImpl implements DLFileShortcutLocalService,
 		IdentifiableBean {
@@ -196,10 +199,10 @@ public abstract class DLFileShortcutLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
@@ -207,11 +210,11 @@ public abstract class DLFileShortcutLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
@@ -223,20 +226,6 @@ public abstract class DLFileShortcutLocalServiceBaseImpl
 	@Override
 	public DLFileShortcut fetchDLFileShortcut(long fileShortcutId) {
 		return dlFileShortcutPersistence.fetchByPrimaryKey(fileShortcutId);
-	}
-
-	/**
-	 * Returns the document library file shortcut with the matching UUID and company.
-	 *
-	 * @param uuid the document library file shortcut's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching document library file shortcut, or <code>null</code> if a matching document library file shortcut could not be found
-	 */
-	@Override
-	public DLFileShortcut fetchDLFileShortcutByUuidAndCompanyId(String uuid,
-		long companyId) {
-		return dlFileShortcutPersistence.fetchByUuid_C_First(uuid, companyId,
-			null);
 	}
 
 	/**
@@ -366,18 +355,34 @@ public abstract class DLFileShortcutLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the document library file shortcut with the matching UUID and company.
+	 * Returns all the document library file shortcuts matching the UUID and company.
 	 *
-	 * @param uuid the document library file shortcut's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching document library file shortcut
-	 * @throws PortalException if a matching document library file shortcut could not be found
+	 * @param uuid the UUID of the document library file shortcuts
+	 * @param companyId the primary key of the company
+	 * @return the matching document library file shortcuts, or an empty list if no matches were found
 	 */
 	@Override
-	public DLFileShortcut getDLFileShortcutByUuidAndCompanyId(String uuid,
-		long companyId) throws PortalException {
-		return dlFileShortcutPersistence.findByUuid_C_First(uuid, companyId,
-			null);
+	public List<DLFileShortcut> getDLFileShortcutsByUuidAndCompanyId(
+		String uuid, long companyId) {
+		return dlFileShortcutPersistence.findByUuid_C(uuid, companyId);
+	}
+
+	/**
+	 * Returns a range of document library file shortcuts matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the document library file shortcuts
+	 * @param companyId the primary key of the company
+	 * @param start the lower bound of the range of document library file shortcuts
+	 * @param end the upper bound of the range of document library file shortcuts (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the range of matching document library file shortcuts, or an empty list if no matches were found
+	 */
+	@Override
+	public List<DLFileShortcut> getDLFileShortcutsByUuidAndCompanyId(
+		String uuid, long companyId, int start, int end,
+		OrderByComparator<DLFileShortcut> orderByComparator) {
+		return dlFileShortcutPersistence.findByUuid_C(uuid, companyId, start,
+			end, orderByComparator);
 	}
 
 	/**

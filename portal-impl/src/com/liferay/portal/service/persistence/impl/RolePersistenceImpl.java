@@ -14,6 +14,8 @@
 
 package com.liferay.portal.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.NoSuchRoleException;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
@@ -28,8 +30,6 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -39,7 +39,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.MVCCModel;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.impl.RoleImpl;
 import com.liferay.portal.model.impl.RoleModelImpl;
@@ -50,7 +49,6 @@ import com.liferay.portal.service.persistence.UserPersistence;
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -71,6 +69,7 @@ import java.util.Set;
  * @see RoleUtil
  * @generated
  */
+@ProviderType
 public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 	implements RolePersistence {
 	/*
@@ -9631,26 +9630,6 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 	 * Initializes the role persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portal.model.Role")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<Role>> listenersList = new ArrayList<ModelListener<Role>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<Role>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
-
 		roleToGroupTableMapper = TableMapperFactory.getTableMapper("Groups_Roles",
 				"roleId", "groupId", this, groupPersistence);
 
@@ -9693,11 +9672,11 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No Role exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No Role exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(RolePersistenceImpl.class);
-	private static Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+	private static final Log _log = LogFactoryUtil.getLog(RolePersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"uuid", "type"
 			});
-	private static Role _nullRole = new RoleImpl() {
+	private static final Role _nullRole = new RoleImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -9709,12 +9688,12 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 			}
 		};
 
-	private static CacheModel<Role> _nullRoleCacheModel = new NullCacheModel();
+	private static final CacheModel<Role> _nullRoleCacheModel = new NullCacheModel();
 
 	private static class NullCacheModel implements CacheModel<Role>, MVCCModel {
 		@Override
 		public long getMvccVersion() {
-			return 0;
+			return -1;
 		}
 
 		@Override

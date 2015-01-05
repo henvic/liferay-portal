@@ -23,7 +23,6 @@ PortletURL portletURL = liferayPortletResponse.createRenderURL();
 
 portletURL.setParameter("struts_action", "/journal/view");
 portletURL.setParameter("folderId", String.valueOf(folderId));
-portletURL.setParameter("displayStyle", JournalUtil.getDisplayStyle(liferayPortletRequest, displayViews));
 %>
 
 <aui:form action="<%= portletURL.toString() %>" method="post" name="fm1">
@@ -93,7 +92,7 @@ portletURL.setParameter("displayStyle", JournalUtil.getDisplayStyle(liferayPortl
 			</c:if>
 		</aui:nav>
 
-		<aui:nav-bar-search cssClass="navbar-search-advanced" file="/html/portlet/journal/article_search.jsp" />
+		<aui:nav-bar-search file="/html/portlet/journal/article_search.jsp" />
 	</aui:nav-bar>
 </aui:form>
 

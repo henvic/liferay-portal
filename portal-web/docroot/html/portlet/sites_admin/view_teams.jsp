@@ -18,6 +18,7 @@
 
 <%
 String redirect = ParamUtil.getString(request, "redirect");
+
 String backURL = ParamUtil.getString(request, "backURL", redirect);
 
 Group group = ActionUtil.getGroup(renderRequest);
@@ -65,7 +66,7 @@ pageContext.setAttribute("portletURL", portletURL);
 		%>
 
 		<aui:nav-bar>
-			<aui:nav>
+			<aui:nav cssClass="navbar-nav">
 				<c:if test="<%= GroupPermissionUtil.contains(permissionChecker, group, ActionKeys.MANAGE_TEAMS) %>">
 					<portlet:renderURL var="addTeamURL">
 						<portlet:param name="struts_action" value="/sites_admin/edit_team" />
@@ -77,8 +78,10 @@ pageContext.setAttribute("portletURL", portletURL);
 				</c:if>
 			</aui:nav>
 
-			<aui:nav-bar-search cssClass="pull-right">
-				<liferay-ui:input-search name="<%= searchTerms.NAME %>" />
+			<aui:nav-bar-search>
+				<div class="form-search">
+					<liferay-ui:input-search autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" name="<%= searchTerms.NAME %>" />
+				</div>
 			</aui:nav-bar-search>
 		</aui:nav-bar>
 

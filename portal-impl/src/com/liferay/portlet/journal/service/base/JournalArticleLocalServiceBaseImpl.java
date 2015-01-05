@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.journal.service.base;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -107,6 +109,7 @@ import javax.sql.DataSource;
  * @see com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil
  * @generated
  */
+@ProviderType
 public abstract class JournalArticleLocalServiceBaseImpl
 	extends BaseLocalServiceImpl implements JournalArticleLocalService,
 		IdentifiableBean {
@@ -226,10 +229,10 @@ public abstract class JournalArticleLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
@@ -237,11 +240,11 @@ public abstract class JournalArticleLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
@@ -253,20 +256,6 @@ public abstract class JournalArticleLocalServiceBaseImpl
 	@Override
 	public JournalArticle fetchJournalArticle(long id) {
 		return journalArticlePersistence.fetchByPrimaryKey(id);
-	}
-
-	/**
-	 * Returns the journal article with the matching UUID and company.
-	 *
-	 * @param uuid the journal article's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching journal article, or <code>null</code> if a matching journal article could not be found
-	 */
-	@Override
-	public JournalArticle fetchJournalArticleByUuidAndCompanyId(String uuid,
-		long companyId) {
-		return journalArticlePersistence.fetchByUuid_C_First(uuid, companyId,
-			null);
 	}
 
 	/**
@@ -411,18 +400,34 @@ public abstract class JournalArticleLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the journal article with the matching UUID and company.
+	 * Returns all the journal articles matching the UUID and company.
 	 *
-	 * @param uuid the journal article's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching journal article
-	 * @throws PortalException if a matching journal article could not be found
+	 * @param uuid the UUID of the journal articles
+	 * @param companyId the primary key of the company
+	 * @return the matching journal articles, or an empty list if no matches were found
 	 */
 	@Override
-	public JournalArticle getJournalArticleByUuidAndCompanyId(String uuid,
-		long companyId) throws PortalException {
-		return journalArticlePersistence.findByUuid_C_First(uuid, companyId,
-			null);
+	public List<JournalArticle> getJournalArticlesByUuidAndCompanyId(
+		String uuid, long companyId) {
+		return journalArticlePersistence.findByUuid_C(uuid, companyId);
+	}
+
+	/**
+	 * Returns a range of journal articles matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the journal articles
+	 * @param companyId the primary key of the company
+	 * @param start the lower bound of the range of journal articles
+	 * @param end the upper bound of the range of journal articles (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the range of matching journal articles, or an empty list if no matches were found
+	 */
+	@Override
+	public List<JournalArticle> getJournalArticlesByUuidAndCompanyId(
+		String uuid, long companyId, int start, int end,
+		OrderByComparator<JournalArticle> orderByComparator) {
+		return journalArticlePersistence.findByUuid_C(uuid, companyId, start,
+			end, orderByComparator);
 	}
 
 	/**
@@ -1417,6 +1422,44 @@ public abstract class JournalArticleLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the d l app local service.
+	 *
+	 * @return the d l app local service
+	 */
+	public com.liferay.portlet.documentlibrary.service.DLAppLocalService getDLAppLocalService() {
+		return dlAppLocalService;
+	}
+
+	/**
+	 * Sets the d l app local service.
+	 *
+	 * @param dlAppLocalService the d l app local service
+	 */
+	public void setDLAppLocalService(
+		com.liferay.portlet.documentlibrary.service.DLAppLocalService dlAppLocalService) {
+		this.dlAppLocalService = dlAppLocalService;
+	}
+
+	/**
+	 * Returns the d l app remote service.
+	 *
+	 * @return the d l app remote service
+	 */
+	public com.liferay.portlet.documentlibrary.service.DLAppService getDLAppService() {
+		return dlAppService;
+	}
+
+	/**
+	 * Sets the d l app remote service.
+	 *
+	 * @param dlAppService the d l app remote service
+	 */
+	public void setDLAppService(
+		com.liferay.portlet.documentlibrary.service.DLAppService dlAppService) {
+		this.dlAppService = dlAppService;
+	}
+
+	/**
 	 * Returns the d d m structure local service.
 	 *
 	 * @return the d d m structure local service
@@ -2257,6 +2300,10 @@ public abstract class JournalArticleLocalServiceBaseImpl
 	protected AssetTagPersistence assetTagPersistence;
 	@BeanReference(type = AssetTagFinder.class)
 	protected AssetTagFinder assetTagFinder;
+	@BeanReference(type = com.liferay.portlet.documentlibrary.service.DLAppLocalService.class)
+	protected com.liferay.portlet.documentlibrary.service.DLAppLocalService dlAppLocalService;
+	@BeanReference(type = com.liferay.portlet.documentlibrary.service.DLAppService.class)
+	protected com.liferay.portlet.documentlibrary.service.DLAppService dlAppService;
 	@BeanReference(type = com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalService.class)
 	protected com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalService ddmStructureLocalService;
 	@BeanReference(type = com.liferay.portlet.dynamicdatamapping.service.DDMStructureService.class)

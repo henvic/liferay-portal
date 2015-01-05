@@ -45,6 +45,18 @@ public class CommentManagerImpl implements CommentManager {
 	}
 
 	@Override
+	public void addComment(
+			long userId, long groupId, String className, long classPK,
+			String body, ServiceContext serviceContext)
+		throws PortalException {
+
+		CommentManager commentManager = getCommentManager();
+
+		commentManager.addComment(
+			userId, groupId, className, classPK, body, serviceContext);
+	}
+
+	@Override
 	public long addComment(
 			long userId, long groupId, String className, long classPK,
 			String userName, String subject, String body,
@@ -86,6 +98,13 @@ public class CommentManagerImpl implements CommentManager {
 		commentManager.deleteDiscussion(className, classPK);
 	}
 
+	@Override
+	public int getCommentsCount(String className, long classPK) {
+		CommentManager commentManager = getCommentManager();
+
+		return commentManager.getCommentsCount(className, classPK);
+	}
+
 	protected CommentManager getCommentManager() {
 		if (_serviceTracker.isEmpty()) {
 			return _defaultCommentManager;
@@ -102,6 +121,7 @@ public class CommentManagerImpl implements CommentManager {
 
 	private CommentManager _defaultCommentManager =
 		new DummyCommentManagerImpl();
-	private ServiceTracker<CommentManager, CommentManager> _serviceTracker;
+	private final ServiceTracker<CommentManager, CommentManager>
+		_serviceTracker;
 
 }

@@ -14,6 +14,8 @@
 
 package com.liferay.portal.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.NoSuchExportImportConfigurationException;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -25,24 +27,19 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ExportImportConfiguration;
 import com.liferay.portal.model.MVCCModel;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.impl.ExportImportConfigurationImpl;
 import com.liferay.portal.model.impl.ExportImportConfigurationModelImpl;
 import com.liferay.portal.service.persistence.ExportImportConfigurationPersistence;
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,6 +60,7 @@ import java.util.Set;
  * @see ExportImportConfigurationUtil
  * @generated
  */
+@ProviderType
 public class ExportImportConfigurationPersistenceImpl
 	extends BasePersistenceImpl<ExportImportConfiguration>
 	implements ExportImportConfigurationPersistence {
@@ -3420,25 +3418,6 @@ public class ExportImportConfigurationPersistenceImpl
 	 * Initializes the export import configuration persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portal.model.ExportImportConfiguration")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<ExportImportConfiguration>> listenersList = new ArrayList<ModelListener<ExportImportConfiguration>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<ExportImportConfiguration>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
 	}
 
 	public void destroy() {
@@ -3458,11 +3437,12 @@ public class ExportImportConfigurationPersistenceImpl
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No ExportImportConfiguration exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No ExportImportConfiguration exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(ExportImportConfigurationPersistenceImpl.class);
-	private static Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+	private static final Log _log = LogFactoryUtil.getLog(ExportImportConfigurationPersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"type", "settings"
 			});
-	private static ExportImportConfiguration _nullExportImportConfiguration = new ExportImportConfigurationImpl() {
+	private static final ExportImportConfiguration _nullExportImportConfiguration =
+		new ExportImportConfigurationImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -3474,14 +3454,14 @@ public class ExportImportConfigurationPersistenceImpl
 			}
 		};
 
-	private static CacheModel<ExportImportConfiguration> _nullExportImportConfigurationCacheModel =
+	private static final CacheModel<ExportImportConfiguration> _nullExportImportConfigurationCacheModel =
 		new NullCacheModel();
 
 	private static class NullCacheModel implements CacheModel<ExportImportConfiguration>,
 		MVCCModel {
 		@Override
 		public long getMvccVersion() {
-			return 0;
+			return -1;
 		}
 
 		@Override

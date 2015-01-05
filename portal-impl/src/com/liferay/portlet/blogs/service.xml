@@ -24,7 +24,7 @@
 		<!-- Other fields -->
 
 		<column name="title" type="String" />
-		<column name="deckTitle" type="String" />
+		<column name="subtitle" type="String" />
 		<column name="urlTitle" type="String" />
 		<column name="description" type="String" />
 		<column name="content" type="String" />
@@ -32,7 +32,10 @@
 		<column name="allowPingbacks" type="boolean" />
 		<column name="allowTrackbacks" type="boolean" />
 		<column name="trackbacks" type="String" />
+		<column name="coverImageFileEntryId" type="long" />
+		<column name="coverImageURL" type="String" />
 		<column name="smallImage" type="boolean" />
+		<column name="smallImageFileEntryId" type="long" />
 		<column name="smallImageId" type="long" />
 		<column name="smallImageURL" type="String" />
 		<column name="status" type="int" />
@@ -55,22 +58,6 @@
 		<finder name="CompanyId" return-type="Collection">
 			<finder-column name="companyId" />
 		</finder>
-		<finder name="C_U" return-type="Collection">
-			<finder-column name="companyId" />
-			<finder-column name="userId" />
-		</finder>
-		<finder name="C_LtD" return-type="Collection">
-			<finder-column name="companyId" />
-			<finder-column name="displayDate" comparator="&lt;" />
-		</finder>
-		<finder name="C_NotS" return-type="Collection">
-			<finder-column name="companyId" />
-			<finder-column name="status" comparator="!=" />
-		</finder>
-		<finder name="C_S" return-type="Collection">
-			<finder-column name="companyId" />
-			<finder-column name="status" />
-		</finder>
 		<finder name="G_UT" return-type="BlogsEntry" unique="true">
 			<finder-column name="groupId" />
 			<finder-column name="urlTitle" />
@@ -79,35 +66,31 @@
 			<finder-column name="groupId" />
 			<finder-column name="displayDate" comparator="&lt;" />
 		</finder>
-		<finder name="G_NotS" return-type="Collection">
-			<finder-column name="groupId" />
-			<finder-column name="status" comparator="!=" />
-		</finder>
 		<finder name="G_S" return-type="Collection">
 			<finder-column name="groupId" />
 			<finder-column name="status" />
 		</finder>
+		<finder name="G_NotS" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="status" comparator="!=" />
+		</finder>
+		<finder name="C_U" return-type="Collection">
+			<finder-column name="companyId" />
+			<finder-column name="userId" />
+		</finder>
+		<finder name="C_LtD" return-type="Collection">
+			<finder-column name="companyId" />
+			<finder-column name="displayDate" comparator="&lt;" />
+		</finder>
+		<finder name="C_S" return-type="Collection">
+			<finder-column name="companyId" />
+			<finder-column name="status" />
+		</finder>
+		<finder name="C_NotS" return-type="Collection">
+			<finder-column name="companyId" />
+			<finder-column name="status" comparator="!=" />
+		</finder>
 		<finder name="LtD_S" return-type="Collection">
-			<finder-column name="displayDate" comparator="&lt;" />
-			<finder-column name="status" />
-		</finder>
-		<finder name="C_U_NotS" return-type="Collection">
-			<finder-column name="companyId" />
-			<finder-column name="userId" />
-			<finder-column name="status" comparator="!=" />
-		</finder>
-		<finder name="C_U_S" return-type="Collection">
-			<finder-column name="companyId" />
-			<finder-column name="userId" />
-			<finder-column name="status" />
-		</finder>
-		<finder name="C_LtD_NotS" return-type="Collection">
-			<finder-column name="companyId" />
-			<finder-column name="displayDate" comparator="&lt;" />
-			<finder-column name="status" comparator="!=" />
-		</finder>
-		<finder name="C_LtD_S" return-type="Collection">
-			<finder-column name="companyId" />
 			<finder-column name="displayDate" comparator="&lt;" />
 			<finder-column name="status" />
 		</finder>
@@ -116,19 +99,14 @@
 			<finder-column name="userId" />
 			<finder-column name="displayDate" comparator="&lt;" />
 		</finder>
-		<finder name="G_U_NotS" return-type="Collection">
-			<finder-column name="groupId" />
-			<finder-column name="userId" />
-			<finder-column name="status" comparator="!=" />
-		</finder>
 		<finder name="G_U_S" return-type="Collection">
 			<finder-column name="groupId" />
 			<finder-column name="userId" />
 			<finder-column name="status" />
 		</finder>
-		<finder name="G_LtD_NotS" return-type="Collection">
+		<finder name="G_U_NotS" return-type="Collection">
 			<finder-column name="groupId" />
-			<finder-column name="displayDate" comparator="&lt;" />
+			<finder-column name="userId" />
 			<finder-column name="status" comparator="!=" />
 		</finder>
 		<finder name="G_LtD_S" return-type="Collection">
@@ -136,9 +114,28 @@
 			<finder-column name="displayDate" comparator="&lt;" />
 			<finder-column name="status" />
 		</finder>
-		<finder name="G_U_LtD_NotS" return-type="Collection">
+		<finder name="G_LtD_NotS" return-type="Collection">
 			<finder-column name="groupId" />
+			<finder-column name="displayDate" comparator="&lt;" />
+			<finder-column name="status" comparator="!=" />
+		</finder>
+		<finder name="C_U_S" return-type="Collection">
+			<finder-column name="companyId" />
 			<finder-column name="userId" />
+			<finder-column name="status" />
+		</finder>
+		<finder name="C_U_NotS" return-type="Collection">
+			<finder-column name="companyId" />
+			<finder-column name="userId" />
+			<finder-column name="status" comparator="!=" />
+		</finder>
+		<finder name="C_LtD_S" return-type="Collection">
+			<finder-column name="companyId" />
+			<finder-column name="displayDate" comparator="&lt;" />
+			<finder-column name="status" />
+		</finder>
+		<finder name="C_LtD_NotS" return-type="Collection">
+			<finder-column name="companyId" />
 			<finder-column name="displayDate" comparator="&lt;" />
 			<finder-column name="status" comparator="!=" />
 		</finder>
@@ -147,6 +144,12 @@
 			<finder-column name="userId" />
 			<finder-column name="displayDate" comparator="&lt;" />
 			<finder-column name="status" />
+		</finder>
+		<finder name="G_U_LtD_NotS" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="userId" />
+			<finder-column name="displayDate" comparator="&lt;" />
+			<finder-column name="status" comparator="!=" />
 		</finder>
 
 		<!-- References -->
@@ -228,7 +231,10 @@
 		<reference package-path="com.liferay.portlet.blogs" entity="BlogsEntry" />
 	</entity>
 	<exceptions>
+		<exception>CoverImageName</exception>
+		<exception>CoverImageSize</exception>
 		<exception>EntryContent</exception>
+		<exception>EntryDescription</exception>
 		<exception>EntryDisplayDate</exception>
 		<exception>EntrySmallImageName</exception>
 		<exception>EntrySmallImageSize</exception>

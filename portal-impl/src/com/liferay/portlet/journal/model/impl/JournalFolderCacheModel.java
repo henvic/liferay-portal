@@ -14,6 +14,9 @@
 
 package com.liferay.portlet.journal.model.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -34,8 +37,33 @@ import java.util.Date;
  * @see JournalFolder
  * @generated
  */
+@ProviderType
 public class JournalFolderCacheModel implements CacheModel<JournalFolder>,
 	Externalizable {
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof JournalFolderCacheModel)) {
+			return false;
+		}
+
+		JournalFolderCacheModel journalFolderCacheModel = (JournalFolderCacheModel)obj;
+
+		if (folderId == journalFolderCacheModel.folderId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, folderId);
+	}
+
 	@Override
 	public String toString() {
 		StringBundler sb = new StringBundler(35);

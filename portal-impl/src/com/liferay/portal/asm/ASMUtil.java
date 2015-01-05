@@ -267,7 +267,7 @@ public class ASMUtil {
 		return removedMethodNodes;
 	}
 
-	private static MethodVisitor _emptyMethodVisitor =
+	private static final MethodVisitor _emptyMethodVisitor =
 		new MethodVisitor(Opcodes.ASM5) {
 		};
 
@@ -287,8 +287,8 @@ public class ASMUtil {
 			return typeName;
 		}
 
-		private final String _oldClassName;
 		private final String _newClassName;
+		private final String _oldClassName;
 
 	}
 

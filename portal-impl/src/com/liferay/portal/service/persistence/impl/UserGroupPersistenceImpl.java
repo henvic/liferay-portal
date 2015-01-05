@@ -14,6 +14,8 @@
 
 package com.liferay.portal.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.NoSuchUserGroupException;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
@@ -27,18 +29,14 @@ import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.MVCCModel;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.UserGroup;
 import com.liferay.portal.model.impl.UserGroupImpl;
 import com.liferay.portal.model.impl.UserGroupModelImpl;
@@ -50,7 +48,6 @@ import com.liferay.portal.service.persistence.UserPersistence;
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -71,6 +68,7 @@ import java.util.Set;
  * @see UserGroupUtil
  * @generated
  */
+@ProviderType
 public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 	implements UserGroupPersistence {
 	/*
@@ -5523,26 +5521,6 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 	 * Initializes the user group persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portal.model.UserGroup")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<UserGroup>> listenersList = new ArrayList<ModelListener<UserGroup>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<UserGroup>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
-
 		userGroupToGroupTableMapper = TableMapperFactory.getTableMapper("Groups_UserGroups",
 				"userGroupId", "groupId", this, groupPersistence);
 
@@ -5592,11 +5570,11 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No UserGroup exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No UserGroup exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(UserGroupPersistenceImpl.class);
-	private static Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+	private static final Log _log = LogFactoryUtil.getLog(UserGroupPersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"uuid"
 			});
-	private static UserGroup _nullUserGroup = new UserGroupImpl() {
+	private static final UserGroup _nullUserGroup = new UserGroupImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -5608,13 +5586,13 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 			}
 		};
 
-	private static CacheModel<UserGroup> _nullUserGroupCacheModel = new NullCacheModel();
+	private static final CacheModel<UserGroup> _nullUserGroupCacheModel = new NullCacheModel();
 
 	private static class NullCacheModel implements CacheModel<UserGroup>,
 		MVCCModel {
 		@Override
 		public long getMvccVersion() {
-			return 0;
+			return -1;
 		}
 
 		@Override

@@ -14,6 +14,8 @@
 
 package com.liferay.portal.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.NoSuchResourceBlockPermissionException;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -25,15 +27,11 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.MVCCModel;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.ResourceBlockPermission;
 import com.liferay.portal.model.impl.ResourceBlockPermissionImpl;
 import com.liferay.portal.model.impl.ResourceBlockPermissionModelImpl;
@@ -41,7 +39,6 @@ import com.liferay.portal.service.persistence.ResourceBlockPermissionPersistence
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,6 +59,7 @@ import java.util.Set;
  * @see ResourceBlockPermissionUtil
  * @generated
  */
+@ProviderType
 public class ResourceBlockPermissionPersistenceImpl extends BasePersistenceImpl<ResourceBlockPermission>
 	implements ResourceBlockPermissionPersistence {
 	/*
@@ -2023,25 +2021,6 @@ public class ResourceBlockPermissionPersistenceImpl extends BasePersistenceImpl<
 	 * Initializes the resource block permission persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portal.model.ResourceBlockPermission")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<ResourceBlockPermission>> listenersList = new ArrayList<ModelListener<ResourceBlockPermission>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<ResourceBlockPermission>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
 	}
 
 	public void destroy() {
@@ -2061,8 +2040,8 @@ public class ResourceBlockPermissionPersistenceImpl extends BasePersistenceImpl<
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No ResourceBlockPermission exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No ResourceBlockPermission exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(ResourceBlockPermissionPersistenceImpl.class);
-	private static ResourceBlockPermission _nullResourceBlockPermission = new ResourceBlockPermissionImpl() {
+	private static final Log _log = LogFactoryUtil.getLog(ResourceBlockPermissionPersistenceImpl.class);
+	private static final ResourceBlockPermission _nullResourceBlockPermission = new ResourceBlockPermissionImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -2074,14 +2053,14 @@ public class ResourceBlockPermissionPersistenceImpl extends BasePersistenceImpl<
 			}
 		};
 
-	private static CacheModel<ResourceBlockPermission> _nullResourceBlockPermissionCacheModel =
+	private static final CacheModel<ResourceBlockPermission> _nullResourceBlockPermissionCacheModel =
 		new NullCacheModel();
 
 	private static class NullCacheModel implements CacheModel<ResourceBlockPermission>,
 		MVCCModel {
 		@Override
 		public long getMvccVersion() {
-			return 0;
+			return -1;
 		}
 
 		@Override

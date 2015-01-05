@@ -124,6 +124,17 @@ public class CommentManagerImplTest extends Mockito {
 		String body = RandomTestUtil.randomString();
 		long commentId = RandomTestUtil.randomLong();
 
+		ServiceContext serviceContext = new ServiceContext();
+
+		_commentManagerImpl.addComment(
+			userId, groupId, className, classPK, body, serviceContext);
+
+		Mockito.verify(
+			commentManager
+		).addComment(
+			userId, groupId, className, classPK, body, serviceContext
+		);
+
 		when(
 			commentManager.addComment(
 				userId, groupId, className, classPK, userName, subject, body,
@@ -162,6 +173,18 @@ public class CommentManagerImplTest extends Mockito {
 		).deleteDiscussion(
 			className, classPK
 		);
+
+		int commentsCount = RandomTestUtil.randomInt();
+
+		when(
+			commentManager.getCommentsCount(className, classPK)
+		).thenReturn(
+			commentsCount
+		);
+
+		Assert.assertEquals(
+			commentsCount,
+			_commentManagerImpl.getCommentsCount(className, classPK));
 	}
 
 	private CommentManagerImpl _commentManagerImpl;

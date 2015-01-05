@@ -14,6 +14,9 @@
 
 package com.liferay.portlet.social.model.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -32,8 +35,33 @@ import java.io.ObjectOutput;
  * @see SocialRelation
  * @generated
  */
+@ProviderType
 public class SocialRelationCacheModel implements CacheModel<SocialRelation>,
 	Externalizable {
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof SocialRelationCacheModel)) {
+			return false;
+		}
+
+		SocialRelationCacheModel socialRelationCacheModel = (SocialRelationCacheModel)obj;
+
+		if (relationId == socialRelationCacheModel.relationId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, relationId);
+	}
+
 	@Override
 	public String toString() {
 		StringBundler sb = new StringBundler(15);

@@ -50,10 +50,7 @@ public class ThemeHotDeployListener extends BaseHotDeployListener {
 		}
 		catch (Throwable t) {
 			throwHotDeployException(
-				hotDeployEvent,
-				"Error registering themes for " +
-					hotDeployEvent.getServletContextName(),
-				t);
+				hotDeployEvent, "Error registering themes for ", t);
 		}
 	}
 
@@ -66,10 +63,7 @@ public class ThemeHotDeployListener extends BaseHotDeployListener {
 		}
 		catch (Throwable t) {
 			throwHotDeployException(
-				hotDeployEvent,
-				"Error unregistering themes for " +
-					hotDeployEvent.getServletContextName(),
-				t);
+				hotDeployEvent, "Error unregistering themes for ", t);
 		}
 	}
 
@@ -180,10 +174,10 @@ public class ThemeHotDeployListener extends BaseHotDeployListener {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		ThemeHotDeployListener.class);
 
-	private static Map<String, List<Theme>> _themes =
+	private static final Map<String, List<Theme>> _themes =
 		new HashMap<String, List<Theme>>();
 
 }

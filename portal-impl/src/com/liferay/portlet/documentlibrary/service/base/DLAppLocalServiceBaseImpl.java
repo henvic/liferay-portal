@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.documentlibrary.service.base;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -31,6 +33,7 @@ import com.liferay.portal.service.persistence.SubscriptionPersistence;
 import com.liferay.portal.util.PortalUtil;
 
 import com.liferay.portlet.documentlibrary.service.DLAppLocalService;
+import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryMetadataFinder;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryMetadataPersistence;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileRankFinder;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileRankPersistence;
@@ -52,6 +55,7 @@ import javax.sql.DataSource;
  * @see com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil
  * @generated
  */
+@ProviderType
 public abstract class DLAppLocalServiceBaseImpl extends BaseLocalServiceImpl
 	implements DLAppLocalService, IdentifiableBean {
 	/*
@@ -363,6 +367,25 @@ public abstract class DLAppLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
+	 * Returns the document library file entry metadata finder.
+	 *
+	 * @return the document library file entry metadata finder
+	 */
+	public DLFileEntryMetadataFinder getDLFileEntryMetadataFinder() {
+		return dlFileEntryMetadataFinder;
+	}
+
+	/**
+	 * Sets the document library file entry metadata finder.
+	 *
+	 * @param dlFileEntryMetadataFinder the document library file entry metadata finder
+	 */
+	public void setDLFileEntryMetadataFinder(
+		DLFileEntryMetadataFinder dlFileEntryMetadataFinder) {
+		this.dlFileEntryMetadataFinder = dlFileEntryMetadataFinder;
+	}
+
+	/**
 	 * Returns the document library file rank local service.
 	 *
 	 * @return the document library file rank local service
@@ -631,6 +654,8 @@ public abstract class DLAppLocalServiceBaseImpl extends BaseLocalServiceImpl
 	protected com.liferay.portlet.documentlibrary.service.DLFileEntryMetadataLocalService dlFileEntryMetadataLocalService;
 	@BeanReference(type = DLFileEntryMetadataPersistence.class)
 	protected DLFileEntryMetadataPersistence dlFileEntryMetadataPersistence;
+	@BeanReference(type = DLFileEntryMetadataFinder.class)
+	protected DLFileEntryMetadataFinder dlFileEntryMetadataFinder;
 	@BeanReference(type = com.liferay.portlet.documentlibrary.service.DLFileRankLocalService.class)
 	protected com.liferay.portlet.documentlibrary.service.DLFileRankLocalService dlFileRankLocalService;
 	@BeanReference(type = DLFileRankPersistence.class)

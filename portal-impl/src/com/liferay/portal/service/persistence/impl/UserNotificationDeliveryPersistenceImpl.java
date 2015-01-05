@@ -14,6 +14,8 @@
 
 package com.liferay.portal.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.NoSuchUserNotificationDeliveryException;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -25,16 +27,12 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.MVCCModel;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.UserNotificationDelivery;
 import com.liferay.portal.model.impl.UserNotificationDeliveryImpl;
 import com.liferay.portal.model.impl.UserNotificationDeliveryModelImpl;
@@ -42,7 +40,6 @@ import com.liferay.portal.service.persistence.UserNotificationDeliveryPersistenc
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,6 +60,7 @@ import java.util.Set;
  * @see UserNotificationDeliveryUtil
  * @generated
  */
+@ProviderType
 public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl<UserNotificationDelivery>
 	implements UserNotificationDeliveryPersistence {
 	/*
@@ -1638,25 +1636,6 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * Initializes the user notification delivery persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portal.model.UserNotificationDelivery")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<UserNotificationDelivery>> listenersList = new ArrayList<ModelListener<UserNotificationDelivery>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<UserNotificationDelivery>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
 	}
 
 	public void destroy() {
@@ -1676,8 +1655,8 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No UserNotificationDelivery exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No UserNotificationDelivery exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(UserNotificationDeliveryPersistenceImpl.class);
-	private static UserNotificationDelivery _nullUserNotificationDelivery = new UserNotificationDeliveryImpl() {
+	private static final Log _log = LogFactoryUtil.getLog(UserNotificationDeliveryPersistenceImpl.class);
+	private static final UserNotificationDelivery _nullUserNotificationDelivery = new UserNotificationDeliveryImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -1689,14 +1668,14 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 			}
 		};
 
-	private static CacheModel<UserNotificationDelivery> _nullUserNotificationDeliveryCacheModel =
+	private static final CacheModel<UserNotificationDelivery> _nullUserNotificationDeliveryCacheModel =
 		new NullCacheModel();
 
 	private static class NullCacheModel implements CacheModel<UserNotificationDelivery>,
 		MVCCModel {
 		@Override
 		public long getMvccVersion() {
-			return 0;
+			return -1;
 		}
 
 		@Override

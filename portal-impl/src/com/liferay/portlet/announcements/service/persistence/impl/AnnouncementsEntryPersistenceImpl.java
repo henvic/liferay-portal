@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.announcements.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -23,19 +25,22 @@ import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.sanitizer.Sanitizer;
+import com.liferay.portal.kernel.sanitizer.SanitizerException;
+import com.liferay.portal.kernel.sanitizer.SanitizerUtil;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.model.ModelListener;
+import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
@@ -47,7 +52,6 @@ import com.liferay.portlet.announcements.service.persistence.AnnouncementsEntryP
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -68,6 +72,7 @@ import java.util.Set;
  * @see AnnouncementsEntryUtil
  * @generated
  */
+@ProviderType
 public class AnnouncementsEntryPersistenceImpl extends BasePersistenceImpl<AnnouncementsEntry>
 	implements AnnouncementsEntryPersistence {
 	/*
@@ -4917,6 +4922,31 @@ public class AnnouncementsEntryPersistenceImpl extends BasePersistenceImpl<Annou
 			announcementsEntry.setUuid(uuid);
 		}
 
+		long userId = GetterUtil.getLong(PrincipalThreadLocal.getName());
+
+		if (userId > 0) {
+			long companyId = announcementsEntry.getCompanyId();
+
+			long groupId = 0;
+
+			long entryId = 0;
+
+			if (!isNew) {
+				entryId = announcementsEntry.getPrimaryKey();
+			}
+
+			try {
+				announcementsEntry.setContent(SanitizerUtil.sanitize(
+						companyId, groupId, userId,
+						com.liferay.portlet.announcements.model.AnnouncementsEntry.class.getName(),
+						entryId, ContentTypes.TEXT_HTML, Sanitizer.MODE_ALL,
+						announcementsEntry.getContent(), null));
+			}
+			catch (SanitizerException se) {
+				throw new SystemException(se);
+			}
+		}
+
 		Session session = null;
 
 		try {
@@ -5451,25 +5481,6 @@ public class AnnouncementsEntryPersistenceImpl extends BasePersistenceImpl<Annou
 	 * Initializes the announcements entry persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portlet.announcements.model.AnnouncementsEntry")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<AnnouncementsEntry>> listenersList = new ArrayList<ModelListener<AnnouncementsEntry>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<AnnouncementsEntry>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
 	}
 
 	public void destroy() {
@@ -5498,11 +5509,11 @@ public class AnnouncementsEntryPersistenceImpl extends BasePersistenceImpl<Annou
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No AnnouncementsEntry exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No AnnouncementsEntry exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(AnnouncementsEntryPersistenceImpl.class);
-	private static Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+	private static final Log _log = LogFactoryUtil.getLog(AnnouncementsEntryPersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"uuid", "type"
 			});
-	private static AnnouncementsEntry _nullAnnouncementsEntry = new AnnouncementsEntryImpl() {
+	private static final AnnouncementsEntry _nullAnnouncementsEntry = new AnnouncementsEntryImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -5514,7 +5525,7 @@ public class AnnouncementsEntryPersistenceImpl extends BasePersistenceImpl<Annou
 			}
 		};
 
-	private static CacheModel<AnnouncementsEntry> _nullAnnouncementsEntryCacheModel =
+	private static final CacheModel<AnnouncementsEntry> _nullAnnouncementsEntryCacheModel =
 		new CacheModel<AnnouncementsEntry>() {
 			@Override
 			public AnnouncementsEntry toEntityModel() {

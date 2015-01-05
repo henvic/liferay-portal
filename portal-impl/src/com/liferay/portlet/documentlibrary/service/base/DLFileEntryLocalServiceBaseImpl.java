@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.documentlibrary.service.base;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -64,6 +66,7 @@ import com.liferay.portlet.asset.service.persistence.AssetTagPersistence;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalService;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryFinder;
+import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryMetadataFinder;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryMetadataPersistence;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryPersistence;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryTypeFinder;
@@ -95,6 +98,7 @@ import javax.sql.DataSource;
  * @see com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil
  * @generated
  */
+@ProviderType
 public abstract class DLFileEntryLocalServiceBaseImpl
 	extends BaseLocalServiceImpl implements DLFileEntryLocalService,
 		IdentifiableBean {
@@ -214,10 +218,10 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
@@ -225,11 +229,11 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
@@ -241,19 +245,6 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	@Override
 	public DLFileEntry fetchDLFileEntry(long fileEntryId) {
 		return dlFileEntryPersistence.fetchByPrimaryKey(fileEntryId);
-	}
-
-	/**
-	 * Returns the document library file entry with the matching UUID and company.
-	 *
-	 * @param uuid the document library file entry's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching document library file entry, or <code>null</code> if a matching document library file entry could not be found
-	 */
-	@Override
-	public DLFileEntry fetchDLFileEntryByUuidAndCompanyId(String uuid,
-		long companyId) {
-		return dlFileEntryPersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
 	/**
@@ -385,17 +376,34 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the document library file entry with the matching UUID and company.
+	 * Returns all the document library file entries matching the UUID and company.
 	 *
-	 * @param uuid the document library file entry's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching document library file entry
-	 * @throws PortalException if a matching document library file entry could not be found
+	 * @param uuid the UUID of the document library file entries
+	 * @param companyId the primary key of the company
+	 * @return the matching document library file entries, or an empty list if no matches were found
 	 */
 	@Override
-	public DLFileEntry getDLFileEntryByUuidAndCompanyId(String uuid,
-		long companyId) throws PortalException {
-		return dlFileEntryPersistence.findByUuid_C_First(uuid, companyId, null);
+	public List<DLFileEntry> getDLFileEntriesByUuidAndCompanyId(String uuid,
+		long companyId) {
+		return dlFileEntryPersistence.findByUuid_C(uuid, companyId);
+	}
+
+	/**
+	 * Returns a range of document library file entries matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the document library file entries
+	 * @param companyId the primary key of the company
+	 * @param start the lower bound of the range of document library file entries
+	 * @param end the upper bound of the range of document library file entries (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the range of matching document library file entries, or an empty list if no matches were found
+	 */
+	@Override
+	public List<DLFileEntry> getDLFileEntriesByUuidAndCompanyId(String uuid,
+		long companyId, int start, int end,
+		OrderByComparator<DLFileEntry> orderByComparator) {
+		return dlFileEntryPersistence.findByUuid_C(uuid, companyId, start, end,
+			orderByComparator);
 	}
 
 	/**
@@ -1540,6 +1548,25 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the document library file entry metadata finder.
+	 *
+	 * @return the document library file entry metadata finder
+	 */
+	public DLFileEntryMetadataFinder getDLFileEntryMetadataFinder() {
+		return dlFileEntryMetadataFinder;
+	}
+
+	/**
+	 * Sets the document library file entry metadata finder.
+	 *
+	 * @param dlFileEntryMetadataFinder the document library file entry metadata finder
+	 */
+	public void setDLFileEntryMetadataFinder(
+		DLFileEntryMetadataFinder dlFileEntryMetadataFinder) {
+		this.dlFileEntryMetadataFinder = dlFileEntryMetadataFinder;
+	}
+
+	/**
 	 * Returns the document library file entry type local service.
 	 *
 	 * @return the document library file entry type local service
@@ -1924,6 +1951,8 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	protected com.liferay.portlet.documentlibrary.service.DLFileEntryMetadataLocalService dlFileEntryMetadataLocalService;
 	@BeanReference(type = DLFileEntryMetadataPersistence.class)
 	protected DLFileEntryMetadataPersistence dlFileEntryMetadataPersistence;
+	@BeanReference(type = DLFileEntryMetadataFinder.class)
+	protected DLFileEntryMetadataFinder dlFileEntryMetadataFinder;
 	@BeanReference(type = com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalService.class)
 	protected com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalService dlFileEntryTypeLocalService;
 	@BeanReference(type = com.liferay.portlet.documentlibrary.service.DLFileEntryTypeService.class)

@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -32,8 +35,36 @@ import java.io.ObjectOutput;
  * @see ServiceComponent
  * @generated
  */
+@ProviderType
 public class ServiceComponentCacheModel implements CacheModel<ServiceComponent>,
 	Externalizable, MVCCModel {
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof ServiceComponentCacheModel)) {
+			return false;
+		}
+
+		ServiceComponentCacheModel serviceComponentCacheModel = (ServiceComponentCacheModel)obj;
+
+		if ((serviceComponentId == serviceComponentCacheModel.serviceComponentId) &&
+				(mvccVersion == serviceComponentCacheModel.mvccVersion)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = HashUtil.hash(0, serviceComponentId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
 	@Override
 	public long getMvccVersion() {
 		return mvccVersion;

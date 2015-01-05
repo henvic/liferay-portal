@@ -26,7 +26,7 @@ ShoppingCoupon coupon = cart.getCoupon();
 int altShipping = cart.getAltShipping();
 String altShippingName = shoppingSettings.getAlternativeShippingName(altShipping);
 
-ShoppingOrder order = (ShoppingOrder)request.getAttribute(WebKeys.SHOPPING_ORDER);
+ShoppingOrder order = ShoppingOrderLocalServiceUtil.getLatestOrder(user.getUserId(), themeDisplay.getScopeGroupId());
 %>
 
 <portlet:actionURL var="checkoutSecondURL">
@@ -194,14 +194,9 @@ ShoppingOrder order = (ShoppingOrder)request.getAttribute(WebKeys.SHOPPING_ORDER
 
 		ResultRow row = new ResultRow(item, item.getItemId(), i);
 
-		PortletURL rowURL = renderResponse.createRenderURL();
-
-		rowURL.setParameter("struts_action", "/shopping/view_item");
-		rowURL.setParameter("itemId", String.valueOf(item.getItemId()));
-
 		// SKU
 
-		row.addText(HtmlUtil.escape(item.getSku()), rowURL);
+		row.addText(HtmlUtil.escape(item.getSku()));
 
 		// Description
 
@@ -213,32 +208,32 @@ ShoppingOrder order = (ShoppingOrder)request.getAttribute(WebKeys.SHOPPING_ORDER
 			sb.append(HtmlUtil.escape(StringUtil.replace(StringUtil.merge(cartItem.getFieldsArray(), ", "), "=", ": ")));
 			sb.append(StringPool.CLOSE_PARENTHESIS);
 
-			row.addText(sb.toString(), rowURL);
+			row.addText(sb.toString());
 		}
 		else {
-			row.addText(HtmlUtil.escape(item.getName()), rowURL);
+			row.addText(HtmlUtil.escape(item.getName()));
 		}
 
 		// Availability
 
 		if (ShoppingUtil.isInStock(item, itemFields, fieldsArray, count)) {
-			row.addText("<div class=\"alert alert-success\">".concat(LanguageUtil.get(request, "in-stock")).concat("</div>"), rowURL);
+			row.addText("<div class=\"alert alert-success\">".concat(LanguageUtil.get(request, "in-stock")).concat("</div>"));
 		}
 		else {
-			row.addText("<div class=\"alert alert-danger\">".concat(LanguageUtil.get(request, "out-of-stock")).concat("</div>"), rowURL);
+			row.addText("<div class=\"alert alert-danger\">".concat(LanguageUtil.get(request, "out-of-stock")).concat("</div>"));
 		}
 
 		// Quantity
 
-		row.addText(count.toString(), rowURL);
+		row.addText(count.toString());
 
 		// Price
 
-		row.addText(currencyFormat.format(ShoppingUtil.calculateActualPrice(item, count.intValue()) / count.intValue()), rowURL);
+		row.addText(currencyFormat.format(ShoppingUtil.calculateActualPrice(item, count.intValue()) / count.intValue()));
 
 		// Total
 
-		row.addText(currencyFormat.format(ShoppingUtil.calculateActualPrice(item, count.intValue())), rowURL);
+		row.addText(currencyFormat.format(ShoppingUtil.calculateActualPrice(item, count.intValue())));
 
 		// Add result row
 
@@ -303,16 +298,7 @@ ShoppingOrder order = (ShoppingOrder)request.getAttribute(WebKeys.SHOPPING_ORDER
 				<td>
 					<%= currencyFormat.format(ShoppingUtil.calculateCouponDiscount(items, order.getBillingState(), coupon)) %>
 
-					<portlet:renderURL var="viewCouponURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-						<portlet:param name="struts_action" value="/shopping/view_coupon" />
-						<portlet:param name="couponId" value="<%= String.valueOf(coupon.getCouponId()) %>" />
-					</portlet:renderURL>
-
-					<%
-					String taglibOpenCouponWindow = "javascript:viewCouponWindow = window.open('" + viewCouponURL + "', 'viewCoupon', 'directories=no,height=200,location=no,menubar=no,resizable=no,scrollbars=yes,status=no,toolbar=no,width=280'); void(''); viewCouponWindow.focus();";
-					%>
-
-					<aui:a href="<%= taglibOpenCouponWindow %>" label='<%= "(" + coupon.getCouponId() + ")" %>' />
+					<aui:a href="javascript:;" label='<%= "(" + coupon.getCouponId() + ")" %>' onClick='<%= renderResponse.getNamespace() + "viewCoupon();" %>' />
 				</td>
 			</tr>
 		</c:if>
@@ -330,5 +316,29 @@ ShoppingOrder order = (ShoppingOrder)request.getAttribute(WebKeys.SHOPPING_ORDER
 
 	<aui:button-row>
 		<aui:button type="submit" value='<%= shoppingSettings.usePayPal() ? "continue" : "finished" %>' />
+
+		<portlet:actionURL var="checkoutURL">
+			<portlet:param name="struts_action" value="/shopping/checkout" />
+			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.CHECKOUT %>" />
+		</portlet:actionURL>
+
+		<aui:button href="<%= checkoutURL.toString() %>" value="back" />
 	</aui:button-row>
 </aui:form>
+
+<aui:script>
+	function <portlet:namespace />viewCoupon() {
+		Liferay.Util.openWindow(
+			{
+				dialog: {
+					height: 200,
+					width: 280
+				},
+				id: '<portlet:namespace />viewCoupon',
+				refreshWindow: window,
+				title: '<%= UnicodeLanguageUtil.get(request, "coupon") %>',
+				uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="struts_action" value="/shopping/view_coupon" /><portlet:param name="couponId" value="<%= String.valueOf(coupon.getCouponId()) %>" /></portlet:renderURL>'
+			}
+		);
+	}
+</aui:script>

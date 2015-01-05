@@ -14,62 +14,130 @@
 
 package com.liferay.portlet.dynamicdatamapping.storage;
 
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portlet.dynamicdatamapping.BaseDDMTestCase;
 import com.liferay.portlet.dynamicdatamapping.model.UnlocalizedValue;
-import com.liferay.portlet.dynamicdatamapping.model.Value;
 
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
+import org.junit.Assert;
 import org.junit.Test;
-
-import org.testng.Assert;
 
 /**
  * @author Marcellus Tavares
  */
-public class DDMFormValuesTest {
-
-	@Before
-	public void setUp() {
-		_ddmFormValues = createDDMFormValues();
-	}
+public class DDMFormValuesTest extends BaseDDMTestCase {
 
 	@Test
 	public void testDDMFormFieldValuesMap() {
-		Map<String, List<Value>> ddmFormFieldValuesMap =
-			_ddmFormValues.getDDMFormFieldValuesMap();
+		DDMFormValues ddmFormValues = createDDMFormValues(null);
 
-		List<Value> values = ddmFormFieldValuesMap.get(_FIELD_NAME);
+		String fieldName = StringUtil.randomString();
 
-		Assert.assertEquals(3, values.size());
+		ddmFormValues.addDDMFormFieldValue(
+			createDDMFormFieldValue(fieldName, null));
+		ddmFormValues.addDDMFormFieldValue(
+			createDDMFormFieldValue(fieldName, null));
+		ddmFormValues.addDDMFormFieldValue(
+			createDDMFormFieldValue(fieldName, null));
+
+		Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap =
+			ddmFormValues.getDDMFormFieldValuesMap();
+
+		List<DDMFormFieldValue> ddmFormFieldValues = ddmFormFieldValuesMap.get(
+			fieldName);
+
+		Assert.assertEquals(3, ddmFormFieldValues.size());
 	}
 
-	protected DDMFormFieldValue createDDMFormFieldValue() {
-		DDMFormFieldValue ddmFormFieldValue = new DDMFormFieldValue();
+	@Test
+	public void testEqualsWithDifferentAvailableLocales() {
+		DDMFormValues ddmFormValues1 = createDDMFormValues(
+			null, createAvailableLocales(LocaleUtil.US), LocaleUtil.US);
 
-		ddmFormFieldValue.setName(_FIELD_NAME);
+		DDMFormValues ddmFormValues2 = createDDMFormValues(
+			null, createAvailableLocales(LocaleUtil.BRAZIL, LocaleUtil.US),
+			LocaleUtil.US);
 
-		Value value = new UnlocalizedValue(StringUtil.randomString());
-
-		ddmFormFieldValue.setValue(value);
-
-		return ddmFormFieldValue;
+		Assert.assertFalse(ddmFormValues1.equals(ddmFormValues2));
 	}
 
-	protected DDMFormValues createDDMFormValues() {
-		DDMFormValues ddmFormValues = new DDMFormValues();
+	@Test
+	public void testEqualsWithDifferentDDMFormFieldValues() {
+		DDMFormValues ddmFormValues1 = createDDMFormValues(
+			null, createAvailableLocales(LocaleUtil.US), LocaleUtil.US);
 
-		ddmFormValues.addDDMFormFieldValue(createDDMFormFieldValue());
-		ddmFormValues.addDDMFormFieldValue(createDDMFormFieldValue());
-		ddmFormValues.addDDMFormFieldValue(createDDMFormFieldValue());
+		ddmFormValues1.addDDMFormFieldValue(
+			createDDMFormFieldValue(
+				StringUtil.randomString(), StringUtil.randomString(),
+				new UnlocalizedValue(StringUtil.randomString())));
 
-		return ddmFormValues;
+		DDMFormValues ddmFormValues2 = createDDMFormValues(
+			null, createAvailableLocales(LocaleUtil.US), LocaleUtil.US);
+
+		ddmFormValues2.addDDMFormFieldValue(
+			createDDMFormFieldValue(
+				StringUtil.randomString(), StringUtil.randomString(),
+				new UnlocalizedValue(StringUtil.randomString())));
+
+		Assert.assertFalse(ddmFormValues1.equals(ddmFormValues2));
 	}
 
-	private final String _FIELD_NAME = StringUtil.randomString();
+	@Test
+	public void testEqualsWithDifferentDefaultLocale() {
+		DDMFormValues ddmFormValues1 = createDDMFormValues(
+			null, createAvailableLocales(LocaleUtil.US), LocaleUtil.US);
 
-	private DDMFormValues _ddmFormValues;
+		DDMFormValues ddmFormValues2 = createDDMFormValues(
+			null, createAvailableLocales(LocaleUtil.US), LocaleUtil.BRAZIL);
+
+		Assert.assertFalse(ddmFormValues1.equals(ddmFormValues2));
+	}
+
+	@Test
+	public void testEqualsWithDifferentOrderOfDDMFormFieldValues() {
+		DDMFormValues ddmFormValues1 = createDDMFormValues(
+			null, createAvailableLocales(LocaleUtil.US), LocaleUtil.US);
+
+		DDMFormFieldValue nestedDDMFormFieldValue1 = createDDMFormFieldValue(
+			StringUtil.randomString(), StringUtil.randomString(),
+			new UnlocalizedValue(StringUtil.randomString()));
+
+		DDMFormFieldValue nestedDDMFormFieldValue2 = createDDMFormFieldValue(
+			StringUtil.randomString(), StringUtil.randomString(),
+			new UnlocalizedValue(StringUtil.randomString()));
+
+		ddmFormValues1.addDDMFormFieldValue(nestedDDMFormFieldValue1);
+		ddmFormValues1.addDDMFormFieldValue(nestedDDMFormFieldValue2);
+
+		DDMFormValues ddmFormValues2 = createDDMFormValues(
+			null, createAvailableLocales(LocaleUtil.US), LocaleUtil.US);
+
+		ddmFormValues2.addDDMFormFieldValue(nestedDDMFormFieldValue2);
+		ddmFormValues2.addDDMFormFieldValue(nestedDDMFormFieldValue1);
+
+		Assert.assertFalse(ddmFormValues1.equals(ddmFormValues2));
+	}
+
+	@Test
+	public void testEqualsWithSameAttributes() {
+		DDMFormFieldValue ddmFormFieldValue = createDDMFormFieldValue(
+			StringUtil.randomString(), StringUtil.randomString(),
+			new UnlocalizedValue(StringUtil.randomString()));
+
+		DDMFormValues ddmFormValues1 = createDDMFormValues(
+			null, createAvailableLocales(LocaleUtil.US), LocaleUtil.US);
+
+		ddmFormValues1.addDDMFormFieldValue(ddmFormFieldValue);
+
+		DDMFormValues ddmFormValues2 = createDDMFormValues(
+			null, createAvailableLocales(LocaleUtil.US), LocaleUtil.US);
+
+		ddmFormValues2.addDDMFormFieldValue(ddmFormFieldValue);
+
+		Assert.assertTrue(ddmFormValues1.equals(ddmFormValues2));
+	}
 
 }

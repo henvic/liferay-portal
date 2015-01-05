@@ -18,7 +18,7 @@
 
 <%@ page import="com.liferay.portlet.blogs.service.BlogsEntryServiceUtil" %><%@
 page import="com.liferay.portlet.blogs.service.permission.BlogsEntryPermission" %><%@
-page import="com.liferay.util.RSSUtil" %>
+page import="com.liferay.portlet.blogs.util.BlogsUtil" %>
 
 <%
 String selectionMethod = portletPreferences.getValue("selectionMethod", "users");

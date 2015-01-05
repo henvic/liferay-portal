@@ -26,7 +26,7 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UniqueList;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Address;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Organization;
@@ -40,6 +40,7 @@ import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -88,9 +89,6 @@ public class OrganizationImpl extends OrganizationBaseImpl {
 			PropsUtil.get(PropsKeys.ORGANIZATIONS_ROOTABLE, new Filter(type)));
 	}
 
-	public OrganizationImpl() {
-	}
-
 	@Override
 	public Address getAddress() {
 		Address address = null;
@@ -120,6 +118,39 @@ public class OrganizationImpl extends OrganizationBaseImpl {
 	}
 
 	@Override
+	public long[] getAncestorOrganizationIds() throws PortalException {
+		if (Validator.isNull(getTreePath())) {
+			List<Organization> ancestorOrganizations = getAncestors();
+
+			long[] ancestorOrganizationIds =
+				new long[ancestorOrganizations.size()];
+
+			for (int i = 0; i < ancestorOrganizations.size(); i++) {
+				Organization organization = ancestorOrganizations.get(i);
+
+				ancestorOrganizationIds[ancestorOrganizations.size() - i - 1] =
+					organization.getOrganizationId();
+			}
+
+			return ancestorOrganizationIds;
+		}
+
+		long[] primaryKeys = StringUtil.split(
+			getTreePath(), StringPool.SLASH, 0L);
+
+		if (primaryKeys.length <= 2) {
+			return new long[0];
+		}
+
+		long[] ancestorOrganizationIds = new long[primaryKeys.length - 2];
+
+		System.arraycopy(
+			primaryKeys, 1, ancestorOrganizationIds, 0, primaryKeys.length - 2);
+
+		return ancestorOrganizationIds;
+	}
+
+	@Override
 	public List<Organization> getAncestors() throws PortalException {
 		List<Organization> ancestors = new ArrayList<Organization>();
 
@@ -141,14 +172,14 @@ public class OrganizationImpl extends OrganizationBaseImpl {
 
 	@Override
 	public List<Organization> getDescendants() {
-		List<Organization> descendants = new UniqueList<Organization>();
+		Set<Organization> descendants = new LinkedHashSet<Organization>();
 
 		for (Organization suborganization : getSuborganizations()) {
 			descendants.add(suborganization);
 			descendants.addAll(suborganization.getDescendants());
 		}
 
-		return descendants;
+		return new ArrayList<Organization>(descendants);
 	}
 
 	@Override

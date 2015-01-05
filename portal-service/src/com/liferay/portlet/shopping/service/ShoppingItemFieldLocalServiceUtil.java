@@ -64,6 +64,15 @@ public class ShoppingItemFieldLocalServiceUtil {
 	}
 
 	/**
+	* @throws PortalException
+	*/
+	public static com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().deletePersistedModel(persistedModel);
+	}
+
+	/**
 	* Deletes the shopping item field with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param itemFieldId the primary key of the shopping item field
@@ -142,10 +151,10 @@ public class ShoppingItemFieldLocalServiceUtil {
 	}
 
 	/**
-	* Returns the number of rows that match the dynamic query.
+	* Returns the number of rows matching the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
-	* @return the number of rows that match the dynamic query
+	* @return the number of rows matching the dynamic query
 	*/
 	public static long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
@@ -153,11 +162,11 @@ public class ShoppingItemFieldLocalServiceUtil {
 	}
 
 	/**
-	* Returns the number of rows that match the dynamic query.
+	* Returns the number of rows matching the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
-	* @return the number of rows that match the dynamic query
+	* @return the number of rows matching the dynamic query
 	*/
 	public static long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
@@ -168,6 +177,30 @@ public class ShoppingItemFieldLocalServiceUtil {
 	public static com.liferay.portlet.shopping.model.ShoppingItemField fetchShoppingItemField(
 		long itemFieldId) {
 		return getService().fetchShoppingItemField(itemFieldId);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return getService().getActionableDynamicQuery();
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public static java.lang.String getBeanIdentifier() {
+		return getService().getBeanIdentifier();
+	}
+
+	public static java.util.List<com.liferay.portlet.shopping.model.ShoppingItemField> getItemFields(
+		long itemId) {
+		return getService().getItemFields(itemId);
+	}
+
+	public static com.liferay.portal.model.PersistedModel getPersistedModel(
+		java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getPersistedModel(primaryKeyObj);
 	}
 
 	/**
@@ -181,25 +214,6 @@ public class ShoppingItemFieldLocalServiceUtil {
 		long itemFieldId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getShoppingItemField(itemFieldId);
-	}
-
-	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
-		return getService().getActionableDynamicQuery();
-	}
-
-	/**
-	* @throws PortalException
-	*/
-	public static com.liferay.portal.model.PersistedModel deletePersistedModel(
-		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().deletePersistedModel(persistedModel);
-	}
-
-	public static com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getPersistedModel(primaryKeyObj);
 	}
 
 	/**
@@ -228,26 +242,6 @@ public class ShoppingItemFieldLocalServiceUtil {
 	}
 
 	/**
-	* Updates the shopping item field in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
-	*
-	* @param shoppingItemField the shopping item field
-	* @return the shopping item field that was updated
-	*/
-	public static com.liferay.portlet.shopping.model.ShoppingItemField updateShoppingItemField(
-		com.liferay.portlet.shopping.model.ShoppingItemField shoppingItemField) {
-		return getService().updateShoppingItemField(shoppingItemField);
-	}
-
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	public static java.lang.String getBeanIdentifier() {
-		return getService().getBeanIdentifier();
-	}
-
-	/**
 	* Sets the Spring bean ID for this bean.
 	*
 	* @param beanIdentifier the Spring bean ID for this bean
@@ -256,9 +250,15 @@ public class ShoppingItemFieldLocalServiceUtil {
 		getService().setBeanIdentifier(beanIdentifier);
 	}
 
-	public static java.util.List<com.liferay.portlet.shopping.model.ShoppingItemField> getItemFields(
-		long itemId) {
-		return getService().getItemFields(itemId);
+	/**
+	* Updates the shopping item field in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	*
+	* @param shoppingItemField the shopping item field
+	* @return the shopping item field that was updated
+	*/
+	public static com.liferay.portlet.shopping.model.ShoppingItemField updateShoppingItemField(
+		com.liferay.portlet.shopping.model.ShoppingItemField shoppingItemField) {
+		return getService().updateShoppingItemField(shoppingItemField);
 	}
 
 	public static ShoppingItemFieldLocalService getService() {

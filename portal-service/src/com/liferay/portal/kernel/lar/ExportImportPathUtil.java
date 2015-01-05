@@ -63,6 +63,13 @@ public class ExportImportPathUtil {
 	 */
 	public static final String PATH_PREFIX_SERVICE = "service";
 
+	public static String getCompanyModelPath(
+		long companyId, String className, long classPK) {
+
+		return getModelPath(
+			PATH_PREFIX_COMPANY, companyId, className, classPK, null);
+	}
+
 	/**
 	 * Returns the expando-specific path for the entity path. The entity path
 	 * must include an XML file.
@@ -279,6 +286,30 @@ public class ExportImportPathUtil {
 				stagedModelType.getClassName(), stagedModel.getPrimaryKeyObj(),
 				dependentFileName);
 		}
+	}
+
+	/**
+	 * Returns a portlet path for the portlet ID.
+	 *
+	 * <p>
+	 * For example, a portlet path would resemble the following:
+	 * </p>
+	 *
+	 * <p>
+	 * <pre>
+	 * <code>
+	 * /group/"queried groupId"/portlet/"portletId"
+	 * </code>
+	 * </pre>
+	 * </p>
+	 *
+	 * @param  portletDataContext the context of the current export/import
+	 *         process
+	 * @return a portlet path for the portlet ID
+	 */
+	public static String getPortletPath(PortletDataContext portletDataContext) {
+		return getPortletPath(
+			portletDataContext, portletDataContext.getPortletId());
 	}
 
 	/**

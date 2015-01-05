@@ -27,8 +27,10 @@ import com.liferay.portal.kernel.scheduler.CronTrigger;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
 import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.scheduler.Trigger;
+import com.liferay.portal.kernel.util.Digester;
+import com.liferay.portal.kernel.util.DigesterUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.TempFileUtil;
+import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -285,16 +287,17 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 
 	@Override
 	public FileEntry addTempFileEntry(
-			long groupId, String fileName, String tempFolderName,
+			long groupId, String folderName, String fileName,
 			InputStream inputStream, String mimeType)
 		throws PortalException {
 
 		GroupPermissionUtil.check(
 			getPermissionChecker(), groupId, ActionKeys.EXPORT_IMPORT_LAYOUTS);
 
-		return TempFileUtil.addTempFile(
-			groupId, getUserId(), fileName, tempFolderName, inputStream,
-			mimeType);
+		return TempFileEntryUtil.addTempFileEntry(
+			groupId, getUserId(),
+			DigesterUtil.digestHex(Digester.SHA_256, folderName), fileName,
+			inputStream, mimeType);
 	}
 
 	/**
@@ -345,14 +348,15 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 
 	@Override
 	public void deleteTempFileEntry(
-			long groupId, String fileName, String tempFolderName)
+			long groupId, String folderName, String fileName)
 		throws PortalException {
 
 		GroupPermissionUtil.check(
 			getPermissionChecker(), groupId, ActionKeys.EXPORT_IMPORT_LAYOUTS);
 
-		TempFileUtil.deleteTempFile(
-			groupId, getUserId(), fileName, tempFolderName);
+		TempFileEntryUtil.deleteTempFileEntry(
+			groupId, getUserId(),
+			DigesterUtil.digestHex(Digester.SHA_256, folderName), fileName);
 	}
 
 	/**
@@ -890,14 +894,23 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 	}
 
 	@Override
-	public String[] getTempFileEntryNames(long groupId, String tempFolderName)
+	public int getLayoutsCount(
+		long groupId, boolean privateLayout, long parentLayoutId) {
+
+		return layoutPersistence.filterCountByG_P_P(
+			groupId, privateLayout, parentLayoutId);
+	}
+
+	@Override
+	public String[] getTempFileNames(long groupId, String folderName)
 		throws PortalException {
 
 		GroupPermissionUtil.check(
 			getPermissionChecker(), groupId, ActionKeys.EXPORT_IMPORT_LAYOUTS);
 
-		return TempFileUtil.getTempFileEntryNames(
-			groupId, getUserId(), tempFolderName);
+		return TempFileEntryUtil.getTempFileNames(
+			groupId, getUserId(),
+			DigesterUtil.digestHex(Digester.SHA_256, folderName));
 	}
 
 	/**
@@ -1718,6 +1731,24 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 			getPermissionChecker(), plid, ActionKeys.UPDATE);
 
 		return layoutLocalService.updateParentLayoutId(plid, parentPlid);
+	}
+
+	/**
+	 * Updates the parent layout ID and priority of the layout.
+	 *
+	 * @param  plid the primary key of the layout
+	 * @param  parentPlid the primary key of the parent layout
+	 * @param  priority the layout's new priority
+	 * @return the layout matching the primary key
+	 * @throws PortalException if a portal exception occurred
+	 */
+	@Override
+	public Layout updateParentLayoutIdAndPriority(
+			long plid, long parentPlid, int priority)
+		throws PortalException {
+
+		return layoutLocalService.updateParentLayoutIdAndPriority(
+			plid, parentPlid, priority);
 	}
 
 	/**

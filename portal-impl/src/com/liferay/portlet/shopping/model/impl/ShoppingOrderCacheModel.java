@@ -14,6 +14,9 @@
 
 package com.liferay.portlet.shopping.model.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -34,8 +37,33 @@ import java.util.Date;
  * @see ShoppingOrder
  * @generated
  */
+@ProviderType
 public class ShoppingOrderCacheModel implements CacheModel<ShoppingOrder>,
 	Externalizable {
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof ShoppingOrderCacheModel)) {
+			return false;
+		}
+
+		ShoppingOrderCacheModel shoppingOrderCacheModel = (ShoppingOrderCacheModel)obj;
+
+		if (orderId == shoppingOrderCacheModel.orderId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, orderId);
+	}
+
 	@Override
 	public String toString() {
 		StringBundler sb = new StringBundler(103);

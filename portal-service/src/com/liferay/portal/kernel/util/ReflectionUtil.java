@@ -14,14 +14,15 @@
 
 package com.liferay.portal.kernel.util;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -31,19 +32,19 @@ import java.util.Set;
  */
 public class ReflectionUtil {
 
-	public static Class<?> getAnnotationDeclaringClass(
-		Class<? extends Annotation> annotationClass, Class<?> clazz) {
+	public static Object arrayClone(Object array) {
+		Class<?> clazz = array.getClass();
 
-		if ((clazz == null) || clazz.equals(Object.class)) {
-			return null;
+		if (!clazz.isArray()) {
+			throw new IllegalArgumentException(
+				"Input object is not an array: " + array);
 		}
 
-		if (isAnnotationDeclaredInClass(annotationClass, clazz)) {
-			return clazz;
+		try {
+			return _CLONE_METHOD.invoke(array);
 		}
-		else {
-			return getAnnotationDeclaringClass(
-				annotationClass, clazz.getSuperclass());
+		catch (Exception e) {
+			return throwException(e);
 		}
 	}
 
@@ -56,15 +57,7 @@ public class ReflectionUtil {
 			field.setAccessible(true);
 		}
 
-		int modifiers = field.getModifiers();
-
-		if ((modifiers & Modifier.FINAL) == Modifier.FINAL) {
-			Field modifiersField = getDeclaredField(Field.class, "modifiers");
-
-			modifiersField.setInt(field, modifiers & ~Modifier.FINAL);
-		}
-
-		return field;
+		return unfinalField(field);
 	}
 
 	public static Method getDeclaredMethod(
@@ -80,6 +73,23 @@ public class ReflectionUtil {
 		return method;
 	}
 
+	public static Class<?> getGenericSuperType(Class<?> clazz) {
+		try {
+			ParameterizedType parameterizedType =
+				(ParameterizedType)clazz.getGenericSuperclass();
+
+			Type[] types = parameterizedType.getActualTypeArguments();
+
+			if (types.length > 0) {
+				return (Class<?>)types[0];
+			}
+		}
+		catch (Throwable t) {
+		}
+
+		return null;
+	}
+
 	public static Class<?>[] getInterfaces(Object object) {
 		return getInterfaces(object, null);
 	}
@@ -87,7 +97,7 @@ public class ReflectionUtil {
 	public static Class<?>[] getInterfaces(
 		Object object, ClassLoader classLoader) {
 
-		List<Class<?>> interfaceClasses = new UniqueList<Class<?>>();
+		Set<Class<?>> interfaceClasses = new LinkedHashSet<Class<?>>();
 
 		Class<?> clazz = object.getClass();
 
@@ -168,26 +178,32 @@ public class ReflectionUtil {
 		return visibleMethods;
 	}
 
-	public static boolean isAnnotationDeclaredInClass(
-		Class<? extends Annotation> annotationClass, Class<?> clazz) {
+	public static <T> T throwException(Throwable throwable) {
+		return ReflectionUtil.<T, RuntimeException>_doThrowException(throwable);
+	}
 
-		if ((annotationClass == null) || (clazz == null)) {
-			throw new IllegalArgumentException();
+	public static Field unfinalField(Field field) throws Exception {
+		int modifiers = field.getModifiers();
+
+		if ((modifiers & Modifier.FINAL) == Modifier.FINAL) {
+			Field modifiersField = getDeclaredField(Field.class, "modifiers");
+
+			modifiersField.setInt(field, modifiers & ~Modifier.FINAL);
 		}
 
-		Annotation[] annotations = clazz.getAnnotations();
+		return field;
+	}
 
-		for (Annotation annotation : annotations) {
-			if (annotationClass.equals(annotation.annotationType())) {
-				return true;
-			}
-		}
+	@SuppressWarnings("unchecked")
+	private static <T, E extends Throwable> T _doThrowException(
+			Throwable throwable)
+		throws E {
 
-		return false;
+		throw (E)throwable;
 	}
 
 	private static void _getInterfaces(
-		List<Class<?>> interfaceClasses, Class<?> clazz,
+		Set<Class<?>> interfaceClasses, Class<?> clazz,
 		ClassLoader classLoader) {
 
 		for (Class<?> interfaceClass : clazz.getInterfaces()) {
@@ -202,6 +218,17 @@ public class ReflectionUtil {
 			}
 			catch (ClassNotFoundException cnfe) {
 			}
+		}
+	}
+
+	private static final Method _CLONE_METHOD;
+
+	static {
+		try {
+			_CLONE_METHOD = getDeclaredMethod(Object.class, "clone");
+		}
+		catch (Exception e) {
+			throw new ExceptionInInitializerError(e);
 		}
 	}
 

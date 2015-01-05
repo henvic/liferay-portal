@@ -294,7 +294,8 @@ public class PortletAction extends Action {
 	}
 
 	/**
-	 * @deprecated As of 6.2.0 {@link #hideDefaultSuccessMessage(PortletRequest)
+	 * @deprecated As of 6.2.0 {@link
+	 *             #hideDefaultSuccessMessage(PortletRequest)}
 	 */
 	@Deprecated
 	protected void hideDefaultSuccessMessage(
@@ -506,6 +507,6 @@ public class PortletAction extends Action {
 
 	private static final boolean _CHECK_METHOD_ON_PROCESS_ACTION = true;
 
-	private static Log _log = LogFactoryUtil.getLog(PortletAction.class);
+	private static final Log _log = LogFactoryUtil.getLog(PortletAction.class);
 
 }

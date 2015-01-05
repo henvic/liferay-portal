@@ -14,9 +14,12 @@
 
 package com.liferay.portal.kernel.process;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.process.ProcessConfig.Builder;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.ServerDetector;
@@ -46,6 +49,7 @@ import javax.servlet.ServletException;
 /**
  * @author Shuyang Zhou
  */
+@ProviderType
 public class ClassPathUtil {
 
 	public static Set<URL> getClassPathURLs(ClassLoader classLoader) {
@@ -103,6 +107,10 @@ public class ClassPathUtil {
 		return _portalClassPath;
 	}
 
+	public static ProcessConfig getPortalProcessConfig() {
+		return _portalProcessConfig;
+	}
+
 	public static void initializeClassPaths(ServletContext servletContext) {
 		ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
 
@@ -136,6 +144,15 @@ public class ClassPathUtil {
 		sb.append("/WEB-INF/classes");
 
 		_portalClassPath = sb.toString();
+
+		Builder builder = new Builder();
+
+		builder.setArguments(Arrays.asList("-Djava.awt.headless=true"));
+		builder.setBootstrapClassPath(_globalClassPath);
+		builder.setReactClassLoader(PortalClassLoaderUtil.getClassLoader());
+		builder.setRuntimeClassPath(_portalClassPath);
+
+		_portalProcessConfig = builder.build();
 	}
 
 	private static String _buildClassPath(
@@ -290,5 +307,6 @@ public class ClassPathUtil {
 
 	private static String _globalClassPath;
 	private static String _portalClassPath;
+	private static ProcessConfig _portalProcessConfig;
 
 }

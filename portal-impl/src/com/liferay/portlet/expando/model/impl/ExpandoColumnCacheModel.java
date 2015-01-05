@@ -14,6 +14,9 @@
 
 package com.liferay.portlet.expando.model.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -32,8 +35,33 @@ import java.io.ObjectOutput;
  * @see ExpandoColumn
  * @generated
  */
+@ProviderType
 public class ExpandoColumnCacheModel implements CacheModel<ExpandoColumn>,
 	Externalizable {
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof ExpandoColumnCacheModel)) {
+			return false;
+		}
+
+		ExpandoColumnCacheModel expandoColumnCacheModel = (ExpandoColumnCacheModel)obj;
+
+		if (columnId == expandoColumnCacheModel.columnId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, columnId);
+	}
+
 	@Override
 	public String toString() {
 		StringBundler sb = new StringBundler(15);

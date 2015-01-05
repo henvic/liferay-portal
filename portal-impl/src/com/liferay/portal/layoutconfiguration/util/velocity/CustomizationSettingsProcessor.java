@@ -14,12 +14,14 @@
 
 package com.liferay.portal.layoutconfiguration.util.velocity;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.servlet.JSPSupportServlet;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.model.CustomizedPages;
 import com.liferay.portal.model.Layout;
+import com.liferay.portlet.layoutsadmin.context.LayoutsAdminDisplayContext;
 import com.liferay.portlet.sites.util.SitesUtil;
 import com.liferay.taglib.aui.InputTag;
 
@@ -40,7 +42,8 @@ import javax.servlet.jsp.tagext.Tag;
 public class CustomizationSettingsProcessor implements ColumnProcessor {
 
 	public CustomizationSettingsProcessor(
-		HttpServletRequest request, HttpServletResponse response) {
+			HttpServletRequest request, HttpServletResponse response)
+		throws PortalException {
 
 		JspFactory jspFactory = JspFactory.getDefaultFactory();
 
@@ -50,8 +53,10 @@ public class CustomizationSettingsProcessor implements ColumnProcessor {
 
 		_writer = _pageContext.getOut();
 
-		Layout selLayout = (Layout)request.getAttribute(
-			"edit_pages.jsp-selLayout");
+		LayoutsAdminDisplayContext layoutsAdminDisplayContext =
+			new LayoutsAdminDisplayContext(request, null);
+
+		Layout selLayout = layoutsAdminDisplayContext.getSelLayout();
 
 		_layoutTypeSettings = selLayout.getTypeSettingsProperties();
 

@@ -27,7 +27,6 @@ import com.liferay.portal.util.PortletKeys;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 
 import java.net.URI;
 import java.net.URL;
@@ -55,6 +54,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockServletConfig;
 import org.springframework.mock.web.MockServletContext;
 
@@ -68,15 +68,11 @@ public class ComboServletTest extends PowerMockito {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		MemoryPortalCacheManager<Serializable, Serializable>
-			memoryPortalCacheManager =
-				new MemoryPortalCacheManager<Serializable, Serializable>();
-
-		memoryPortalCacheManager.afterPropertiesSet();
-
 		SingleVMPoolImpl singleVMPoolImpl = new SingleVMPoolImpl();
 
-		singleVMPoolImpl.setPortalCacheManager(memoryPortalCacheManager);
+		singleVMPoolImpl.setPortalCacheManager(
+			MemoryPortalCacheManager.createMemoryPortalCacheManager(
+				ComboServletTest.class.getName()));
 
 		SingleVMPoolUtil singleVMPoolUtil = new SingleVMPoolUtil();
 
@@ -100,8 +96,8 @@ public class ComboServletTest extends PowerMockito {
 
 					Object[] args = invocation.getArguments();
 
-					if (PortletKeys.ACTIVITIES.equals(args[0])) {
-						return _activitiesPortlet;
+					if (PortletKeys.ADMIN.equals(args[0])) {
+						return _adminPortlet;
 					}
 					else if (PortletKeys.PORTAL.equals(args[0])) {
 						return _portalPortlet;
@@ -169,19 +165,19 @@ public class ComboServletTest extends PowerMockito {
 		);
 
 		when(
-			_activitiesPortletApp.getServletContext()
+			_adminPortletApp.getServletContext()
 		).thenReturn(
 			_pluginServletContext
 		);
 
 		when(
-			_activitiesPortlet.getPortletApp()
+			_adminPortlet.getPortletApp()
 		).thenReturn(
-			_activitiesPortletApp
+			_adminPortletApp
 		);
 
 		when(
-			_activitiesPortlet.getRootPortletId()
+			_adminPortlet.getRootPortletId()
 		).thenReturn(
 			"75"
 		);
@@ -191,11 +187,18 @@ public class ComboServletTest extends PowerMockito {
 		).thenReturn(
 			true
 		);
+
+		_mockHttpServletRequest = new MockHttpServletRequest();
+
+		_mockHttpServletRequest.setLocalAddr("localhost");
+		_mockHttpServletRequest.setLocalPort(8080);
+		_mockHttpServletRequest.setScheme("http");
 	}
 
 	@Test
 	public void testGetResourceWithNonexistingPortletId() throws Exception {
-		URL url = _comboServlet.getResourceURL("2345678:/js/javascript.js");
+		URL url = _comboServlet.getResourceURL(
+			_mockHttpServletRequest, "2345678:/js/javascript.js");
 
 		Assert.assertNull(url);
 	}
@@ -204,7 +207,8 @@ public class ComboServletTest extends PowerMockito {
 	public void testGetResourceWithoutPortletId() throws Exception {
 		String path = "/js/javascript.js";
 
-		_comboServlet.getResourceURL("/js/javascript.js");
+		_comboServlet.getResourceURL(
+			_mockHttpServletRequest, "/js/javascript.js");
 
 		verify(_portalServletContext);
 
@@ -214,7 +218,7 @@ public class ComboServletTest extends PowerMockito {
 	@Test
 	public void testGetResourceWithPortletId() throws Exception {
 		_comboServlet.getResourceURL(
-			PortletKeys.ACTIVITIES + ":/js/javascript.js");
+			_mockHttpServletRequest, PortletKeys.ADMIN + ":/js/javascript.js");
 
 		verify(_pluginServletContext);
 
@@ -222,12 +226,13 @@ public class ComboServletTest extends PowerMockito {
 	}
 
 	@Mock
-	private Portlet _activitiesPortlet;
+	private Portlet _adminPortlet;
 
 	@Mock
-	private PortletApp _activitiesPortletApp;
+	private PortletApp _adminPortletApp;
 
 	private ComboServlet _comboServlet;
+	private MockHttpServletRequest _mockHttpServletRequest;
 	private MockServletContext _pluginServletContext;
 
 	@Mock
@@ -245,6 +250,6 @@ public class ComboServletTest extends PowerMockito {
 	private Portlet _portletUndeployed;
 
 	@Rule
-	private TemporaryFolder _temporaryFolder = new TemporaryFolder();
+	private final TemporaryFolder _temporaryFolder = new TemporaryFolder();
 
 }

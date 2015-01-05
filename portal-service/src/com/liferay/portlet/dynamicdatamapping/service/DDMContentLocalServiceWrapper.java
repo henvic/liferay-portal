@@ -33,6 +33,16 @@ public class DDMContentLocalServiceWrapper implements DDMContentLocalService,
 		_ddmContentLocalService = ddmContentLocalService;
 	}
 
+	@Override
+	public com.liferay.portlet.dynamicdatamapping.model.DDMContent addContent(
+		long userId, long groupId, java.lang.String name,
+		java.lang.String description, java.lang.String data,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _ddmContentLocalService.addContent(userId, groupId, name,
+			description, data, serviceContext);
+	}
+
 	/**
 	* Adds the d d m content to the database. Also notifies the appropriate model listeners.
 	*
@@ -55,6 +65,17 @@ public class DDMContentLocalServiceWrapper implements DDMContentLocalService,
 	public com.liferay.portlet.dynamicdatamapping.model.DDMContent createDDMContent(
 		long contentId) {
 		return _ddmContentLocalService.createDDMContent(contentId);
+	}
+
+	@Override
+	public void deleteContent(
+		com.liferay.portlet.dynamicdatamapping.model.DDMContent content) {
+		_ddmContentLocalService.deleteContent(content);
+	}
+
+	@Override
+	public void deleteContents(long groupId) {
+		_ddmContentLocalService.deleteContents(groupId);
 	}
 
 	/**
@@ -81,6 +102,16 @@ public class DDMContentLocalServiceWrapper implements DDMContentLocalService,
 	public com.liferay.portlet.dynamicdatamapping.model.DDMContent deleteDDMContent(
 		com.liferay.portlet.dynamicdatamapping.model.DDMContent ddmContent) {
 		return _ddmContentLocalService.deleteDDMContent(ddmContent);
+	}
+
+	/**
+	* @throws PortalException
+	*/
+	@Override
+	public com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _ddmContentLocalService.deletePersistedModel(persistedModel);
 	}
 
 	@Override
@@ -142,10 +173,10 @@ public class DDMContentLocalServiceWrapper implements DDMContentLocalService,
 	}
 
 	/**
-	* Returns the number of rows that match the dynamic query.
+	* Returns the number of rows matching the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
-	* @return the number of rows that match the dynamic query
+	* @return the number of rows matching the dynamic query
 	*/
 	@Override
 	public long dynamicQueryCount(
@@ -154,11 +185,11 @@ public class DDMContentLocalServiceWrapper implements DDMContentLocalService,
 	}
 
 	/**
-	* Returns the number of rows that match the dynamic query.
+	* Returns the number of rows matching the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
-	* @return the number of rows that match the dynamic query
+	* @return the number of rows matching the dynamic query
 	*/
 	@Override
 	public long dynamicQueryCount(
@@ -175,20 +206,6 @@ public class DDMContentLocalServiceWrapper implements DDMContentLocalService,
 	}
 
 	/**
-	* Returns the d d m content with the matching UUID and company.
-	*
-	* @param uuid the d d m content's UUID
-	* @param companyId the primary key of the company
-	* @return the matching d d m content, or <code>null</code> if a matching d d m content could not be found
-	*/
-	@Override
-	public com.liferay.portlet.dynamicdatamapping.model.DDMContent fetchDDMContentByUuidAndCompanyId(
-		java.lang.String uuid, long companyId) {
-		return _ddmContentLocalService.fetchDDMContentByUuidAndCompanyId(uuid,
-			companyId);
-	}
-
-	/**
 	* Returns the d d m content matching the UUID and group.
 	*
 	* @param uuid the d d m content's UUID
@@ -200,6 +217,50 @@ public class DDMContentLocalServiceWrapper implements DDMContentLocalService,
 		java.lang.String uuid, long groupId) {
 		return _ddmContentLocalService.fetchDDMContentByUuidAndGroupId(uuid,
 			groupId);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return _ddmContentLocalService.getActionableDynamicQuery();
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	@Override
+	public java.lang.String getBeanIdentifier() {
+		return _ddmContentLocalService.getBeanIdentifier();
+	}
+
+	@Override
+	public com.liferay.portlet.dynamicdatamapping.model.DDMContent getContent(
+		long contentId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _ddmContentLocalService.getContent(contentId);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMContent> getContents() {
+		return _ddmContentLocalService.getContents();
+	}
+
+	@Override
+	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMContent> getContents(
+		long groupId) {
+		return _ddmContentLocalService.getContents(groupId);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMContent> getContents(
+		long groupId, int start, int end) {
+		return _ddmContentLocalService.getContents(groupId, start, end);
+	}
+
+	@Override
+	public int getContentsCount(long groupId) {
+		return _ddmContentLocalService.getContentsCount(groupId);
 	}
 
 	/**
@@ -214,50 +275,6 @@ public class DDMContentLocalServiceWrapper implements DDMContentLocalService,
 		long contentId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmContentLocalService.getDDMContent(contentId);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
-		return _ddmContentLocalService.getActionableDynamicQuery();
-	}
-
-	@Override
-	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
-		return _ddmContentLocalService.getExportActionableDynamicQuery(portletDataContext);
-	}
-
-	/**
-	* @throws PortalException
-	*/
-	@Override
-	public com.liferay.portal.model.PersistedModel deletePersistedModel(
-		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _ddmContentLocalService.deletePersistedModel(persistedModel);
-	}
-
-	@Override
-	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _ddmContentLocalService.getPersistedModel(primaryKeyObj);
-	}
-
-	/**
-	* Returns the d d m content with the matching UUID and company.
-	*
-	* @param uuid the d d m content's UUID
-	* @param companyId the primary key of the company
-	* @return the matching d d m content
-	* @throws PortalException if a matching d d m content could not be found
-	*/
-	@Override
-	public com.liferay.portlet.dynamicdatamapping.model.DDMContent getDDMContentByUuidAndCompanyId(
-		java.lang.String uuid, long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _ddmContentLocalService.getDDMContentByUuidAndCompanyId(uuid,
-			companyId);
 	}
 
 	/**
@@ -294,6 +311,38 @@ public class DDMContentLocalServiceWrapper implements DDMContentLocalService,
 	}
 
 	/**
+	* Returns all the d d m contents matching the UUID and company.
+	*
+	* @param uuid the UUID of the d d m contents
+	* @param companyId the primary key of the company
+	* @return the matching d d m contents, or an empty list if no matches were found
+	*/
+	@Override
+	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMContent> getDDMContentsByUuidAndCompanyId(
+		java.lang.String uuid, long companyId) {
+		return _ddmContentLocalService.getDDMContentsByUuidAndCompanyId(uuid,
+			companyId);
+	}
+
+	/**
+	* Returns a range of d d m contents matching the UUID and company.
+	*
+	* @param uuid the UUID of the d d m contents
+	* @param companyId the primary key of the company
+	* @param start the lower bound of the range of d d m contents
+	* @param end the upper bound of the range of d d m contents (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the range of matching d d m contents, or an empty list if no matches were found
+	*/
+	@Override
+	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMContent> getDDMContentsByUuidAndCompanyId(
+		java.lang.String uuid, long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.dynamicdatamapping.model.DDMContent> orderByComparator) {
+		return _ddmContentLocalService.getDDMContentsByUuidAndCompanyId(uuid,
+			companyId, start, end, orderByComparator);
+	}
+
+	/**
 	* Returns the number of d d m contents.
 	*
 	* @return the number of d d m contents
@@ -303,26 +352,17 @@ public class DDMContentLocalServiceWrapper implements DDMContentLocalService,
 		return _ddmContentLocalService.getDDMContentsCount();
 	}
 
-	/**
-	* Updates the d d m content in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
-	*
-	* @param ddmContent the d d m content
-	* @return the d d m content that was updated
-	*/
 	@Override
-	public com.liferay.portlet.dynamicdatamapping.model.DDMContent updateDDMContent(
-		com.liferay.portlet.dynamicdatamapping.model.DDMContent ddmContent) {
-		return _ddmContentLocalService.updateDDMContent(ddmContent);
+	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		return _ddmContentLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
 	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _ddmContentLocalService.getBeanIdentifier();
+	public com.liferay.portal.model.PersistedModel getPersistedModel(
+		java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _ddmContentLocalService.getPersistedModel(primaryKeyObj);
 	}
 
 	/**
@@ -336,63 +376,25 @@ public class DDMContentLocalServiceWrapper implements DDMContentLocalService,
 	}
 
 	@Override
-	public com.liferay.portlet.dynamicdatamapping.model.DDMContent addContent(
-		long userId, long groupId, java.lang.String name,
-		java.lang.String description, java.lang.String xml,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _ddmContentLocalService.addContent(userId, groupId, name,
-			description, xml, serviceContext);
-	}
-
-	@Override
-	public void deleteContent(
-		com.liferay.portlet.dynamicdatamapping.model.DDMContent content) {
-		_ddmContentLocalService.deleteContent(content);
-	}
-
-	@Override
-	public void deleteContents(long groupId) {
-		_ddmContentLocalService.deleteContents(groupId);
-	}
-
-	@Override
-	public com.liferay.portlet.dynamicdatamapping.model.DDMContent getContent(
-		long contentId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _ddmContentLocalService.getContent(contentId);
-	}
-
-	@Override
-	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMContent> getContents() {
-		return _ddmContentLocalService.getContents();
-	}
-
-	@Override
-	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMContent> getContents(
-		long groupId) {
-		return _ddmContentLocalService.getContents(groupId);
-	}
-
-	@Override
-	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMContent> getContents(
-		long groupId, int start, int end) {
-		return _ddmContentLocalService.getContents(groupId, start, end);
-	}
-
-	@Override
-	public int getContentsCount(long groupId) {
-		return _ddmContentLocalService.getContentsCount(groupId);
-	}
-
-	@Override
 	public com.liferay.portlet.dynamicdatamapping.model.DDMContent updateContent(
 		long contentId, java.lang.String name, java.lang.String description,
-		java.lang.String xml,
+		java.lang.String data,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmContentLocalService.updateContent(contentId, name,
-			description, xml, serviceContext);
+			description, data, serviceContext);
+	}
+
+	/**
+	* Updates the d d m content in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	*
+	* @param ddmContent the d d m content
+	* @return the d d m content that was updated
+	*/
+	@Override
+	public com.liferay.portlet.dynamicdatamapping.model.DDMContent updateDDMContent(
+		com.liferay.portlet.dynamicdatamapping.model.DDMContent ddmContent) {
+		return _ddmContentLocalService.updateDDMContent(ddmContent);
 	}
 
 	/**

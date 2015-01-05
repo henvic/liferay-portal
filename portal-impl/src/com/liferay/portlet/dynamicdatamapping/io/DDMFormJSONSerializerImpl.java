@@ -45,7 +45,7 @@ public class DDMFormJSONSerializerImpl implements DDMFormJSONSerializer {
 	}
 
 	protected void addAvailableLanguageIds(
-		JSONObject jsonObject, List<Locale> availableLocales) {
+		JSONObject jsonObject, Set<Locale> availableLocales) {
 
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
@@ -116,6 +116,7 @@ public class DDMFormJSONSerializerImpl implements DDMFormJSONSerializer {
 		jsonObject.put("readOnly", ddmFormField.isReadOnly());
 		jsonObject.put("repeatable", ddmFormField.isRepeatable());
 		jsonObject.put("required", ddmFormField.isRequired());
+		jsonObject.put("showLabel", ddmFormField.isShowLabel());
 		jsonObject.put("type", ddmFormField.getType());
 	}
 
@@ -167,7 +168,7 @@ public class DDMFormJSONSerializerImpl implements DDMFormJSONSerializer {
 		for (Locale availableLocale : localizedValue.getAvailableLocales()) {
 			jsonObject.put(
 				LocaleUtil.toLanguageId(availableLocale),
-				localizedValue.getValue(availableLocale));
+				localizedValue.getString(availableLocale));
 		}
 
 		return jsonObject;

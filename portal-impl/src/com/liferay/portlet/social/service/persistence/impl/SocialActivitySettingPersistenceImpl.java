@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.social.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -24,15 +26,12 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
 import com.liferay.portlet.social.NoSuchActivitySettingException;
@@ -43,7 +42,6 @@ import com.liferay.portlet.social.service.persistence.SocialActivitySettingPersi
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,6 +62,7 @@ import java.util.Set;
  * @see SocialActivitySettingUtil
  * @generated
  */
+@ProviderType
 public class SocialActivitySettingPersistenceImpl extends BasePersistenceImpl<SocialActivitySetting>
 	implements SocialActivitySettingPersistence {
 	/*
@@ -3279,25 +3278,6 @@ public class SocialActivitySettingPersistenceImpl extends BasePersistenceImpl<So
 	 * Initializes the social activity setting persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portlet.social.model.SocialActivitySetting")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<SocialActivitySetting>> listenersList = new ArrayList<ModelListener<SocialActivitySetting>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<SocialActivitySetting>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
 	}
 
 	public void destroy() {
@@ -3316,8 +3296,8 @@ public class SocialActivitySettingPersistenceImpl extends BasePersistenceImpl<So
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No SocialActivitySetting exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No SocialActivitySetting exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(SocialActivitySettingPersistenceImpl.class);
-	private static SocialActivitySetting _nullSocialActivitySetting = new SocialActivitySettingImpl() {
+	private static final Log _log = LogFactoryUtil.getLog(SocialActivitySettingPersistenceImpl.class);
+	private static final SocialActivitySetting _nullSocialActivitySetting = new SocialActivitySettingImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -3329,7 +3309,7 @@ public class SocialActivitySettingPersistenceImpl extends BasePersistenceImpl<So
 			}
 		};
 
-	private static CacheModel<SocialActivitySetting> _nullSocialActivitySettingCacheModel =
+	private static final CacheModel<SocialActivitySetting> _nullSocialActivitySettingCacheModel =
 		new CacheModel<SocialActivitySetting>() {
 			@Override
 			public SocialActivitySetting toEntityModel() {

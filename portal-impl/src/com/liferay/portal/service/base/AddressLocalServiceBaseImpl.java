@@ -14,6 +14,8 @@
 
 package com.liferay.portal.service.base;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -69,6 +71,7 @@ import javax.sql.DataSource;
  * @see com.liferay.portal.service.AddressLocalServiceUtil
  * @generated
  */
+@ProviderType
 public abstract class AddressLocalServiceBaseImpl extends BaseLocalServiceImpl
 	implements AddressLocalService, IdentifiableBean {
 	/*
@@ -185,10 +188,10 @@ public abstract class AddressLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
@@ -196,11 +199,11 @@ public abstract class AddressLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
@@ -217,7 +220,7 @@ public abstract class AddressLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * Returns the address with the matching UUID and company.
 	 *
 	 * @param uuid the address's UUID
-	 * @param  companyId the primary key of the company
+	 * @param companyId the primary key of the company
 	 * @return the matching address, or <code>null</code> if a matching address could not be found
 	 */
 	@Override
@@ -341,7 +344,7 @@ public abstract class AddressLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * Returns the address with the matching UUID and company.
 	 *
 	 * @param uuid the address's UUID
-	 * @param  companyId the primary key of the company
+	 * @param companyId the primary key of the company
 	 * @return the matching address
 	 * @throws PortalException if a matching address could not be found
 	 */

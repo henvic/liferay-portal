@@ -33,24 +33,22 @@ import org.junit.Test;
 public class ClassLoaderPoolTest {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	public static final CodeCoverageAssertor codeCoverageAssertor =
+		CodeCoverageAssertor.INSTANCE;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		Class<?> clazz = getClass();
 
 		PortalClassLoaderUtil.setClassLoader(clazz.getClassLoader());
 
-		_classLoaders =
-			(Map<String, ClassLoader>)ReflectionTestUtil.getFieldValue(
-				ClassLoaderPool.class, "_classLoaders");
+		_classLoaders = ReflectionTestUtil.getFieldValue(
+			ClassLoaderPool.class, "_classLoaders");
 
 		_classLoaders.clear();
 
-		_contextNames =
-			(Map<ClassLoader, String>)ReflectionTestUtil.getFieldValue(
-				ClassLoaderPool.class, "_contextNames");
+		_contextNames = ReflectionTestUtil.getFieldValue(
+			ClassLoaderPool.class, "_contextNames");
 
 		_contextNames.clear();
 	}

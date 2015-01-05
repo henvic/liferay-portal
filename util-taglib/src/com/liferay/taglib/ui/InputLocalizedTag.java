@@ -16,7 +16,9 @@ package com.liferay.taglib.ui;
 
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.ModelHintsConstants;
+import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.taglib.util.IncludeTag;
 
 import java.util.Locale;
@@ -92,6 +94,10 @@ public class InputLocalizedTag extends IncludeTag {
 		_name = name;
 	}
 
+	public void setToolbarSet(String toolbarSet) {
+		_toolbarSet = toolbarSet;
+	}
+
 	public void setType(String type) {
 		_type = type;
 	}
@@ -115,6 +121,7 @@ public class InputLocalizedTag extends IncludeTag {
 		_languageId = null;
 		_maxLength = null;
 		_name = null;
+		_toolbarSet = "simple";
 		_type = "input";
 		_xml = null;
 	}
@@ -129,7 +136,11 @@ public class InputLocalizedTag extends IncludeTag {
 		Locale[] availableLocales = _availableLocales;
 
 		if (availableLocales == null) {
-			availableLocales = LanguageUtil.getAvailableLocales();
+			ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+			availableLocales = LanguageUtil.getAvailableLocales(
+				themeDisplay.getSiteGroupId());
 		}
 
 		String formName = _formName;
@@ -175,6 +186,8 @@ public class InputLocalizedTag extends IncludeTag {
 		request.setAttribute(
 			"liferay-ui:input-localized:maxLength", _maxLength);
 		request.setAttribute("liferay-ui:input-localized:name", _name);
+		request.setAttribute(
+			"liferay-ui:input-localized:toolbarSet", _toolbarSet);
 		request.setAttribute("liferay-ui:input-localized:type", _type);
 		request.setAttribute("liferay-ui:input-localized:xml", _xml);
 	}
@@ -197,6 +210,7 @@ public class InputLocalizedTag extends IncludeTag {
 	private String _languageId;
 	private String _maxLength;
 	private String _name;
+	private String _toolbarSet = "simple";
 	private String _type = "input";
 	private String _xml;
 

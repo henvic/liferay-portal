@@ -42,10 +42,7 @@ public class SpringHotDeployListener extends BaseHotDeployListener {
 		}
 		catch (Throwable t) {
 			throwHotDeployException(
-				hotDeployEvent,
-				"Error initializing Spring for " +
-					hotDeployEvent.getServletContextName(),
-				t);
+				hotDeployEvent, "Error initializing Spring for ", t);
 		}
 	}
 
@@ -58,10 +55,7 @@ public class SpringHotDeployListener extends BaseHotDeployListener {
 		}
 		catch (Throwable t) {
 			throwHotDeployException(
-				hotDeployEvent,
-				"Error uninitializing Spring for " +
-					hotDeployEvent.getServletContextName(),
-				t);
+				hotDeployEvent, "Error uninitializing Spring for ", t);
 		}
 	}
 
@@ -121,7 +115,7 @@ public class SpringHotDeployListener extends BaseHotDeployListener {
 		}
 	}
 
-	private static Map<String, ContextLoaderListener> _contextLoaderListeners =
-		new HashMap<String, ContextLoaderListener>();
+	private static final Map<String, ContextLoaderListener>
+		_contextLoaderListeners = new HashMap<String, ContextLoaderListener>();
 
 }

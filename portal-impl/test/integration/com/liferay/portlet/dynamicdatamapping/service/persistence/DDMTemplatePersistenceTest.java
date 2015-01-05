@@ -14,27 +14,23 @@
 
 package com.liferay.portlet.dynamicdatamapping.service.persistence;
 
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.ModelListener;
-import com.liferay.portal.service.persistence.BasePersistence;
-import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
-import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.LiferayIntegrationTestRule;
+import com.liferay.portal.test.PersistenceTestRule;
+import com.liferay.portal.test.TransactionalTestRule;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -45,58 +41,35 @@ import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalServiceUti
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-
-import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Brian Wing Shun Chan
+ * @generated
  */
-@ExecutionTestListeners(listeners =  {
-	PersistenceExecutionTestListener.class})
-@RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
 public class DDMTemplatePersistenceTest {
-	@Before
-	public void setUp() {
-		_modelListeners = _persistence.getListeners();
-
-		for (ModelListener<DDMTemplate> modelListener : _modelListeners) {
-			_persistence.unregisterListener(modelListener);
-		}
-	}
+	@Rule
+	public final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
+			PersistenceTestRule.INSTANCE,
+			new TransactionalTestRule(Propagation.REQUIRED));
 
 	@After
 	public void tearDown() throws Exception {
-		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
+		Iterator<DDMTemplate> iterator = _ddmTemplates.iterator();
 
-		Set<Serializable> primaryKeys = basePersistences.keySet();
+		while (iterator.hasNext()) {
+			_persistence.remove(iterator.next());
 
-		for (Serializable primaryKey : primaryKeys) {
-			BasePersistence<?> basePersistence = basePersistences.get(primaryKey);
-
-			try {
-				basePersistence.remove(primaryKey);
-			}
-			catch (Exception e) {
-				if (_log.isDebugEnabled()) {
-					_log.debug("The model with primary key " + primaryKey +
-						" was already deleted");
-				}
-			}
-		}
-
-		_transactionalPersistenceAdvice.reset();
-
-		for (ModelListener<DDMTemplate> modelListener : _modelListeners) {
-			_persistence.registerListener(modelListener);
+			iterator.remove();
 		}
 	}
 
@@ -153,6 +126,8 @@ public class DDMTemplatePersistenceTest {
 
 		newDDMTemplate.setTemplateKey(RandomTestUtil.randomString());
 
+		newDDMTemplate.setVersion(RandomTestUtil.randomString());
+
 		newDDMTemplate.setName(RandomTestUtil.randomString());
 
 		newDDMTemplate.setDescription(RandomTestUtil.randomString());
@@ -173,7 +148,7 @@ public class DDMTemplatePersistenceTest {
 
 		newDDMTemplate.setSmallImageURL(RandomTestUtil.randomString());
 
-		_persistence.update(newDDMTemplate);
+		_ddmTemplates.add(_persistence.update(newDDMTemplate));
 
 		DDMTemplate existingDDMTemplate = _persistence.findByPrimaryKey(newDDMTemplate.getPrimaryKey());
 
@@ -201,6 +176,8 @@ public class DDMTemplatePersistenceTest {
 			newDDMTemplate.getClassPK());
 		Assert.assertEquals(existingDDMTemplate.getTemplateKey(),
 			newDDMTemplate.getTemplateKey());
+		Assert.assertEquals(existingDDMTemplate.getVersion(),
+			newDDMTemplate.getVersion());
 		Assert.assertEquals(existingDDMTemplate.getName(),
 			newDDMTemplate.getName());
 		Assert.assertEquals(existingDDMTemplate.getDescription(),
@@ -517,10 +494,10 @@ public class DDMTemplatePersistenceTest {
 		return OrderByComparatorFactoryUtil.create("DDMTemplate", "uuid", true,
 			"templateId", true, "groupId", true, "companyId", true, "userId",
 			true, "userName", true, "createDate", true, "modifiedDate", true,
-			"classNameId", true, "classPK", true, "templateKey", true, "name",
-			true, "description", true, "type", true, "mode", true, "language",
-			true, "script", true, "cacheable", true, "smallImage", true,
-			"smallImageId", true, "smallImageURL", true);
+			"classNameId", true, "classPK", true, "templateKey", true,
+			"version", true, "name", true, "description", true, "type", true,
+			"mode", true, "language", true, "script", true, "cacheable", true,
+			"smallImage", true, "smallImageId", true, "smallImageURL", true);
 	}
 
 	@Test
@@ -772,6 +749,8 @@ public class DDMTemplatePersistenceTest {
 
 		ddmTemplate.setTemplateKey(RandomTestUtil.randomString());
 
+		ddmTemplate.setVersion(RandomTestUtil.randomString());
+
 		ddmTemplate.setName(RandomTestUtil.randomString());
 
 		ddmTemplate.setDescription(RandomTestUtil.randomString());
@@ -792,13 +771,11 @@ public class DDMTemplatePersistenceTest {
 
 		ddmTemplate.setSmallImageURL(RandomTestUtil.randomString());
 
-		_persistence.update(ddmTemplate);
+		_ddmTemplates.add(_persistence.update(ddmTemplate));
 
 		return ddmTemplate;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(DDMTemplatePersistenceTest.class);
-	private ModelListener<DDMTemplate>[] _modelListeners;
-	private DDMTemplatePersistence _persistence = (DDMTemplatePersistence)PortalBeanLocatorUtil.locate(DDMTemplatePersistence.class.getName());
-	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
+	private List<DDMTemplate> _ddmTemplates = new ArrayList<DDMTemplate>();
+	private DDMTemplatePersistence _persistence = DDMTemplateUtil.getPersistence();
 }

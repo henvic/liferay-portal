@@ -78,14 +78,14 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 					</liferay-portlet:renderURL>
 
 					<aui:nav-bar-search>
-						<div class="col-xs-12 form-search">
+						<div class="form-search">
 							<aui:form action="<%= searchURL %>" method="get" name="searchFm">
 								<liferay-portlet:renderURLParams varImpl="searchURL" />
 								<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 								<aui:input name="repositoryId" type="hidden" value="<%= repositoryId %>" />
 								<aui:input name="folderId" type="hidden" value="<%= folderId %>" />
 								<aui:input name="breadcrumbsFolderId" type="hidden" value="<%= folderId %>" />
-								<aui:input name="searchFolderIds" type="hidden" value="<%= folderId %>" />
+								<aui:input name="searchFolderId" type="hidden" value="<%= folderId %>" />
 
 								<liferay-ui:input-search id="keywords1" />
 							</aui:form>

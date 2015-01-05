@@ -139,6 +139,11 @@ public class IndexerWrapper implements Indexer {
 	}
 
 	@Override
+	public boolean isCommitImmediately() {
+		return _indexer.isCommitImmediately();
+	}
+
+	@Override
 	public boolean isFilterSearch() {
 		return _indexer.isFilterSearch();
 	}
@@ -235,6 +240,6 @@ public class IndexerWrapper implements Indexer {
 		_indexer.updateFullQuery(searchContext);
 	}
 
-	private Indexer _indexer;
+	private final Indexer _indexer;
 
 }

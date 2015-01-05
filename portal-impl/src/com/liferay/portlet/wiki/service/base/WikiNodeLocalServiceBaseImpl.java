@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.wiki.service.base;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -80,6 +82,7 @@ import javax.sql.DataSource;
  * @see com.liferay.portlet.wiki.service.WikiNodeLocalServiceUtil
  * @generated
  */
+@ProviderType
 public abstract class WikiNodeLocalServiceBaseImpl extends BaseLocalServiceImpl
 	implements WikiNodeLocalService, IdentifiableBean {
 	/*
@@ -196,10 +199,10 @@ public abstract class WikiNodeLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
@@ -207,11 +210,11 @@ public abstract class WikiNodeLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows matching the dynamic query.
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
-	 * @return the number of rows that match the dynamic query
+	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
@@ -223,18 +226,6 @@ public abstract class WikiNodeLocalServiceBaseImpl extends BaseLocalServiceImpl
 	@Override
 	public WikiNode fetchWikiNode(long nodeId) {
 		return wikiNodePersistence.fetchByPrimaryKey(nodeId);
-	}
-
-	/**
-	 * Returns the wiki node with the matching UUID and company.
-	 *
-	 * @param uuid the wiki node's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching wiki node, or <code>null</code> if a matching wiki node could not be found
-	 */
-	@Override
-	public WikiNode fetchWikiNodeByUuidAndCompanyId(String uuid, long companyId) {
-		return wikiNodePersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
 	/**
@@ -362,17 +353,34 @@ public abstract class WikiNodeLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the wiki node with the matching UUID and company.
+	 * Returns all the wiki nodes matching the UUID and company.
 	 *
-	 * @param uuid the wiki node's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching wiki node
-	 * @throws PortalException if a matching wiki node could not be found
+	 * @param uuid the UUID of the wiki nodes
+	 * @param companyId the primary key of the company
+	 * @return the matching wiki nodes, or an empty list if no matches were found
 	 */
 	@Override
-	public WikiNode getWikiNodeByUuidAndCompanyId(String uuid, long companyId)
-		throws PortalException {
-		return wikiNodePersistence.findByUuid_C_First(uuid, companyId, null);
+	public List<WikiNode> getWikiNodesByUuidAndCompanyId(String uuid,
+		long companyId) {
+		return wikiNodePersistence.findByUuid_C(uuid, companyId);
+	}
+
+	/**
+	 * Returns a range of wiki nodes matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the wiki nodes
+	 * @param companyId the primary key of the company
+	 * @param start the lower bound of the range of wiki nodes
+	 * @param end the upper bound of the range of wiki nodes (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the range of matching wiki nodes, or an empty list if no matches were found
+	 */
+	@Override
+	public List<WikiNode> getWikiNodesByUuidAndCompanyId(String uuid,
+		long companyId, int start, int end,
+		OrderByComparator<WikiNode> orderByComparator) {
+		return wikiNodePersistence.findByUuid_C(uuid, companyId, start, end,
+			orderByComparator);
 	}
 
 	/**

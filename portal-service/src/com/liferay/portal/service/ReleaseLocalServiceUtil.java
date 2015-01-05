@@ -52,6 +52,11 @@ public class ReleaseLocalServiceUtil {
 		return getService().addRelease(release);
 	}
 
+	public static com.liferay.portal.model.Release addRelease(
+		java.lang.String servletContextName, int buildNumber) {
+		return getService().addRelease(servletContextName, buildNumber);
+	}
+
 	/**
 	* Creates a new release with the primary key. Does not add the release to the database.
 	*
@@ -60,6 +65,30 @@ public class ReleaseLocalServiceUtil {
 	*/
 	public static com.liferay.portal.model.Release createRelease(long releaseId) {
 		return getService().createRelease(releaseId);
+	}
+
+	public static void createTablesAndPopulate() {
+		getService().createTablesAndPopulate();
+	}
+
+	/**
+	* @throws PortalException
+	*/
+	public static com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().deletePersistedModel(persistedModel);
+	}
+
+	/**
+	* Deletes the release from the database. Also notifies the appropriate model listeners.
+	*
+	* @param release the release
+	* @return the release that was removed
+	*/
+	public static com.liferay.portal.model.Release deleteRelease(
+		com.liferay.portal.model.Release release) {
+		return getService().deleteRelease(release);
 	}
 
 	/**
@@ -72,17 +101,6 @@ public class ReleaseLocalServiceUtil {
 	public static com.liferay.portal.model.Release deleteRelease(long releaseId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().deleteRelease(releaseId);
-	}
-
-	/**
-	* Deletes the release from the database. Also notifies the appropriate model listeners.
-	*
-	* @param release the release
-	* @return the release that was removed
-	*/
-	public static com.liferay.portal.model.Release deleteRelease(
-		com.liferay.portal.model.Release release) {
-		return getService().deleteRelease(release);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
@@ -140,10 +158,10 @@ public class ReleaseLocalServiceUtil {
 	}
 
 	/**
-	* Returns the number of rows that match the dynamic query.
+	* Returns the number of rows matching the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
-	* @return the number of rows that match the dynamic query
+	* @return the number of rows matching the dynamic query
 	*/
 	public static long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
@@ -151,11 +169,11 @@ public class ReleaseLocalServiceUtil {
 	}
 
 	/**
-	* Returns the number of rows that match the dynamic query.
+	* Returns the number of rows matching the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
-	* @return the number of rows that match the dynamic query
+	* @return the number of rows matching the dynamic query
 	*/
 	public static long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
@@ -165,6 +183,35 @@ public class ReleaseLocalServiceUtil {
 
 	public static com.liferay.portal.model.Release fetchRelease(long releaseId) {
 		return getService().fetchRelease(releaseId);
+	}
+
+	public static com.liferay.portal.model.Release fetchRelease(
+		java.lang.String servletContextName) {
+		return getService().fetchRelease(servletContextName);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return getService().getActionableDynamicQuery();
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public static java.lang.String getBeanIdentifier() {
+		return getService().getBeanIdentifier();
+	}
+
+	public static int getBuildNumberOrCreate()
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getBuildNumberOrCreate();
+	}
+
+	public static com.liferay.portal.model.PersistedModel getPersistedModel(
+		java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getPersistedModel(primaryKeyObj);
 	}
 
 	/**
@@ -177,25 +224,6 @@ public class ReleaseLocalServiceUtil {
 	public static com.liferay.portal.model.Release getRelease(long releaseId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getRelease(releaseId);
-	}
-
-	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
-		return getService().getActionableDynamicQuery();
-	}
-
-	/**
-	* @throws PortalException
-	*/
-	public static com.liferay.portal.model.PersistedModel deletePersistedModel(
-		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().deletePersistedModel(persistedModel);
-	}
-
-	public static com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getPersistedModel(primaryKeyObj);
 	}
 
 	/**
@@ -224,6 +252,15 @@ public class ReleaseLocalServiceUtil {
 	}
 
 	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
+		getService().setBeanIdentifier(beanIdentifier);
+	}
+
+	/**
 	* Updates the release in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	*
 	* @param release the release
@@ -234,49 +271,30 @@ public class ReleaseLocalServiceUtil {
 		return getService().updateRelease(release);
 	}
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	public static java.lang.String getBeanIdentifier() {
-		return getService().getBeanIdentifier();
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
-		getService().setBeanIdentifier(beanIdentifier);
-	}
-
-	public static com.liferay.portal.model.Release addRelease(
-		java.lang.String servletContextName, int buildNumber) {
-		return getService().addRelease(servletContextName, buildNumber);
-	}
-
-	public static void createTablesAndPopulate() {
-		getService().createTablesAndPopulate();
-	}
-
-	public static com.liferay.portal.model.Release fetchRelease(
-		java.lang.String servletContextName) {
-		return getService().fetchRelease(servletContextName);
-	}
-
-	public static int getBuildNumberOrCreate()
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getBuildNumberOrCreate();
-	}
-
 	public static com.liferay.portal.model.Release updateRelease(
 		long releaseId, int buildNumber, java.util.Date buildDate,
 		boolean verified)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .updateRelease(releaseId, buildNumber, buildDate, verified);
+	}
+
+	public static void updateRelease(java.lang.String servletContextName,
+		java.util.List<com.liferay.portal.kernel.upgrade.UpgradeProcess> upgradeProcesses,
+		int buildNumber, int previousBuildNumber, boolean indexOnUpgrade)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService()
+			.updateRelease(servletContextName, upgradeProcesses, buildNumber,
+			previousBuildNumber, indexOnUpgrade);
+	}
+
+	public static void updateRelease(java.lang.String servletContextName,
+		java.util.List<com.liferay.portal.kernel.upgrade.UpgradeProcess> upgradeProcesses,
+		java.util.Properties unfilteredPortalProperties)
+		throws java.lang.Exception {
+		getService()
+			.updateRelease(servletContextName, upgradeProcesses,
+			unfilteredPortalProperties);
 	}
 
 	public static ReleaseLocalService getService() {

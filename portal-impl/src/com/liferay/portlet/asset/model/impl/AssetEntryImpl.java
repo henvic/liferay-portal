@@ -17,7 +17,6 @@ package com.liferay.portlet.asset.model.impl;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetRenderer;
@@ -33,9 +32,6 @@ import java.util.List;
  * @author Juan Fernández
  */
 public class AssetEntryImpl extends AssetEntryBaseImpl {
-
-	public AssetEntryImpl() {
-	}
 
 	@Override
 	public AssetRenderer getAssetRenderer() {
@@ -69,15 +65,13 @@ public class AssetEntryImpl extends AssetEntryBaseImpl {
 
 	@Override
 	public long[] getCategoryIds() {
-		return StringUtil.split(
-			ListUtil.toString(
-				getCategories(), AssetCategory.CATEGORY_ID_ACCESSOR), 0L);
+		return ListUtil.toLongArray(
+			getCategories(), AssetCategory.CATEGORY_ID_ACCESSOR);
 	}
 
 	@Override
 	public String[] getTagNames() {
-		return StringUtil.split(
-			ListUtil.toString(getTags(), AssetTag.NAME_ACCESSOR));
+		return ListUtil.toArray(getTags(), AssetTag.NAME_ACCESSOR);
 	}
 
 	@Override
@@ -85,6 +79,6 @@ public class AssetEntryImpl extends AssetEntryBaseImpl {
 		return AssetTagLocalServiceUtil.getEntryTags(getEntryId());
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(AssetEntryImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(AssetEntryImpl.class);
 
 }

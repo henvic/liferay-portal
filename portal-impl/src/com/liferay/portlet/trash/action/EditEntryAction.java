@@ -104,7 +104,10 @@ public class EditEntryAction extends PortletAction {
 				addRestoreData(actionRequest, entryOVPs);
 			}
 
-			sendRedirect(actionRequest, actionResponse);
+			String redirect = PortalUtil.escapeRedirect(
+				ParamUtil.getString(actionRequest, "redirect"));
+
+			sendRedirect(actionRequest, actionResponse, redirect);
 		}
 		catch (Exception e) {
 			if (e instanceof RestoreEntryException) {

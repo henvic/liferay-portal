@@ -31,8 +31,10 @@ import com.liferay.portlet.dynamicdatamapping.model.DDMFormFieldOptions;
 import com.liferay.portlet.dynamicdatamapping.model.LocalizedValue;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * @author Pablo Carvalho
@@ -89,8 +91,8 @@ public class DDMFormXSDDeserializerImpl implements DDMFormXSDDeserializer {
 		return (Element)xPathSelector.selectSingleNode(parentElement);
 	}
 
-	protected List<Locale> getAvailableLocales(Element rootElement) {
-		List<Locale> availableLocales = new ArrayList<Locale>();
+	protected Set<Locale> getAvailableLocales(Element rootElement) {
+		Set<Locale> availableLocales = new HashSet<Locale>();
 
 		String availableLanguageIds = rootElement.attributeValue(
 			"available-locales");
@@ -121,6 +123,7 @@ public class DDMFormXSDDeserializerImpl implements DDMFormXSDDeserializer {
 		setDDMFormFieldReadOnly(dynamicElementElement, ddmFormField);
 		setDDMFormFieldRepeatable(dynamicElementElement, ddmFormField);
 		setDDMFormFieldRequired(dynamicElementElement, ddmFormField);
+		setDDMFormFieldShowLabel(dynamicElementElement, ddmFormField);
 
 		List<Element> metadataElements = dynamicElementElement.elements(
 			"meta-data");
@@ -177,7 +180,7 @@ public class DDMFormXSDDeserializerImpl implements DDMFormXSDDeserializer {
 	protected void setDDMFormAvailableLocales(
 		Element rootElement, DDMForm ddmForm) {
 
-		List<Locale> availableLocales = getAvailableLocales(rootElement);
+		Set<Locale> availableLocales = getAvailableLocales(rootElement);
 
 		ddmForm.setAvailableLocales(availableLocales);
 	}
@@ -259,7 +262,7 @@ public class DDMFormXSDDeserializerImpl implements DDMFormXSDDeserializer {
 		if (labelElement != null) {
 			LocalizedValue label = ddmFormField.getLabel();
 
-			label.addValue(locale, labelElement.getText());
+			label.addString(locale, labelElement.getText());
 		}
 
 		Element predefinedValueElement = fetchMetadataEntry(
@@ -268,7 +271,7 @@ public class DDMFormXSDDeserializerImpl implements DDMFormXSDDeserializer {
 		if (predefinedValueElement != null) {
 			LocalizedValue predefinedValue = ddmFormField.getPredefinedValue();
 
-			predefinedValue.addValue(locale, predefinedValueElement.getText());
+			predefinedValue.addString(locale, predefinedValueElement.getText());
 		}
 
 		Element styleElement = fetchMetadataEntry(metadataElement, "style");
@@ -276,7 +279,7 @@ public class DDMFormXSDDeserializerImpl implements DDMFormXSDDeserializer {
 		if (styleElement != null) {
 			LocalizedValue style = ddmFormField.getStyle();
 
-			style.addValue(locale, styleElement.getText());
+			style.addString(locale, styleElement.getText());
 		}
 
 		Element tipElement = fetchMetadataEntry(metadataElement, "tip");
@@ -284,7 +287,7 @@ public class DDMFormXSDDeserializerImpl implements DDMFormXSDDeserializer {
 		if (tipElement != null) {
 			LocalizedValue tip = ddmFormField.getTip();
 
-			tip.addValue(locale, tipElement.getText());
+			tip.addString(locale, tipElement.getText());
 		}
 	}
 
@@ -346,6 +349,15 @@ public class DDMFormXSDDeserializerImpl implements DDMFormXSDDeserializer {
 		List<DDMFormField> ddmFormFields = getDDMFormFields(rootElement);
 
 		ddmForm.setDDMFormFields(ddmFormFields);
+	}
+
+	protected void setDDMFormFieldShowLabel(
+		Element dynamicElementElement, DDMFormField ddmFormField) {
+
+		boolean showLabel = GetterUtil.getBoolean(
+			dynamicElementElement.attributeValue("showLabel"), true);
+
+		ddmFormField.setShowLabel(showLabel);
 	}
 
 	protected void setDDMFormLocalizedValuesDefaultLocale(DDMForm ddmForm) {

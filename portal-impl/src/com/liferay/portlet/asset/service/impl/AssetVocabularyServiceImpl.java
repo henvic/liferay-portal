@@ -157,6 +157,16 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 		assetVocabularyLocalService.deleteVocabulary(vocabularyId);
 	}
 
+	@Override
+	public AssetVocabulary fetchVocabulary(long vocabularyId)
+		throws PortalException {
+
+		AssetVocabularyPermission.check(
+			getPermissionChecker(), vocabularyId, ActionKeys.VIEW);
+
+		return assetVocabularyLocalService.fetchAssetVocabulary(vocabularyId);
+	}
+
 	/**
 	 * @deprecated As of 7.0.0, with no direct replacement
 	 */
@@ -211,6 +221,29 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 
 		List<AssetVocabulary> vocabularies =
 			assetVocabularyPersistence.filterFindByGroupId(groupId);
+
+		if (!vocabularies.isEmpty() || !createDefaultVocabulary) {
+			return vocabularies;
+		}
+
+		vocabularies = new ArrayList<AssetVocabulary>();
+
+		AssetVocabulary vocabulary =
+			assetVocabularyLocalService.addDefaultVocabulary(groupId);
+
+		vocabularies.add(vocabulary);
+
+		return vocabularies;
+	}
+
+	@Override
+	public List<AssetVocabulary> getGroupVocabularies(
+			long groupId, boolean createDefaultVocabulary, int start, int end,
+			OrderByComparator<AssetVocabulary> obc)
+		throws PortalException {
+
+		List<AssetVocabulary> vocabularies = getGroupVocabularies(
+			groupId, start, end, obc);
 
 		if (!vocabularies.isEmpty() || !createDefaultVocabulary) {
 			return vocabularies;

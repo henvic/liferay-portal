@@ -34,16 +34,16 @@ import org.junit.Test;
 public class LoggingOutputProcessorTest extends BaseOutputProcessorTestCase {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	public static final CodeCoverageAssertor codeCoverageAssertor =
+		CodeCoverageAssertor.INSTANCE;
 
 	@Test
-	public void testLoggingFail() throws Exception {
+	public void testLoggingFail() {
 		testFailToRead(new LoggingOutputProcessor());
 	}
 
 	@Test
-	public void testLoggingSuccess() throws Exception, ProcessException {
+	public void testLoggingSuccess() throws Exception {
 		LoggingOutputProcessor loggingOutputProcessor =
 			new LoggingOutputProcessor();
 
@@ -52,12 +52,10 @@ public class LoggingOutputProcessorTest extends BaseOutputProcessorTestCase {
 		byte[] stdErrBytes = stdErrString.getBytes(
 			StringPool.DEFAULT_CHARSET_NAME);
 
-		CaptureHandler captureHandler = null;
+		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
+			LoggingOutputProcessor.class.getName(), Level.OFF);
 
 		try {
-			captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-				LoggingOutputProcessor.class.getName(), Level.OFF);
-
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			Assert.assertNull(
@@ -103,9 +101,7 @@ public class LoggingOutputProcessorTest extends BaseOutputProcessorTestCase {
 			Assert.assertEquals(stdOutString, logRecord.getMessage());
 		}
 		finally {
-			if (captureHandler != null) {
-				captureHandler.close();
-			}
+			captureHandler.close();
 		}
 	}
 

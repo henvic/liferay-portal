@@ -34,11 +34,11 @@ import org.junit.Test;
 public class ResourceBundleEnumerationTest {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	public static final CodeCoverageAssertor codeCoverageAssertor =
+		CodeCoverageAssertor.INSTANCE;
 
 	@Test
-	public void testWithEnumeration() throws Exception {
+	public void testWithEnumeration() {
 		Set<String> set = new LinkedHashSet<String>(
 			Arrays.asList("key1", "key2"));
 		Enumeration<String> enumeration = Collections.enumeration(
@@ -66,7 +66,7 @@ public class ResourceBundleEnumerationTest {
 	}
 
 	@Test
-	public void testWithoutEnumeration() throws Exception {
+	public void testWithoutEnumeration() {
 		Set<String> set = new LinkedHashSet<String>(
 			Arrays.asList("key1", "key2"));
 

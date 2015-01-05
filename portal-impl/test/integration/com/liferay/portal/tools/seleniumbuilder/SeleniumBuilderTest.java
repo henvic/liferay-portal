@@ -14,18 +14,23 @@
 
 package com.liferay.portal.tools.seleniumbuilder;
 
-import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.test.LiferayIntegrationTestRule;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @author Michael Hashimoto
  */
-@RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class SeleniumBuilderTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayIntegrationTestRule liferayIntegrationTestRule =
+		new LiferayIntegrationTestRule();
 
 	@Before
 	public void setUp() throws Exception {
@@ -38,283 +43,274 @@ public class SeleniumBuilderTest {
 	}
 
 	@Test
-	public void testActionCaseElement1001() throws Exception {
+	public void testActionCaseElementInvalidAttributeName() throws Exception {
 		test(
-			"ActionCaseElement1001.action",
-			"Error 1001: Missing (execute) child element in " + _DIR_NAME +
-				"/ActionCaseElement1001.action:3");
-	}
-
-	@Test
-	public void testActionCaseElement1002() throws Exception {
-		test(
-			"ActionCaseElement1002.action",
-			"Error 1002: Invalid var element in " + _DIR_NAME +
-				"/ActionCaseElement1002.action:4");
-	}
-
-	@Test
-	public void testActionCaseElement1004_1() throws Exception {
-		test(
-			"ActionCaseElement1004_1.action",
-			"Error 1004: Missing (locator1|locator-key1|value1) attribute in " +
-				_DIR_NAME + "/ActionCaseElement1004_1.action:3");
-	}
-
-	@Test
-	public void testActionCaseElement1004_2() throws Exception {
-		test(
-			"ActionCaseElement1004_2.action",
-			"Error 1004: Missing (locator1|locator-key1|value1) attribute in " +
-				_DIR_NAME + "/ActionCaseElement1004_2.action:3");
-	}
-
-	@Test
-	public void testActionCaseElement1005() throws Exception {
-		test(
-			"ActionCaseElement1005.action",
+			"ActionCaseElementInvalidAttributeName.action",
 			"Error 1005: Invalid fail attribute in " + _DIR_NAME +
-				"/ActionCaseElement1005.action:3");
+				"/ActionCaseElementInvalidAttributeName.action:3");
 	}
 
 	@Test
-	public void testActionCaseElement1006_1() throws Exception {
+	public void testActionCaseElementInvalidAttributeValue() throws Exception {
 		test(
-			"ActionCaseElement1006_1.action",
+			"ActionCaseElementInvalidAttributeValue_1.action",
 			"Error 1006: Invalid locator1 attribute value in " + _DIR_NAME +
-				"/ActionCaseElement1006_1.action:3");
-	}
+				"/ActionCaseElementInvalidAttributeValue_1.action:3");
 
-	@Test
-	public void testActionCaseElement1006_2() throws Exception {
 		test(
-			"ActionCaseElement1006_2.action",
+			"ActionCaseElementInvalidAttributeValue_2.action",
 			"Error 1006: Invalid locator-key1 attribute value in " + _DIR_NAME +
-				"/ActionCaseElement1006_2.action:3");
-	}
+				"/ActionCaseElementInvalidAttributeValue_2.action:3");
 
-	@Test
-	public void testActionCaseElement1006_3() throws Exception {
 		test(
-			"ActionCaseElement1006_3.action",
+			"ActionCaseElementInvalidAttributeValue_3.action",
 			"Error 1006: Invalid comparator attribute value in " + _DIR_NAME +
-				"/ActionCaseElement1006_3.action:3");
-	}
+				"/ActionCaseElementInvalidAttributeValue_3.action:3");
 
-	@Test
-	public void testActionCaseElement1006_4() throws Exception {
 		test(
-			"ActionCaseElement1006_4.action",
+			"ActionCaseElementInvalidAttributeValue_4.action",
 			"Error 1006: Invalid comparator attribute value in " + _DIR_NAME +
-				"/ActionCaseElement1006_4.action:3");
+				"/ActionCaseElementInvalidAttributeValue_4.action:3");
 	}
 
 	@Test
-	public void testActionCaseElement1007() throws Exception {
+	public void testActionCaseElementInvalidChildElement() throws Exception {
 		test(
-			"ActionCaseElement1007.action",
-			"Error 1007: Poorly formed XML in " + _DIR_NAME +
-				"/ActionCaseElement1007.action");
-	}
-
-	@Test
-	public void testActionCaseElement2000() throws Exception {
-		test(
-			"ActionCaseElement2000.action",
-			"Error 2000: Too many child elements in the case element in " +
-				_DIR_NAME + "/ActionCaseElement2000.action:6");
-	}
-
-	@Test
-	public void testActionCommandElement1001() throws Exception {
-		test(
-			"ActionCommandElement1001.action",
-			"Error 1001: Missing (case|default) child element in " + _DIR_NAME +
-				"/ActionCommandElement1001.action:2");
-	}
-
-	@Test
-	public void testActionCommandElement1002() throws Exception {
-		test(
-			"ActionCommandElement1002.action",
-			"Error 1002: Invalid case-fail element in " + _DIR_NAME +
-				"/ActionCommandElement1002.action:3");
-	}
-
-	@Test
-	public void testActionCommandElement1003_1() throws Exception {
-		test(
-			"ActionCommandElement1003_1.action",
-			"Error 1003: Missing name attribute in " + _DIR_NAME +
-				"/ActionCommandElement1003_1.action:2");
-	}
-
-	@Test
-	public void testActionCommandElement1003_2() throws Exception {
-		test(
-			"ActionCommandElement1003_2.action",
-			"Error 1003: Missing name attribute in " + _DIR_NAME +
-				"/ActionCommandElement1003_2.action:2");
-	}
-
-	@Test
-	public void testActionCommandElement1006() throws Exception {
-		test(
-			"ActionCommandElement1006.action",
-			"Error 1006: Invalid name attribute value in " + _DIR_NAME +
-				"/ActionCommandElement1006.action:2");
-	}
-
-	@Test
-	public void testActionCommandElement1007() throws Exception {
-		test(
-			"ActionCommandElement1007.action",
-			"Error 1007: Poorly formed XML in " + _DIR_NAME +
-				"/ActionCommandElement1007.action");
-	}
-
-	@Test
-	public void testActionDefaultElement1001() throws Exception {
-		test(
-			"ActionDefaultElement1001.action",
-			"Error 1001: Missing (description|execute) child element in " +
-				_DIR_NAME + "/ActionDefaultElement1001.action:3");
-	}
-
-	@Test
-	public void testActionDefaultElement1002() throws Exception {
-		test(
-			"ActionDefaultElement1002.action",
-			"Error 1002: Invalid fail element in " + _DIR_NAME +
-				"/ActionDefaultElement1002.action:4");
-	}
-
-	@Test
-	public void testActionDefaultElement1005() throws Exception {
-		test(
-			"ActionDefaultElement1005.action",
-			"Error 1005: Invalid locator1 attribute in " + _DIR_NAME +
-				"/ActionDefaultElement1005.action:3");
-	}
-
-	@Test
-	public void testActionDefaultElement1007() throws Exception {
-		test(
-			"ActionDefaultElement1007.action",
-			"Error 1007: Poorly formed XML in " + _DIR_NAME +
-				"/ActionDefaultElement1007.action");
-	}
-
-	@Test
-	public void testActionDefaultElement2000() throws Exception {
-		test(
-			"ActionDefaultElement2000.action",
-			"Error 2000: Too many child elements in the default element in " +
-				_DIR_NAME + "/ActionDefaultElement2000.action:6");
-	}
-
-	@Test
-	public void testActionDefinitionElement1000() throws Exception {
-		test(
-			"ActionDefinitionElement1000.action",
-			"Error 1000: Invalid root element in " + _DIR_NAME +
-				"/ActionDefinitionElement1000.action:1");
-	}
-
-	@Test
-	public void testActionDefinitionElement1001() throws Exception {
-		test(
-			"ActionDefinitionElement1001.action",
-			"Error 1001: Missing (command) child element in " + _DIR_NAME +
-				"/ActionDefinitionElement1001.action:1");
-	}
-
-	@Test
-	public void testActionDefinitionElement1002() throws Exception {
-		test(
-			"ActionDefinitionElement1002.action",
-			"Error 1002: Invalid command-fail element in " + _DIR_NAME +
-				"/ActionDefinitionElement1002.action:2");
-	}
-
-	@Test
-	public void testActionDefinitionElement1007() throws Exception {
-		test(
-			"ActionDefinitionElement1007.action",
-			"Error 1007: Poorly formed XML in " + _DIR_NAME +
-				"/ActionDefinitionElement1007.action");
-	}
-
-	@Test
-	public void testActionExecuteElement1002() throws Exception {
-		test(
-			"ActionExecuteElement1002.action",
+			"ActionCaseElementInvalidChildElement.action",
 			"Error 1002: Invalid var element in " + _DIR_NAME +
-				"/ActionExecuteElement1002.action:5");
+				"/ActionCaseElementInvalidChildElement.action:4");
 	}
 
 	@Test
-	public void testActionExecuteElement1004_1() throws Exception {
+	public void testActionCaseElementMissingAttribute() throws Exception {
 		test(
-			"ActionExecuteElement1004_1.action",
-			"Error 1004: Missing (function) attribute in " + _DIR_NAME +
-				"/ActionExecuteElement1004_1.action:4");
+			"ActionCaseElementMissingAttribute_1.action",
+			"Error 1004: Missing (locator1|locator-key1|value1) attribute in " +
+				_DIR_NAME +
+				"/ActionCaseElementMissingAttribute_1.action:3");
+
+		test(
+			"ActionCaseElementMissingAttribute_2.action",
+			"Error 1004: Missing (locator1|locator-key1|value1) attribute in " +
+				_DIR_NAME +
+				"/ActionCaseElementMissingAttribute_2.action:3");
 	}
 
 	@Test
-	public void testActionExecuteElement1004_2() throws Exception {
+	public void testActionCaseElementMissingChildElement() throws Exception {
 		test(
-			"ActionExecuteElement1004_2.action",
-			"Error 1004: Missing (function) attribute in " + _DIR_NAME +
-				"/ActionExecuteElement1004_2.action:4");
+			"ActionCaseElementMissingChildElement.action",
+			"Error 1001: Missing (execute) child element in " + _DIR_NAME +
+				"/ActionCaseElementMissingChildElement.action:3");
 	}
 
 	@Test
-	public void testActionExecuteElement1004_3() throws Exception {
+	public void testActionCaseElementPoorlyFormedXML() throws Exception {
 		test(
-			"ActionExecuteElement1004_3.action",
-			"Error 1004: Missing (function) attribute in " + _DIR_NAME +
-				"/ActionExecuteElement1004_3.action:4");
-	}
-
-	@Test
-	public void testActionExecuteElement1005_1() throws Exception {
-		test(
-			"ActionExecuteElement1005_1.action",
-			"Error 1005: Invalid fail attribute in " + _DIR_NAME +
-				"/ActionExecuteElement1005_1.action:4");
-	}
-
-	@Test
-	public void testActionExecuteElement1005_2() throws Exception {
-		test(
-			"ActionExecuteElement1005_2.action",
-			"Error 1005: Invalid locator attribute in " + _DIR_NAME +
-				"/ActionExecuteElement1005_2.action:4");
-	}
-
-	@Test
-	public void testActionExecuteElement1005_3() throws Exception {
-		test(
-			"ActionExecuteElement1005_3.action",
-			"Error 1005: Invalid value attribute in " + _DIR_NAME +
-				"/ActionExecuteElement1005_3.action:4");
-	}
-
-	@Test
-	public void testActionExecuteElement1006() throws Exception {
-		test(
-			"ActionExecuteElement1006.action",
-			"Error 1006: Invalid function attribute value in " + _DIR_NAME +
-				"/ActionExecuteElement1006.action:4");
-	}
-
-	@Test
-	public void testActionExecuteElement1007() throws Exception {
-		test(
-			"ActionExecuteElement1007.action",
+			"ActionCaseElementPoorlyFormedXML.action",
 			"Error 1007: Poorly formed XML in " + _DIR_NAME +
-				"/ActionExecuteElement1007.action");
+				"/ActionCaseElementPoorlyFormedXML.action");
+	}
+
+	@Test
+	public void testActionCaseElementTooManyChildElements() throws Exception {
+		test(
+			"ActionCaseElementTooManyChildElements.action",
+			"Error 2000: Too many child elements in the case element in " +
+				_DIR_NAME + "/ActionCaseElementTooManyChildElements.action:6");
+	}
+
+	@Test
+	public void testActionCommandElementInvalidAttributeValue()
+		throws Exception {
+
+		test(
+			"ActionCommandElementInvalidAttributeValue.action",
+			"Error 1006: Invalid name attribute value in " + _DIR_NAME +
+				"/ActionCommandElementInvalidAttributeValue.action:2");
+	}
+
+	@Test
+	public void testActionCommandElementInvalidElement() throws Exception {
+		test(
+			"ActionCommandElementInvalidElement.action",
+			"Error 1002: Invalid case-fail element in " + _DIR_NAME +
+				"/ActionCommandElementInvalidElement.action:3");
+	}
+
+	@Test
+	public void testActionCommandElementMissingAttribute() throws Exception {
+		test(
+			"ActionCommandElementMissingAttribute_1.action",
+			"Error 1003: Missing name attribute in " + _DIR_NAME +
+				"/ActionCommandElementMissingAttribute_1.action:2");
+
+		test(
+			"ActionCommandElementMissingAttribute_2.action",
+			"Error 1003: Missing name attribute in " + _DIR_NAME +
+				"/ActionCommandElementMissingAttribute_2.action:2");
+	}
+
+	@Test
+	public void testActionCommandElementMissingChildElement() throws Exception {
+		test(
+			"ActionCommandElementMissingChildElement.action",
+			"Error 1001: Missing (case|default) child element in " + _DIR_NAME +
+				"/ActionCommandElementMissingChildElement.action:2");
+	}
+
+	@Test
+	public void testActionCommandElementPoorlyFormedXML() throws Exception {
+		test(
+			"ActionCommandElementPoorlyFormedXML.action",
+			"Error 1007: Poorly formed XML in " + _DIR_NAME +
+				"/ActionCommandElementPoorlyFormedXML.action");
+	}
+
+	@Test
+	public void testActionDefaultElementInvalidAttributeName()
+		throws Exception {
+
+		test(
+			"ActionDefaultElementInvalidAttributeName.action",
+			"Error 1005: Invalid locator1 attribute in " + _DIR_NAME +
+				"/ActionDefaultElementInvalidAttributeName.action:3");
+	}
+
+	@Test
+	public void testActionDefaultElementInvalidElement() throws Exception {
+		test(
+			"ActionDefaultElementInvalidElement.action",
+			"Error 1002: Invalid fail element in " + _DIR_NAME +
+				"/ActionDefaultElementInvalidElement.action:4");
+	}
+
+	@Test
+	public void testActionDefaultElementMissingChildElement() throws Exception {
+		test(
+			"ActionDefaultElementMissingChildElement.action",
+			"Error 1001: Missing (description|execute) child element in " +
+				_DIR_NAME +
+				"/ActionDefaultElementMissingChildElement.action:3");
+	}
+
+	@Test
+	public void testActionDefaultElementPoorlyFormedXML() throws Exception {
+		test(
+			"ActionDefaultElementPoorlyFormedXML.action",
+			"Error 1007: Poorly formed XML in " + _DIR_NAME +
+				"/ActionDefaultElementPoorlyFormedXML.action");
+	}
+
+	@Test
+	public void testActionDefaultElementTooManyChildElements()
+		throws Exception {
+
+		test(
+			"ActionDefaultElementTooManyChildElements.action",
+			"Error 2000: Too many child elements in the default element in " +
+				_DIR_NAME +
+				"/ActionDefaultElementTooManyChildElements.action:6");
+	}
+
+	@Test
+	public void testActionDefinitionElementInvalidElement() throws Exception {
+		test(
+			"ActionDefinitionElementInvalidElement.action",
+			"Error 1002: Invalid command-fail element in " + _DIR_NAME +
+				"/ActionDefinitionElementInvalidElement.action:2");
+	}
+
+	@Test
+	public void testActionDefinitionElementInvalidRootElement()
+		throws Exception {
+
+		test(
+			"ActionDefinitionElementInvalidRootElement.action",
+			"Error 1000: Invalid root element in " + _DIR_NAME +
+				"/ActionDefinitionElementInvalidRootElement.action:1");
+	}
+
+	@Test
+	public void testActionDefinitionElementMissingChildElement()
+		throws Exception {
+
+		test(
+			"ActionDefinitionElementMissingChildElement.action",
+			"Error 1001: Missing (command) child element in " + _DIR_NAME +
+				"/ActionDefinitionElementMissingChildElement.action:1");
+	}
+
+	@Test
+	public void testActionDefinitionElementPoorlyFormedXML() throws Exception {
+		test(
+			"ActionDefinitionElementPoorlyFormedXML.action",
+			"Error 1007: Poorly formed XML in " + _DIR_NAME +
+				"/ActionDefinitionElementPoorlyFormedXML.action");
+	}
+
+	@Test
+	public void testActionExecuteElementInvalidAttributeName()
+		throws Exception {
+
+		test(
+			"ActionExecuteElementInvalidAttributeName_1.action",
+			"Error 1005: Invalid fail attribute in " + _DIR_NAME +
+				"/ActionExecuteElementInvalidAttributeName_1.action:4");
+
+		test(
+			"ActionExecuteElementInvalidAttributeName_2.action",
+			"Error 1005: Invalid locator attribute in " + _DIR_NAME +
+				"/ActionExecuteElementInvalidAttributeName_2.action:4");
+
+		test(
+			"ActionExecuteElementInvalidAttributeName_3.action",
+			"Error 1005: Invalid value attribute in " + _DIR_NAME +
+				"/ActionExecuteElementInvalidAttributeName_3.action:4");
+	}
+
+	@Test
+	public void testActionExecuteElementInvalidAttributeValue()
+		throws Exception {
+
+		test(
+			"ActionExecuteElementInvalidAttributeValue_1.action",
+			"Error 1006: Invalid function attribute value in " + _DIR_NAME +
+				"/ActionExecuteElementInvalidAttributeValue_1.action:4");
+	}
+
+	@Test
+	public void testActionExecuteElementInvalidElement() throws Exception {
+		test(
+			"ActionExecuteElementInvalidElement.action",
+			"Error 1002: Invalid var element in " + _DIR_NAME +
+				"/ActionExecuteElementInvalidElement.action:5");
+	}
+
+	@Test
+	public void testActionExecuteElementMissingAttribute() throws Exception {
+		test(
+			"ActionExecuteElementMissingAttribute_1.action",
+			"Error 1004: Missing (function) attribute in " + _DIR_NAME +
+				"/ActionExecuteElementMissingAttribute_1.action:4");
+
+		test(
+			"ActionExecuteElementMissingAttribute_2.action",
+			"Error 1004: Missing (function) attribute in " + _DIR_NAME +
+				"/ActionExecuteElementMissingAttribute_2.action:4");
+
+		test(
+			"ActionExecuteElementMissingAttribute_3.action",
+			"Error 1004: Missing (function) attribute in " + _DIR_NAME +
+				"/ActionExecuteElementMissingAttribute_3.action:4");
+	}
+
+	@Test
+	public void testActionExecuteElementPoorlyFormedXML() throws Exception {
+		test(
+			"ActionExecuteElementPoorlyFormedXML.action",
+			"Error 1007: Poorly formed XML in " + _DIR_NAME +
+				"/ActionExecuteElementPoorlyFormedXML.action");
 	}
 
 	@Test
@@ -847,32 +843,24 @@ public class SeleniumBuilderTest {
 	public void testMacroConditionElement1004_1() throws Exception {
 		test(
 			"MacroConditionElement1004_1.macro",
-			"Error 1004: Missing (action|macro) attribute in " + _DIR_NAME +
-				"/MacroConditionElement1004_1.macro:4");
+			"Error 1004: Missing (action|function|macro) attribute in " +
+				_DIR_NAME + "/MacroConditionElement1004_1.macro:4");
 	}
 
 	@Test
 	public void testMacroConditionElement1004_2() throws Exception {
 		test(
 			"MacroConditionElement1004_2.macro",
-			"Error 1004: Missing (action|macro) attribute in " + _DIR_NAME +
-				"/MacroConditionElement1004_2.macro:4");
+			"Error 1004: Missing (action|function|macro) attribute in " +
+				_DIR_NAME + "/MacroConditionElement1004_2.macro:4");
 	}
 
 	@Test
 	public void testMacroConditionElement1004_3() throws Exception {
 		test(
 			"MacroConditionElement1004_3.macro",
-			"Error 1004: Missing (action|macro) attribute in " + _DIR_NAME +
-				"/MacroConditionElement1004_3.macro:4");
-	}
-
-	@Test
-	public void testMacroConditionElement1004_4() throws Exception {
-		test(
-			"MacroConditionElement1004_4.macro",
-			"Error 1004: Missing (action|macro) attribute in " + _DIR_NAME +
-				"/MacroConditionElement1004_4.macro:4");
+			"Error 1004: Missing (action|function|macro) attribute in " +
+				_DIR_NAME + "/MacroConditionElement1004_3.macro:4");
 	}
 
 	@Test
@@ -1162,24 +1150,24 @@ public class SeleniumBuilderTest {
 	public void testMacroExecuteElement1004_1() throws Exception {
 		test(
 			"MacroExecuteElement1004_1.macro",
-			"Error 1004: Missing (action|macro) attribute in " + _DIR_NAME +
-				"/MacroExecuteElement1004_1.macro:3");
+			"Error 1004: Missing (action|function|macro) attribute in " +
+				_DIR_NAME + "/MacroExecuteElement1004_1.macro:3");
 	}
 
 	@Test
 	public void testMacroExecuteElement1004_2() throws Exception {
 		test(
 			"MacroExecuteElement1004_2.macro",
-			"Error 1004: Missing (action|macro) attribute in " + _DIR_NAME +
-				"/MacroExecuteElement1004_2.macro:3");
+			"Error 1004: Missing (action|function|macro) attribute in " +
+				_DIR_NAME + "/MacroExecuteElement1004_2.macro:3");
 	}
 
 	@Test
 	public void testMacroExecuteElement1004_3() throws Exception {
 		test(
 			"MacroExecuteElement1004_3.macro",
-			"Error 1004: Missing (action|macro) attribute in " + _DIR_NAME +
-				"/MacroExecuteElement1004_3.macro:3");
+			"Error 1004: Missing (action|function|macro) attribute in " +
+				_DIR_NAME + "/MacroExecuteElement1004_3.macro:3");
 	}
 
 	@Test
@@ -1244,6 +1232,27 @@ public class SeleniumBuilderTest {
 			"MacroExecuteElement1007.macro",
 			"Error 1007: Poorly formed XML in " + _DIR_NAME +
 				"/MacroExecuteElement1007.macro");
+	}
+
+	@Test
+	public void testMacroExecuteFunctionInvalidAttribute() throws Exception {
+		test(
+			"MacroExecuteFunctionInvalidAttribute_1.macro",
+			"Error 1005: Invalid locator attribute in " + _DIR_NAME +
+				"/MacroExecuteFunctionInvalidAttribute_1.macro:3");
+
+		test(
+			"MacroExecuteFunctionInvalidAttribute_2.macro",
+			"Error 1005: Invalid value attribute in " + _DIR_NAME +
+				"/MacroExecuteFunctionInvalidAttribute_2.macro:3");
+	}
+
+	@Test
+	public void testMacroExecuteFunctionMissingAttribute() throws Exception {
+		test(
+			"MacroExecuteFunctionMissingAttribute.macro",
+			"Error 1004: Missing (action|function|macro) attribute in " +
+				_DIR_NAME + "/MacroExecuteFunctionMissingAttribute.macro:3");
 	}
 
 	@Test
@@ -1713,11 +1722,13 @@ public class SeleniumBuilderTest {
 	}
 
 	@Test
-	public void testPathExtendPath1007() throws Exception {
+	public void testPathExtendPathPoorlyFormedXML() throws Exception {
+		test("PathExtend.action");
+
 		test(
-			"PathExtendPath1007.action",
+			"PathExtendPathPoorlyFormedXML.action",
 			"Error 1007: Poorly formed XML in " + _DIR_NAME +
-				"/PathExtendPath1007.action");
+				"/PathExtendPathPoorlyFormedXML.action");
 	}
 
 	@Test
@@ -1803,6 +1814,29 @@ public class SeleniumBuilderTest {
 	@Test
 	public void testTestCase() throws Exception {
 		test("TestCase.testcase");
+	}
+
+	@Test
+	public void testTestCaseActionCommandMissingAttributeValue()
+		throws Exception {
+
+		test(
+			"TestCaseActionCommandMissingAttributeValue_1.testcase",
+			"Error 1018: Missing (-Dfile|-Dtofile) in attribute value1 at " +
+				_DIR_NAME +
+				"/TestCaseActionCommandMissingAttributeValue_1.testcase:3");
+
+		test(
+			"TestCaseActionCommandMissingAttributeValue_2.testcase",
+			"Error 1018: Missing (-Dfile|-Dtofile) in attribute value1 at " +
+				_DIR_NAME +
+				"/TestCaseActionCommandMissingAttributeValue_2.testcase:3");
+
+		test(
+			"TestCaseActionCommandMissingAttributeValue_3.testcase",
+			"Error 1018: Missing (-Dfile|-Dtoken|-Dvalue) in attribute " +
+				"value1 at " + _DIR_NAME +
+				"/TestCaseActionCommandMissingAttributeValue_3.testcase:3");
 	}
 
 	@Test
@@ -1963,24 +1997,24 @@ public class SeleniumBuilderTest {
 	public void testTestCaseExecuteElement1004_1() throws Exception {
 		test(
 			"TestCaseExecuteElement1004_1.testcase",
-			"Error 1004: Missing (action|macro|test-case) attribute in " +
-				_DIR_NAME + "/TestCaseExecuteElement1004_1.testcase:5");
+			"Error 1004: Missing (action|function|macro|test-case) attribute " +
+				"in " + _DIR_NAME + "/TestCaseExecuteElement1004_1.testcase:5");
 	}
 
 	@Test
 	public void testTestCaseExecuteElement1004_2() throws Exception {
 		test(
 			"TestCaseExecuteElement1004_2.testcase",
-			"Error 1004: Missing (action|macro|test-case) attribute in " +
-				_DIR_NAME + "/TestCaseExecuteElement1004_2.testcase:5");
+			"Error 1004: Missing (action|function|macro|test-case) attribute " +
+				"in " + _DIR_NAME + "/TestCaseExecuteElement1004_2.testcase:5");
 	}
 
 	@Test
 	public void testTestCaseExecuteElement1004_3() throws Exception {
 		test(
 			"TestCaseExecuteElement1004_3.testcase",
-			"Error 1004: Missing (action|macro|test-case) attribute in " +
-				_DIR_NAME + "/TestCaseExecuteElement1004_3.testcase:5");
+			"Error 1004: Missing (action|function|macro|test-case) attribute " +
+				"in " + _DIR_NAME + "/TestCaseExecuteElement1004_3.testcase:5");
 	}
 
 	@Test
@@ -2045,6 +2079,30 @@ public class SeleniumBuilderTest {
 			"TestCaseExecuteElement1007.testcase",
 			"Error 1007: Poorly formed XML in " + _DIR_NAME +
 				"/TestCaseExecuteElement1007.testcase");
+	}
+
+	@Test
+	public void testTestCaseExecuteFunctionElementInvalidAttribute()
+		throws Exception {
+
+		test(
+			"TestCaseExecuteFunctionElementInvalidAttribute_1.testcase",
+			"Error 1005: Invalid locator attribute in " + _DIR_NAME +
+				"/TestCaseExecuteFunctionElementInvalidAttribute_1.testcase:5");
+
+		test(
+			"TestCaseExecuteFunctionElementInvalidAttribute_2.testcase",
+			"Error 1005: Invalid value attribute in " + _DIR_NAME +
+				"/TestCaseExecuteFunctionElementInvalidAttribute_2.testcase:5");
+	}
+
+	@Test
+	public void testTestCaseExecuteFunctionMissingAttribute() throws Exception {
+		test(
+			"TestCaseExecuteFunctionMissingAttribute.testcase",
+			"Error 1004: Missing (action|function|macro|test-case) attribute " +
+				"in " + _DIR_NAME +
+				"/TestCaseExecuteFunctionMissingAttribute.testcase:5");
 	}
 
 	@Test

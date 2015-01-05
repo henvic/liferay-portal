@@ -17,6 +17,7 @@ package com.liferay.portlet.journalcontentsearch.util;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portlet.journal.service.JournalContentSearchLocalServiceUtil;
@@ -43,7 +44,9 @@ public class ContentHits {
 		List<Document> docs = new ArrayList<Document>();
 		List<Float> scores = new ArrayList<Float>();
 
-		for (int i = 0; i < hits.getLength(); i++) {
+		Document[] docsArray = hits.getDocs();
+
+		for (int i = 0; i < docsArray.length; i++) {
 			Document doc = hits.doc(i);
 
 			String articleId = doc.get(Field.ARTICLE_ID);
@@ -73,7 +76,7 @@ public class ContentHits {
 		scores = scores.subList(start, end);
 
 		hits.setDocs(docs.toArray(new Document[docs.size()]));
-		hits.setScores(scores.toArray(new Float[docs.size()]));
+		hits.setScores(ArrayUtil.toFloatArray(scores));
 
 		hits.setSearchTime(
 			(float)(System.currentTimeMillis() - hits.getStart()) /

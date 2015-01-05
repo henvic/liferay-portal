@@ -65,7 +65,7 @@ public class NonceUtil {
 	private static final long _NONCE_EXPIRATION =
 		PropsValues.WEBDAV_NONCE_EXPIRATION * Time.MINUTE;
 
-	private static DelayQueue<NonceDelayed> _nonceDelayQueue =
+	private static final DelayQueue<NonceDelayed> _nonceDelayQueue =
 		new DelayQueue<NonceDelayed>();
 
 	private static class NonceDelayed implements Delayed {
@@ -77,14 +77,6 @@ public class NonceUtil {
 
 			_nonce = nonce;
 			_createTime = System.currentTimeMillis();
-		}
-
-		@Override
-		public long getDelay(TimeUnit timeUnit) {
-			long leftDelayTime =
-				_NONCE_EXPIRATION + _createTime - System.currentTimeMillis();
-
-			return timeUnit.convert(leftDelayTime, TimeUnit.MILLISECONDS);
 		}
 
 		@Override
@@ -113,6 +105,14 @@ public class NonceUtil {
 			}
 
 			return false;
+		}
+
+		@Override
+		public long getDelay(TimeUnit timeUnit) {
+			long leftDelayTime =
+				_NONCE_EXPIRATION + _createTime - System.currentTimeMillis();
+
+			return timeUnit.convert(leftDelayTime, TimeUnit.MILLISECONDS);
 		}
 
 		@Override

@@ -45,6 +45,35 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 		return _mdrRuleGroupLocalService.addMDRRuleGroup(mdrRuleGroup);
 	}
 
+	@Override
+	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup addRuleGroup(
+		long groupId,
+		java.util.Map<java.util.Locale, java.lang.String> nameMap,
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _mdrRuleGroupLocalService.addRuleGroup(groupId, nameMap,
+			descriptionMap, serviceContext);
+	}
+
+	@Override
+	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup copyRuleGroup(
+		com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup ruleGroup,
+		long groupId, com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _mdrRuleGroupLocalService.copyRuleGroup(ruleGroup, groupId,
+			serviceContext);
+	}
+
+	@Override
+	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup copyRuleGroup(
+		long ruleGroupId, long groupId,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _mdrRuleGroupLocalService.copyRuleGroup(ruleGroupId, groupId,
+			serviceContext);
+	}
+
 	/**
 	* Creates a new m d r rule group with the primary key. Does not add the m d r rule group to the database.
 	*
@@ -55,6 +84,18 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup createMDRRuleGroup(
 		long ruleGroupId) {
 		return _mdrRuleGroupLocalService.createMDRRuleGroup(ruleGroupId);
+	}
+
+	/**
+	* Deletes the m d r rule group from the database. Also notifies the appropriate model listeners.
+	*
+	* @param mdrRuleGroup the m d r rule group
+	* @return the m d r rule group that was removed
+	*/
+	@Override
+	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup deleteMDRRuleGroup(
+		com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup mdrRuleGroup) {
+		return _mdrRuleGroupLocalService.deleteMDRRuleGroup(mdrRuleGroup);
 	}
 
 	/**
@@ -72,15 +113,29 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	}
 
 	/**
-	* Deletes the m d r rule group from the database. Also notifies the appropriate model listeners.
-	*
-	* @param mdrRuleGroup the m d r rule group
-	* @return the m d r rule group that was removed
+	* @throws PortalException
 	*/
 	@Override
-	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup deleteMDRRuleGroup(
-		com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup mdrRuleGroup) {
-		return _mdrRuleGroupLocalService.deleteMDRRuleGroup(mdrRuleGroup);
+	public com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _mdrRuleGroupLocalService.deletePersistedModel(persistedModel);
+	}
+
+	@Override
+	public void deleteRuleGroup(
+		com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup ruleGroup) {
+		_mdrRuleGroupLocalService.deleteRuleGroup(ruleGroup);
+	}
+
+	@Override
+	public void deleteRuleGroup(long ruleGroupId) {
+		_mdrRuleGroupLocalService.deleteRuleGroup(ruleGroupId);
+	}
+
+	@Override
+	public void deleteRuleGroups(long groupId) {
+		_mdrRuleGroupLocalService.deleteRuleGroups(groupId);
 	}
 
 	@Override
@@ -142,10 +197,10 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	}
 
 	/**
-	* Returns the number of rows that match the dynamic query.
+	* Returns the number of rows matching the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
-	* @return the number of rows that match the dynamic query
+	* @return the number of rows matching the dynamic query
 	*/
 	@Override
 	public long dynamicQueryCount(
@@ -154,11 +209,11 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	}
 
 	/**
-	* Returns the number of rows that match the dynamic query.
+	* Returns the number of rows matching the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
-	* @return the number of rows that match the dynamic query
+	* @return the number of rows matching the dynamic query
 	*/
 	@Override
 	public long dynamicQueryCount(
@@ -175,20 +230,6 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	}
 
 	/**
-	* Returns the m d r rule group with the matching UUID and company.
-	*
-	* @param uuid the m d r rule group's UUID
-	* @param companyId the primary key of the company
-	* @return the matching m d r rule group, or <code>null</code> if a matching m d r rule group could not be found
-	*/
-	@Override
-	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup fetchMDRRuleGroupByUuidAndCompanyId(
-		java.lang.String uuid, long companyId) {
-		return _mdrRuleGroupLocalService.fetchMDRRuleGroupByUuidAndCompanyId(uuid,
-			companyId);
-	}
-
-	/**
 	* Returns the m d r rule group matching the UUID and group.
 	*
 	* @param uuid the m d r rule group's UUID
@@ -200,6 +241,33 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 		java.lang.String uuid, long groupId) {
 		return _mdrRuleGroupLocalService.fetchMDRRuleGroupByUuidAndGroupId(uuid,
 			groupId);
+	}
+
+	@Override
+	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup fetchRuleGroup(
+		long ruleGroupId) {
+		return _mdrRuleGroupLocalService.fetchRuleGroup(ruleGroupId);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return _mdrRuleGroupLocalService.getActionableDynamicQuery();
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	@Override
+	public java.lang.String getBeanIdentifier() {
+		return _mdrRuleGroupLocalService.getBeanIdentifier();
+	}
+
+	@Override
+	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		return _mdrRuleGroupLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
 	/**
@@ -214,50 +282,6 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 		long ruleGroupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _mdrRuleGroupLocalService.getMDRRuleGroup(ruleGroupId);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
-		return _mdrRuleGroupLocalService.getActionableDynamicQuery();
-	}
-
-	@Override
-	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
-		return _mdrRuleGroupLocalService.getExportActionableDynamicQuery(portletDataContext);
-	}
-
-	/**
-	* @throws PortalException
-	*/
-	@Override
-	public com.liferay.portal.model.PersistedModel deletePersistedModel(
-		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _mdrRuleGroupLocalService.deletePersistedModel(persistedModel);
-	}
-
-	@Override
-	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _mdrRuleGroupLocalService.getPersistedModel(primaryKeyObj);
-	}
-
-	/**
-	* Returns the m d r rule group with the matching UUID and company.
-	*
-	* @param uuid the m d r rule group's UUID
-	* @param companyId the primary key of the company
-	* @return the matching m d r rule group
-	* @throws PortalException if a matching m d r rule group could not be found
-	*/
-	@Override
-	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup getMDRRuleGroupByUuidAndCompanyId(
-		java.lang.String uuid, long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _mdrRuleGroupLocalService.getMDRRuleGroupByUuidAndCompanyId(uuid,
-			companyId);
 	}
 
 	/**
@@ -294,6 +318,38 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	}
 
 	/**
+	* Returns all the m d r rule groups matching the UUID and company.
+	*
+	* @param uuid the UUID of the m d r rule groups
+	* @param companyId the primary key of the company
+	* @return the matching m d r rule groups, or an empty list if no matches were found
+	*/
+	@Override
+	public java.util.List<com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup> getMDRRuleGroupsByUuidAndCompanyId(
+		java.lang.String uuid, long companyId) {
+		return _mdrRuleGroupLocalService.getMDRRuleGroupsByUuidAndCompanyId(uuid,
+			companyId);
+	}
+
+	/**
+	* Returns a range of m d r rule groups matching the UUID and company.
+	*
+	* @param uuid the UUID of the m d r rule groups
+	* @param companyId the primary key of the company
+	* @param start the lower bound of the range of m d r rule groups
+	* @param end the upper bound of the range of m d r rule groups (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the range of matching m d r rule groups, or an empty list if no matches were found
+	*/
+	@Override
+	public java.util.List<com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup> getMDRRuleGroupsByUuidAndCompanyId(
+		java.lang.String uuid, long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup> orderByComparator) {
+		return _mdrRuleGroupLocalService.getMDRRuleGroupsByUuidAndCompanyId(uuid,
+			companyId, start, end, orderByComparator);
+	}
+
+	/**
 	* Returns the number of m d r rule groups.
 	*
 	* @return the number of m d r rule groups
@@ -303,87 +359,11 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 		return _mdrRuleGroupLocalService.getMDRRuleGroupsCount();
 	}
 
-	/**
-	* Updates the m d r rule group in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
-	*
-	* @param mdrRuleGroup the m d r rule group
-	* @return the m d r rule group that was updated
-	*/
 	@Override
-	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup updateMDRRuleGroup(
-		com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup mdrRuleGroup) {
-		return _mdrRuleGroupLocalService.updateMDRRuleGroup(mdrRuleGroup);
-	}
-
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _mdrRuleGroupLocalService.getBeanIdentifier();
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_mdrRuleGroupLocalService.setBeanIdentifier(beanIdentifier);
-	}
-
-	@Override
-	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup addRuleGroup(
-		long groupId,
-		java.util.Map<java.util.Locale, java.lang.String> nameMap,
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
-		com.liferay.portal.service.ServiceContext serviceContext)
+	public com.liferay.portal.model.PersistedModel getPersistedModel(
+		java.io.Serializable primaryKeyObj)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _mdrRuleGroupLocalService.addRuleGroup(groupId, nameMap,
-			descriptionMap, serviceContext);
-	}
-
-	@Override
-	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup copyRuleGroup(
-		long ruleGroupId, long groupId,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _mdrRuleGroupLocalService.copyRuleGroup(ruleGroupId, groupId,
-			serviceContext);
-	}
-
-	@Override
-	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup copyRuleGroup(
-		com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup ruleGroup,
-		long groupId, com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _mdrRuleGroupLocalService.copyRuleGroup(ruleGroup, groupId,
-			serviceContext);
-	}
-
-	@Override
-	public void deleteRuleGroup(long ruleGroupId) {
-		_mdrRuleGroupLocalService.deleteRuleGroup(ruleGroupId);
-	}
-
-	@Override
-	public void deleteRuleGroup(
-		com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup ruleGroup) {
-		_mdrRuleGroupLocalService.deleteRuleGroup(ruleGroup);
-	}
-
-	@Override
-	public void deleteRuleGroups(long groupId) {
-		_mdrRuleGroupLocalService.deleteRuleGroups(groupId);
-	}
-
-	@Override
-	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup fetchRuleGroup(
-		long ruleGroupId) {
-		return _mdrRuleGroupLocalService.fetchRuleGroup(ruleGroupId);
+		return _mdrRuleGroupLocalService.getPersistedModel(primaryKeyObj);
 	}
 
 	@Override
@@ -491,6 +471,28 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 		boolean andOperator) {
 		return _mdrRuleGroupLocalService.searchCount(groupId, name, params,
 			andOperator);
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	@Override
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_mdrRuleGroupLocalService.setBeanIdentifier(beanIdentifier);
+	}
+
+	/**
+	* Updates the m d r rule group in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	*
+	* @param mdrRuleGroup the m d r rule group
+	* @return the m d r rule group that was updated
+	*/
+	@Override
+	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup updateMDRRuleGroup(
+		com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup mdrRuleGroup) {
+		return _mdrRuleGroupLocalService.updateMDRRuleGroup(mdrRuleGroup);
 	}
 
 	@Override

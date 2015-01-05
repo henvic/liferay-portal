@@ -3,6 +3,7 @@
 
 .form-group-inline {
 	display: inline-block;
+	vertical-align: bottom;
 }
 
 .button-holder {
@@ -52,27 +53,15 @@
 }
 
 .input-flex-add-on {
+	position: relative;
 	width: 100%;
 
-	&.input-group {
-		input[type="text"] {
-			margin-bottom: 0;
-			margin-left: -1px;
-		}
-	}
-
-	&.input-group {
-		input[type="text"] {
-			margin-bottom: 0;
-		}
-
-		.input-group-addon {
-			height: auto;
-			text-align: left;
-			white-space: normal;
-
-			@include word-break(break-all);
-		}
+	&:after {
+		clear: left;
+		content: "";
+		display: block;
+		height: 0;
+		visibility: hidden;
 	}
 
 	input {
@@ -83,17 +72,44 @@
 	.input-group-addon {
 		float: left;
 		margin-top: -1px;
+		padding: 9px;
+		white-space: normal;
+		width: auto;
+
+		@include word-break(break-all);
+
+		@include respond-to(phone, tablet) {
+			font-size: 18px;
+			padding: 8px;
+		}
 	}
 
 	.input-localized-content {
 		clear: both;
+		left: 0;
 		padding-top: 10px;
+		position: absolute;
+		top: 100%;
+	}
+
+	.input-localized-input {
+		float: left;
 	}
 }
 
 .lfr-ddm-container {
 	.form-group label {
 		margin-left: 0;
+	}
+
+	.lfr-ddm-repeatable-helper {
+		display: none;
+	}
+
+	.lfr-ddm-repeatable-placeholder {
+		border: 1px dotted;
+		margin-top: 15px;
+		padding: 20px 0;
 	}
 
 	.field-wrapper {
@@ -110,6 +126,11 @@
 				display: inline;
 				float: none;
 			}
+		}
+
+		.file-entry-upload-progress {
+			height: 6px;
+			margin-top: -7px;
 		}
 
 		.lfr-ddm-repeatable-add-button, .lfr-ddm-repeatable-delete-button {
@@ -136,6 +157,10 @@
 			font-weight: bold;
 			margin-left: 0;
 		}
+
+		&, .field-wrapper-content {
+			margin-left: 15px;
+		}
 	}
 }
 
@@ -153,30 +178,13 @@
 	}
 }
 
-.lfr-input-resource {
-	width: @model_hints_constants_text_display_width@px;
-}
-
-.lfr-input-text, .form .fieldset .lfr-input-text-container input {
-	max-width: @model_hints_constants_text_display_width@px;
-	width: 100%;
-}
-
-.lfr-textarea, .form .fieldset .lfr-textarea-container textarea {
-	height: @model_hints_constants_textarea_display_height@px;
-	max-width: @model_hints_constants_textarea_display_width@px;
-	width: 100%;
-}
-
 @include respond-to(phone, tablet) {
-	.aui {
-		#{$form_text_fields},
-		select,
-		.input-group .input-group-addon,
-		.navbar-search .search-query {
-			font-size: 18px;
-			height: auto;
-			line-height: normal;
-		}
+	#{$form_text_fields},
+	select,
+	.input-group .input-group-addon,
+	.navbar-search .search-query {
+		font-size: 18px;
+		height: auto;
+		line-height: normal;
 	}
 }

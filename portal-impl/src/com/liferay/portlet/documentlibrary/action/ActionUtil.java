@@ -115,7 +115,9 @@ public class ActionUtil {
 			fileVersion = fileEntry.getFileVersion();
 		}
 
-		RawMetadataProcessorUtil.generateMetadata(fileVersion);
+		if (RawMetadataProcessorUtil.isSupported(fileVersion)) {
+			RawMetadataProcessorUtil.generateMetadata(fileVersion);
+		}
 
 		String cmd = ParamUtil.getString(request, Constants.CMD);
 
@@ -192,7 +194,10 @@ public class ActionUtil {
 
 		long folderId = ParamUtil.getLong(request, "folderId");
 
-		if (folderId <= 0) {
+		boolean ignoreRootFolder = ParamUtil.getBoolean(
+			request, "ignoreRootFolder");
+
+		if ((folderId <= 0) && !ignoreRootFolder) {
 			PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
 			String portletId = portletDisplay.getId();

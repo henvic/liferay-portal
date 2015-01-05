@@ -17,6 +17,7 @@
 <%@ include file="/html/taglib/init.jsp" %>
 
 <%
+String contents = (String)request.getAttribute("liferay-ui:input-editor:contents");
 String cssClass = GetterUtil.getString((String)request.getAttribute("liferay-ui:input-editor:cssClass"));
 String editorImpl = (String)request.getAttribute("liferay-ui:input-editor:editorImpl");
 String initMethod = (String)request.getAttribute("liferay-ui:input-editor:initMethod");
@@ -26,6 +27,12 @@ String onChangeMethod = (String)request.getAttribute("liferay-ui:input-editor:on
 
 if (Validator.isNotNull(onChangeMethod)) {
 	onChangeMethod = namespace + onChangeMethod;
+}
+
+String onInitMethod = (String)request.getAttribute("liferay-ui:input-editor:onInitMethod");
+
+if (Validator.isNotNull(onInitMethod)) {
+	onInitMethod = namespace + onInitMethod;
 }
 
 boolean resizable = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:input-editor:resizable"));
@@ -48,38 +55,12 @@ boolean skipEditorLoading = GetterUtil.getBoolean((String)request.getAttribute("
 </c:if>
 
 <div class="<%= cssClass %>">
-	<textarea id="<%= name %>" name="<%= name %>" style="height: 100%; width: 100%;"></textarea>
+	<textarea id="<%= name %>" name="<%= name %>" style="height: 100%; visibility: hidden; width: 100%;"><%= (contents != null) ? contents : StringPool.BLANK %></textarea>
 </div>
 
 <aui:script use="aui-node-base">
 	window['<%= name %>'] = {
 		onChangeCallbackCounter: 0,
-
-		destroy: function() {
-			tinyMCE.editors['<%= name %>'].destroy();
-
-			window['<%= name %>'] = null;
-		},
-
-		focus: function() {
-			tinyMCE.editors['<%= name %>'].focus();
-		},
-
-		fileBrowserCallback: function(field_name, url, type) {
-		},
-
-		getHTML: function() {
-			var data;
-
-			if (!window['<%= name %>'].instanceReady && window['<%= HtmlUtil.escape(namespace + initMethod) %>']) {
-				data = <%= HtmlUtil.escape(namespace + initMethod) %>();
-			}
-			else {
-				data = tinyMCE.editors['<%= name %>'].getContent();
-			}
-
-			return data;
-		},
 
 		init: function(value) {
 			if (typeof value != 'string') {
@@ -89,8 +70,34 @@ boolean skipEditorLoading = GetterUtil.getBoolean((String)request.getAttribute("
 			window['<%= name %>'].setHTML(value);
 		},
 
+		destroy: function() {
+			tinyMCE.editors['<%= name %>'].destroy();
+
+			window['<%= name %>'] = null;
+		},
+
+		fileBrowserCallback: function(field_name, url, type) {
+		},
+
+		focus: function() {
+			tinyMCE.editors['<%= name %>'].focus();
+		},
+
+		getHTML: function() {
+			var data;
+
+			if ((contents == null) && !window['<%= name %>'].instanceReady && window['<%= HtmlUtil.escape(namespace + initMethod) %>']) {
+				data = <%= HtmlUtil.escape(namespace + initMethod) %>();
+			}
+			else {
+				data = tinyMCE.editors['<%= name %>'].getContent();
+			}
+
+			return data;
+		},
+
 		initInstanceCallback: function() {
-			<c:if test="<%= Validator.isNotNull(initMethod) %>">
+			<c:if test="<%= (contents == null) && Validator.isNotNull(initMethod) %>">
 				window['<%= name %>'].init(<%= HtmlUtil.escape(namespace + initMethod) %>());
 			</c:if>
 
@@ -105,6 +112,10 @@ boolean skipEditorLoading = GetterUtil.getBoolean((String)request.getAttribute("
 					A.one(iframeDoc).addClass('aui');
 				}
 			}
+
+			<c:if test="<%= Validator.isNotNull(onInitMethod) %>">
+				window['<%= HtmlUtil.escapeJS(namespace + onInitMethod) %>']();
+			</c:if>
 
 			window['<%= name %>'].instanceReady = true;
 		},
@@ -173,8 +184,8 @@ boolean skipEditorLoading = GetterUtil.getBoolean((String)request.getAttribute("
 			relative_urls: false,
 			remove_script_host: false,
 			theme: 'advanced',
-			theme_advanced_buttons1_add_before: 'fontselect,fontsizeselect,forecolor,backcolor,separator',
 			theme_advanced_buttons2_add: 'separator,media,advhr,separator,preview,print',
+			theme_advanced_buttons1_add_before: 'fontselect,fontsizeselect,forecolor,backcolor,separator',
 			theme_advanced_buttons2_add_before: 'cut,copy,paste,search,replace',
 			theme_advanced_buttons3_add_before: 'tablecontrols,separator',
 			theme_advanced_disable: 'formatselect,styleselect,help',

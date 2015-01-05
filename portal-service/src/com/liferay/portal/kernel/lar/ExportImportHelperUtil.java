@@ -267,6 +267,13 @@ public class ExportImportHelperUtil {
 			portletDataContext, stagedModelType);
 	}
 
+	public static String getSelectedLayoutsJSON(
+		long groupId, boolean privateLayout, String selectedNodes) {
+
+		return getExportImportHelper().getSelectedLayoutsJSON(
+			groupId, privateLayout, selectedNodes);
+	}
+
 	public static FileEntry getTempFileEntry(
 			long groupId, long userId, String folderName)
 		throws PortalException {
@@ -524,14 +531,6 @@ public class ExportImportHelperUtil {
 			portletDataContext, portletPreferences, key, clazz, companyGroupId);
 	}
 
-	public static MissingReferences validateMissingReferences(
-			final PortletDataContext portletDataContext)
-		throws Exception {
-
-		return getExportImportHelper().validateMissingReferences(
-			portletDataContext);
-	}
-
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
 	 *             #validateMissingReferences(PortletDataContext)}
@@ -544,6 +543,14 @@ public class ExportImportHelperUtil {
 
 		return getExportImportHelper().validateMissingReferences(
 			userId, groupId, parameterMap, file);
+	}
+
+	public static MissingReferences validateMissingReferences(
+			final PortletDataContext portletDataContext)
+		throws Exception {
+
+		return getExportImportHelper().validateMissingReferences(
+			portletDataContext);
 	}
 
 	public static void writeManifestSummary(

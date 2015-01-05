@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.journal.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -25,17 +27,13 @@ import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
@@ -47,7 +45,6 @@ import com.liferay.portlet.journal.service.persistence.JournalFeedPersistence;
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -68,6 +65,7 @@ import java.util.Set;
  * @see JournalFeedUtil
  * @generated
  */
+@ProviderType
 public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	implements JournalFeedPersistence {
 	/*
@@ -2932,10 +2930,9 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		journalFeedImpl.setFeedId(journalFeed.getFeedId());
 		journalFeedImpl.setName(journalFeed.getName());
 		journalFeedImpl.setDescription(journalFeed.getDescription());
-		journalFeedImpl.setType(journalFeed.getType());
-		journalFeedImpl.setStructureId(journalFeed.getStructureId());
-		journalFeedImpl.setTemplateId(journalFeed.getTemplateId());
-		journalFeedImpl.setRendererTemplateId(journalFeed.getRendererTemplateId());
+		journalFeedImpl.setDDMStructureKey(journalFeed.getDDMStructureKey());
+		journalFeedImpl.setDDMTemplateKey(journalFeed.getDDMTemplateKey());
+		journalFeedImpl.setDDMRendererTemplateKey(journalFeed.getDDMRendererTemplateKey());
 		journalFeedImpl.setDelta(journalFeed.getDelta());
 		journalFeedImpl.setOrderByCol(journalFeed.getOrderByCol());
 		journalFeedImpl.setOrderByType(journalFeed.getOrderByType());
@@ -3309,25 +3306,6 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * Initializes the journal feed persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portlet.journal.model.JournalFeed")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<JournalFeed>> listenersList = new ArrayList<ModelListener<JournalFeed>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<JournalFeed>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
 	}
 
 	public void destroy() {
@@ -3356,11 +3334,11 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No JournalFeed exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No JournalFeed exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(JournalFeedPersistenceImpl.class);
-	private static Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
-				"uuid", "id", "type"
+	private static final Log _log = LogFactoryUtil.getLog(JournalFeedPersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+				"uuid", "id"
 			});
-	private static JournalFeed _nullJournalFeed = new JournalFeedImpl() {
+	private static final JournalFeed _nullJournalFeed = new JournalFeedImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -3372,7 +3350,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 			}
 		};
 
-	private static CacheModel<JournalFeed> _nullJournalFeedCacheModel = new CacheModel<JournalFeed>() {
+	private static final CacheModel<JournalFeed> _nullJournalFeedCacheModel = new CacheModel<JournalFeed>() {
 			@Override
 			public JournalFeed toEntityModel() {
 				return _nullJournalFeed;

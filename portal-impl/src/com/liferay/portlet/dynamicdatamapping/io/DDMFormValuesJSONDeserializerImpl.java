@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
 import com.liferay.portlet.dynamicdatamapping.model.LocalizedValue;
 import com.liferay.portlet.dynamicdatamapping.model.UnlocalizedValue;
 import com.liferay.portlet.dynamicdatamapping.model.Value;
@@ -28,9 +29,11 @@ import com.liferay.portlet.dynamicdatamapping.storage.DDMFormFieldValue;
 import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * @author Marcellus Tavares
@@ -39,14 +42,15 @@ public class DDMFormValuesJSONDeserializerImpl
 	implements DDMFormValuesJSONDeserializer {
 
 	@Override
-	public DDMFormValues deserialize(String serializedDDMFormValues)
+	public DDMFormValues deserialize(
+			DDMForm ddmForm, String serializedDDMFormValues)
 		throws PortalException {
 
 		try {
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 				serializedDDMFormValues);
 
-			DDMFormValues ddmFormValues = new DDMFormValues();
+			DDMFormValues ddmFormValues = new DDMFormValues(ddmForm);
 
 			setDDMFormValuesAvailableLocales(
 				jsonObject.getJSONArray("availableLanguageIds"), ddmFormValues);
@@ -63,8 +67,8 @@ public class DDMFormValuesJSONDeserializerImpl
 		}
 	}
 
-	protected List<Locale> getAvailableLocales(JSONArray jsonArray) {
-		List<Locale> availableLocales = new ArrayList<Locale>();
+	protected Set<Locale> getAvailableLocales(JSONArray jsonArray) {
+		Set<Locale> availableLocales = new HashSet<Locale>();
 
 		for (int i = 0; i < jsonArray.length(); i++) {
 			Locale availableLocale = LocaleUtil.fromLanguageId(
@@ -79,6 +83,7 @@ public class DDMFormValuesJSONDeserializerImpl
 	protected DDMFormFieldValue getDDMFormFieldValue(JSONObject jsonObject) {
 		DDMFormFieldValue ddmFormFieldValue = new DDMFormFieldValue();
 
+		ddmFormFieldValue.setInstanceId(jsonObject.getString("instanceId"));
 		ddmFormFieldValue.setName(jsonObject.getString("name"));
 
 		setDDMFormFieldValueValue(jsonObject, ddmFormFieldValue);
@@ -113,7 +118,7 @@ public class DDMFormValuesJSONDeserializerImpl
 		while (itr.hasNext()) {
 			String languageId = itr.next();
 
-			localizedValue.addValue(
+			localizedValue.addString(
 				LocaleUtil.fromLanguageId(languageId),
 				jsonObject.getString(languageId));
 		}
@@ -141,7 +146,7 @@ public class DDMFormValuesJSONDeserializerImpl
 		while (keys.hasNext()) {
 			String key = keys.next();
 
-			if (!LanguageUtil.isAvailableLanguageCode(key)) {
+			if (!LanguageUtil.isAvailableLocale(key)) {
 				return false;
 			}
 		}
@@ -203,7 +208,7 @@ public class DDMFormValuesJSONDeserializerImpl
 	protected void setDDMFormValuesAvailableLocales(
 		JSONArray jsonArray, DDMFormValues ddmFormValues) {
 
-		List<Locale> availableLocales = getAvailableLocales(jsonArray);
+		Set<Locale> availableLocales = getAvailableLocales(jsonArray);
 
 		ddmFormValues.setAvailableLocales(availableLocales);
 	}

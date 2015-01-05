@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.messageboards.service.persistence.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -26,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -36,7 +36,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
@@ -50,7 +49,6 @@ import java.io.Serializable;
 
 import java.sql.Timestamp;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -72,6 +70,7 @@ import java.util.Set;
  * @see MBThreadUtil
  * @generated
  */
+@ProviderType
 public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 	implements MBThreadPersistence {
 	/*
@@ -13354,25 +13353,6 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 	 * Initializes the message boards thread persistence.
 	 */
 	public void afterPropertiesSet() {
-		String[] listenerClassNames = StringUtil.split(GetterUtil.getString(
-					com.liferay.portal.util.PropsUtil.get(
-						"value.object.listener.com.liferay.portlet.messageboards.model.MBThread")));
-
-		if (listenerClassNames.length > 0) {
-			try {
-				List<ModelListener<MBThread>> listenersList = new ArrayList<ModelListener<MBThread>>();
-
-				for (String listenerClassName : listenerClassNames) {
-					listenersList.add((ModelListener<MBThread>)InstanceFactory.newInstance(
-							getClassLoader(), listenerClassName));
-				}
-
-				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
-			}
-			catch (Exception e) {
-				_log.error(e);
-			}
-		}
 	}
 
 	public void destroy() {
@@ -13401,11 +13381,11 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No MBThread exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No MBThread exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
-	private static Log _log = LogFactoryUtil.getLog(MBThreadPersistenceImpl.class);
-	private static Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+	private static final Log _log = LogFactoryUtil.getLog(MBThreadPersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"uuid"
 			});
-	private static MBThread _nullMBThread = new MBThreadImpl() {
+	private static final MBThread _nullMBThread = new MBThreadImpl() {
 			@Override
 			public Object clone() {
 				return this;
@@ -13417,7 +13397,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 			}
 		};
 
-	private static CacheModel<MBThread> _nullMBThreadCacheModel = new CacheModel<MBThread>() {
+	private static final CacheModel<MBThread> _nullMBThreadCacheModel = new CacheModel<MBThread>() {
 			@Override
 			public MBThread toEntityModel() {
 				return _nullMBThread;

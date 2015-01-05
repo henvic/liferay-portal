@@ -14,6 +14,9 @@
 
 package com.liferay.portlet.messageboards.model.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.model.CacheModel;
 
@@ -33,8 +36,33 @@ import java.util.Date;
  * @see MBStatsUser
  * @generated
  */
+@ProviderType
 public class MBStatsUserCacheModel implements CacheModel<MBStatsUser>,
 	Externalizable {
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof MBStatsUserCacheModel)) {
+			return false;
+		}
+
+		MBStatsUserCacheModel mbStatsUserCacheModel = (MBStatsUserCacheModel)obj;
+
+		if (statsUserId == mbStatsUserCacheModel.statsUserId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, statsUserId);
+	}
+
 	@Override
 	public String toString() {
 		StringBundler sb = new StringBundler(11);
