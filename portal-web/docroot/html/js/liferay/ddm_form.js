@@ -126,7 +126,7 @@ AUI.add(
 				var fieldDefinition = instance.getFieldInfo(definition, 'name', fieldName);
 
 				var FieldClass = getFieldClass(fieldDefinition.type);
-
+				
 				var field = new FieldClass(
 					A.merge(
 						instance.getAttrs(A.Object.keys(DDMPortletSupport.ATTRS)),
@@ -263,7 +263,7 @@ AUI.add(
 
 					renderUI: function() {
 						var instance = this;
-
+						
 						if (instance.get('repeatable')) {
 							instance.renderRepeatableUI();
 							instance.syncRepeatablelUI();
@@ -272,6 +272,8 @@ AUI.add(
 						instance.syncLabelUI();
 						instance.syncValueUI();
 
+						AArray.invoke(instance.get('fields'), 'renderUI');
+						
 						instance.fire(
 							'render',
 							{
@@ -334,6 +336,8 @@ AUI.add(
 						else if (currentTarget.hasClass('lfr-ddm-repeatable-delete-button')) {
 							instance.remove();
 						}
+						
+						event.stopPropagation()
 					},
 
 					_valueLocalizationMap: function() {
@@ -480,7 +484,7 @@ AUI.add(
 								field.set('parent', parent);
 
 								field.renderUI();
-
+								
 								instance.fire(
 									'repeat',
 									{
