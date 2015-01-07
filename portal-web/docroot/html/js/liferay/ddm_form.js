@@ -1461,8 +1461,6 @@ AUI.add(
 
 							liferayForm.formValidator.set('rules', validatorRules);
 						}
-
-						AArray.invoke(field.getRepeatedSiblings(), 'syncRepeatablelUI');
 					},
 
 					_onLiferaySubmitForm: function(event) {
