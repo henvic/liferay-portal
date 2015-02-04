@@ -106,7 +106,17 @@ properties.read(portalProperties, function(data) {
                 served: true
             },
 
-            'test/js/*-test.js'
+            {
+                pattern: 'test/js/*/assets/*',
+                included: false,
+                served: true
+            },
+
+            {
+                pattern: 'test/js/*/*-test.js',
+                included: true,
+                served: true
+            }
         ]
     );
 
