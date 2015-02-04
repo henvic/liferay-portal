@@ -35,6 +35,9 @@ window.Liferay = {
 		},
 		getPathThemeImages: function() {
 			return '../../themes/classic/images';
+		},
+		isAddSessionIdToURL: function() {
+			return false;
 		}
 	}
 };
