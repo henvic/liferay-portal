@@ -24,8 +24,6 @@ if (Validator.isNotNull(portletResourceNamespace)) {
 if (Validator.isNull(script)) {
 	script = structure.getDefinition();
 }
-
-JSONArray fieldsJSONArray = _getFormTemplateFieldsJSONArray(structure, script);
 %>
 
 <aui:input name="language" type="hidden" value="xsd" />

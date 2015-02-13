@@ -39,6 +39,12 @@ public interface DDMFormFieldType {
 	public DDMFormFieldValueRendererAccessor
 		getDDMFormFieldValueRendererAccessor(Locale locale);
 
+	public String getFieldJavaScript();
+
+	public String getIcon();
+
+	public String getLabel();
+
 	public String getName();
 
 }

@@ -14,11 +14,14 @@
 
 package com.liferay.dynamicdatamapping.type;
 
+import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldRenderer;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldType;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldValueAccessor;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldValueRendererAccessor;
 
+import java.io.IOException;
 import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
@@ -48,6 +51,28 @@ public class TextDDMFormFieldType implements DDMFormFieldType {
 
 		return new TextDDMFormFieldValueRendererAccessor(
 			getDDMFormFieldValueAccessor(locale));
+	}
+
+	@Override
+	public String getFieldJavaScript() {
+		try {
+			return FileUtil.read("META-INF/field.js");
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+	
+		return StringPool.BLANK;
+	}
+
+	@Override
+	public String getIcon() {
+		return "icon-test";
+	}
+
+	@Override
+	public String getLabel() {
+		return "Text";
 	}
 
 	@Override

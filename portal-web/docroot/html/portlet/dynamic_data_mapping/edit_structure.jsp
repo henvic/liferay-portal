@@ -14,6 +14,8 @@
  */
 --%>
 
+<%@ page import="com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout" %>
+
 <%@ include file="/html/portlet/dynamic_data_mapping/init.jsp" %>
 
 <%
@@ -47,6 +49,8 @@ String script = BeanParamUtil.getString(structure, request, "definition");
 
 JSONArray fieldsJSONArray = null;
 
+DDMFormLayout ddmFormLayout = null;
+
 if (Validator.isNotNull(script)) {
 	if (structure != null) {
 		try {
@@ -55,6 +59,8 @@ if (Validator.isNotNull(script)) {
 		catch (Exception e) {
 			fieldsJSONArray = DDMXSDUtil.getJSONArray(structure.getDefinition());
 		}
+
+		ddmFormLayout = structure.getDDMFormLayout();
 	}
 	else {
 		try {
@@ -62,7 +68,12 @@ if (Validator.isNotNull(script)) {
 		}
 		catch (Exception e) {
 		}
+
+		ddmFormLayout = new DDMFormLayout();
 	}
+}
+else {
+	ddmFormLayout = new DDMFormLayout();
 }
 %>
 

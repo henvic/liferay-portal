@@ -14,6 +14,9 @@ window.Liferay = {
 		},
 		getJavaScriptRootPath: function() {
 			return '/base/docroot/html/js';
+		},
+		getPortletRootPath: function() {
+			return 'base/docroot/html/portlet';
 		}
 	},
 
