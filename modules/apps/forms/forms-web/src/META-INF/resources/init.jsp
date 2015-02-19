@@ -14,11 +14,8 @@
  */
 --%>
 
-<%@ page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
-page import="com.liferay.portal.kernel.util.StringPool" %><%@
-page import="com.liferay.portal.util.PortalUtil" %><%@
-page import="com.liferay.portlet.PortalPreferences" %><%@
-page import="com.liferay.portlet.PortletPreferencesFactoryUtil" %>
+<%@ page import="com.liferay.forms.web.portlet.display.FormsRequestHelper" %><%@
+page import="com.liferay.portal.kernel.util.ParamUtil" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
@@ -69,47 +66,41 @@ page import="com.liferay.portlet.dynamicdatamapping.util.DDMTemplateHelperUtil" 
 page import="com.liferay.portlet.dynamicdatamapping.util.DDMUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.util.DDMXSDUtil" %>
 
-<%@ page import="java.util.StringTokenizer" %>
+<%@ page import="com.liferay.portlet.dynamicdatamapping.search.StructureSearchTerms" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.service.DDMStructureServiceUtil" %><%@
+page import="com.liferay.portal.kernel.dao.search.RowChecker" %><%@
+page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
+page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %><%@
+page import="com.liferay.portal.kernel.util.Constants" %><%@
+page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
+page import="com.liferay.portal.kernel.util.OrderByComparator" %><%@
+page import="com.liferay.portal.kernel.util.Validator" %><%@
+page import="com.liferay.portal.kernel.util.WebKeys" %><%@
+page import="com.liferay.portal.model.Group" %><%@
+page import="com.liferay.portal.security.permission.ResourceActionsUtil" %><%@
+page import="com.liferay.portal.service.GroupLocalServiceUtil" %><%@
+page import="com.liferay.portal.util.PortletKeys" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.model.DDMStructure" %><%@
+page import="javax.portlet.PortletURL" %>
+
+<%@ page import="com.liferay.portal.util.PortalUtil" %><%@
+page import="java.util.StringTokenizer" %>
 
 <liferay-theme:defineObjects />
 <portlet:defineObjects />
 
 <%
-PortalPreferences portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(request);
-
 String refererPortletName = ParamUtil.getString(request, "refererPortletName", portletName);
 String refererWebDAVToken = ParamUtil.getString(request, "refererWebDAVToken", portletConfig.getInitParameter("refererWebDAVToken"));
 String scopeTitle = ParamUtil.getString(request, "scopeTitle");
-boolean showAncestorScopes = ParamUtil.getBoolean(request, "showAncestorScopes");
 boolean showManageTemplates = ParamUtil.getBoolean(request, "showManageTemplates", true);
 boolean showToolbar = ParamUtil.getBoolean(request, "showToolbar", true);
 
-DDMDisplay ddmDisplay = DDMDisplayRegistryUtil.getDDMDisplay(refererPortletName);
+FormsRequestHelper formsRequestHelper = new FormsRequestHelper(request);
 
-long scopeClassNameId = PortalUtil.getClassNameId(ddmDisplay.getStructureType());
+DDMDisplay ddmDisplay = formsRequestHelper.getDDMDisplay();
 
 String scopeAvailableFields = ddmDisplay.getAvailableFields();
 String scopeStorageType = ddmDisplay.getStorageType();
 String scopeTemplateType = ddmDisplay.getTemplateType();
-
-String storageTypeValue = StringPool.BLANK;
-
-if (scopeStorageType.equals("expando")) {
-	storageTypeValue = StorageType.EXPANDO.getValue();
-}
-else if (scopeStorageType.equals("json")) {
-	storageTypeValue = StorageType.JSON.getValue();
-}
-else if (scopeStorageType.equals("xml")) {
-	storageTypeValue = StorageType.XML.getValue();
-}
-
-String templateTypeValue = StringPool.BLANK;
-
-if (scopeTemplateType.equals(DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY)) {
-	templateTypeValue = DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY;
-}
-else if (scopeTemplateType.equals(DDMTemplateConstants.TEMPLATE_TYPE_FORM)) {
-	templateTypeValue = DDMTemplateConstants.TEMPLATE_TYPE_FORM;
-}
 %>
