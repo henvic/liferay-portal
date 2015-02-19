@@ -1,9 +1,9 @@
 Bundle-Name: Liferay Forms Web
-Bundle-SymbolicName: com.liferay.rss.web
+Bundle-SymbolicName: com.liferay.forms.web
 Bundle-Version: 1.0.0
 Include-Resource:\
 	classes,\
-	META-INF/resources=src/META-INF/resources
+	META-INF=src/META-INF
 Require-Capability:\
 	osgi.extender;filter:="(&(osgi.extender=jsp.taglib)(uri=http://java.sun.com/portlet_2_0))",\
 	osgi.extender;filter:="(&(osgi.extender=jsp.taglib)(uri=http://liferay.com/tld/aui))",\

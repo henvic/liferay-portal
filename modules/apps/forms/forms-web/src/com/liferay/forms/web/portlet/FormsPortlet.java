@@ -12,13 +12,18 @@
  * details.
  */
 
-package com.liferay.forms.web.portlet.action;
+package com.liferay.forms.web.portlet;
+
+import com.liferay.portal.kernel.portlet.LiferayPortletConfig;
+import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.servlet.ServletContextPool;
+import com.liferay.portal.model.PortletApp;
 
 import javax.portlet.Portlet;
+import javax.portlet.PortletConfig;
+import javax.portlet.PortletException;
 
 import org.osgi.service.component.annotations.Component;
-
-import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 
 /**
  * @author Bruno Basto
@@ -41,11 +46,27 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 		"javax.portlet.init-param.template-path=/",
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.preferences=classpath:/META-INF/portlet-preferences/default-portlet-preferences.xml",
-		"javax.portlet.resource-bundle=content.Language",
+//		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=power-user,user"
 	},
 	service = Portlet.class
 )
 public class FormsPortlet extends MVCPortlet {
+
+	@Override
+	public void init(PortletConfig portletConfig) throws PortletException {
+		super.init(portletConfig);
+
+		LiferayPortletConfig liferayPortletConfig =
+			(LiferayPortletConfig)portletConfig;
+
+		com.liferay.portal.model.Portlet portlet =
+			liferayPortletConfig.getPortlet();
+
+		PortletApp portletApp = portlet.getPortletApp();
+
+		ServletContextPool.put(
+			portletApp.getServletContextName(), portletApp.getServletContext());
+	}
 
 }

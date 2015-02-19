@@ -12,32 +12,14 @@
  * details.
  */
 
-package com.liferay.forms.web.portlet.action;
-
-import com.liferay.portal.util.PortalUtil;
-
-import javax.portlet.PortletRequest;
-
-import javax.servlet.http.HttpServletRequest;
+package com.liferay.forms.web.constants;
 
 /**
  * @author Bruno Basto
  */
-public class ActionUtil {
+public class FormsPortletKeys {
 
-	public static void getForm(HttpServletRequest request)
-		throws Exception {
-
-		request.setAttribute("a", "b");
-	}
-
-	public static void getQuestion(PortletRequest portletRequest)
-		throws Exception {
-
-		HttpServletRequest request = PortalUtil.getHttpServletRequest(
-			portletRequest);
-
-		getForm(request);
-	}
+	public static final String FORMS =
+		"com_liferay_forms_web_portlet_FormsPortlet";
 
 }
