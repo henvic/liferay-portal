@@ -20,7 +20,11 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldType;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldTypeRegistryUtil;
+import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldTypeSetting;
+import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldTypeSettingEditor;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -44,7 +48,11 @@ public class DDMFormFieldTypesHelper {
 					ddmFormFieldTypeName);
 
 			ddmFormFieldTypeJSONObject.put(
-				"fieldClass", ddmFormFieldType.getFieldJavaScript());
+				"advancedSettings",
+				getSettings(ddmFormFieldType.getAdvancedSettings()));
+			ddmFormFieldTypeJSONObject.put(
+				"basicSettings",
+				getSettings(ddmFormFieldType.getBasicSettings()));
 			ddmFormFieldTypeJSONObject.put("icon", ddmFormFieldType.getIcon());
 			ddmFormFieldTypeJSONObject.put(
 				"label", ddmFormFieldType.getLabel());
@@ -54,6 +62,32 @@ public class DDMFormFieldTypesHelper {
 		}
 
 		return jsonArray;
+	}
+	
+	private static JSONObject getSettings(List<DDMFormFieldTypeSetting> settings) {
+		JSONObject settingsJSONObject = JSONFactoryUtil.createJSONObject();
+
+		for (DDMFormFieldTypeSetting setting : settings) {
+			settingsJSONObject.put("attrName", setting.getName());
+
+			JSONObject optionsJSONObject = JSONFactoryUtil.createJSONObject();
+
+			DDMFormFieldTypeSettingEditor editor =
+				setting.getDDMFormFieldTypeSettingEditor();
+
+			Map<String, String> options = editor.getOptions();
+
+			Set<String> optionsKeys = options.keySet();
+
+			for (String key : optionsKeys) {
+				optionsJSONObject.put(key, options.get(key));
+			}
+
+			settingsJSONObject.put("editorOptions", optionsJSONObject);
+			settingsJSONObject.put("editorType", editor.getEditorType());
+		}
+
+		return settingsJSONObject;
 	}
 
 }
