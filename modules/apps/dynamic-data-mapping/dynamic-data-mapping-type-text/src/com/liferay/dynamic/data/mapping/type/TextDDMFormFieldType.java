@@ -109,4 +109,22 @@ public class TextDDMFormFieldType implements DDMFormFieldType {
 		return file.toURI().toURL();
 	}
 
+	@Override
+	public String getFieldJavaScript() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getIcon() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getLabel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

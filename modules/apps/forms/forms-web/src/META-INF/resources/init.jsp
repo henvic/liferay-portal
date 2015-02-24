@@ -14,30 +14,58 @@
  */
 --%>
 
-<%@ page import="com.liferay.forms.web.portlet.display.FormsRequestHelper" %><%@
-page import="com.liferay.portal.kernel.util.ParamUtil" %>
-
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-
-<%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
-
-<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+<%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
-taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
+taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %><%@
+taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
+taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
 <%@ page contentType="text/html; charset=UTF-8" %>
 
 <%@ page import="com.liferay.portal.kernel.editor.EditorUtil" %><%@
+page import="com.liferay.forms.web.portlet.display.FormsRequestHelper"%><%@
+page import="com.liferay.portal.kernel.dao.search.ResultRow" %><%@
+page import="com.liferay.portal.kernel.dao.search.RowChecker" %><%@
+page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
+page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %><%@
+page import="com.liferay.portal.kernel.template.comparator.TemplateHandlerComparator" %><%@
 page import="com.liferay.portal.kernel.template.TemplateConstants" %><%@
 page import="com.liferay.portal.kernel.template.TemplateVariableDefinition" %><%@
 page import="com.liferay.portal.kernel.template.TemplateVariableGroup" %><%@
-page import="com.liferay.portal.kernel.template.comparator.TemplateHandlerComparator" %><%@
+page import="com.liferay.portal.kernel.util.Constants" %><%@
+page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
+page import="com.liferay.portal.kernel.util.HttpUtil" %><%@
+page import="com.liferay.portal.kernel.util.OrderByComparator" %><%@
+page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
+page import="com.liferay.portal.kernel.util.StringBundler" %><%@
+page import="com.liferay.portal.kernel.util.StringPool" %><%@
+page import="com.liferay.portal.kernel.util.Validator" %><%@
+page import="com.liferay.portal.model.Group" %><%@
+page import="com.liferay.portal.security.permission.ActionKeys" %><%@
+page import="com.liferay.portal.security.permission.ResourceActionsUtil" %><%@
+page import="com.liferay.portal.service.GroupLocalServiceUtil" %><%@
 page import="com.liferay.portal.template.TemplateContextHelper" %><%@
+page import="com.liferay.portal.util.PortalUtil" %><%@
+page import="com.liferay.portal.util.PortletKeys" %><%@
 page import="com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata" %><%@
 page import="com.liferay.portlet.dynamicdatalists.model.DDLRecordSet" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.model.DDMStructure" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.RequiredStructureException" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.RequiredTemplateException" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.search.TemplateDisplayTerms" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.search.TemplateSearch" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.search.TemplateSearchTerms" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.service.DDMStorageLinkLocalServiceUtil" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.service.DDMStructureServiceUtil" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.service.DDMStructureServiceUtil" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.service.DDMTemplateServiceUtil" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.service.permission.DDMPermission" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.service.permission.DDMStructurePermission" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.storage.StorageType" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.StructureDefinitionException" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.StructureDuplicateElementException" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.StructureFieldException" %><%@
@@ -46,61 +74,55 @@ page import="com.liferay.portlet.dynamicdatamapping.TemplateNameException" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.TemplateScriptException" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.TemplateSmallImageNameException" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.TemplateSmallImageSizeException" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.search.StructureDisplayTerms" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.search.StructureSearch" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.search.StructureSearchTerms" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.search.TemplateDisplayTerms" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.search.TemplateSearch" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.search.TemplateSearchTerms" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.service.DDMStorageLinkLocalServiceUtil" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.service.DDMStructureServiceUtil" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.service.DDMTemplateServiceUtil" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.service.permission.DDMPermission" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.service.permission.DDMStructurePermission" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.storage.StorageType" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.util.DDMDisplay" %><%@
+page import="com.liferay.portal.kernel.dao.search.SearchContainer"%><%@
 page import="com.liferay.portlet.dynamicdatamapping.util.DDMDisplayRegistryUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.util.DDMTemplateHelperUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.util.DDMUtil" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.util.DDMXSDUtil" %>
-
-<%@ page import="com.liferay.portlet.dynamicdatamapping.search.StructureSearchTerms" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.service.DDMStructureServiceUtil" %><%@
-page import="com.liferay.portal.kernel.dao.search.RowChecker" %><%@
-page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
-page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %><%@
-page import="com.liferay.portal.kernel.util.Constants" %><%@
-page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
-page import="com.liferay.portal.kernel.util.OrderByComparator" %><%@
-page import="com.liferay.portal.kernel.util.Validator" %><%@
-page import="com.liferay.portal.kernel.util.WebKeys" %><%@
-page import="com.liferay.portal.model.Group" %><%@
-page import="com.liferay.portal.security.permission.ResourceActionsUtil" %><%@
-page import="com.liferay.portal.service.GroupLocalServiceUtil" %><%@
-page import="com.liferay.portal.util.PortletKeys" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.model.DDMStructure" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.util.DDMXSDUtil" %><%@
+page import="java.util.StringTokenizer" %><%@
+page import="javax.portlet.WindowState"%><%@
+page import="com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout" %><%@
 page import="javax.portlet.PortletURL" %>
 
-<%@ page import="com.liferay.portal.util.PortalUtil" %><%@
-page import="java.util.StringTokenizer" %>
+<%@page import="com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil"%>
+<%@page import="javax.portlet.PortletRequest"%>
+<%@page import="com.liferay.portlet.PortletURLFactoryUtil"%>
+<%@page import="com.liferay.portal.util.PropsValues"%>
+<%@page import="com.liferay.portal.kernel.portlet.LiferayWindowState"%>
+<%@page import="com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalServiceUtil"%>
+<%@page import="com.liferay.portal.kernel.util.StringUtil"%>
+<%@page import="com.liferay.portal.LocaleException"%>
+<%@page import="com.liferay.portlet.dynamicdatamapping.NoSuchStructureException"%>
+<%@page import="com.liferay.portal.kernel.json.JSONArray"%>
+<%@page import="com.liferay.portal.kernel.bean.BeanParamUtil"%>
+<%@page import="com.liferay.portal.util.WebKeys"%>
+<%@page import="com.liferay.portal.kernel.util.LocalizationUtil"%>
+<%@page import="com.liferay.portal.kernel.util.LocaleUtil"%>
+<%@page import="com.liferay.portal.kernel.json.JSONObject"%>
+<%@page import="com.liferay.portal.kernel.json.JSONArray"%>
+<%@page import="com.liferay.portal.kernel.json.JSONFactoryUtil"%>
+<%@page import="com.liferay.portal.kernel.language.LanguageUtil"%>
+<%@page import="java.util.Locale"%>
+<%@ page import="com.liferay.portlet.dynamicdatamapping.io.DDMFormLayoutJSONSerializerUtil" %>
+<%@ page import="com.liferay.portlet.dynamicdatamapping.util.DDMFormFieldTypesHelper" %>
+
+<%@page import="com.liferay.portal.kernel.dao.search.DisplayTerms"%>
 
 <liferay-theme:defineObjects />
 <portlet:defineObjects />
 
 <%
-String refererPortletName = ParamUtil.getString(request, "refererPortletName", portletName);
-String refererWebDAVToken = ParamUtil.getString(request, "refererWebDAVToken", portletConfig.getInitParameter("refererWebDAVToken"));
 String scopeTitle = ParamUtil.getString(request, "scopeTitle");
-boolean showManageTemplates = ParamUtil.getBoolean(request, "showManageTemplates", true);
 boolean showToolbar = ParamUtil.getBoolean(request, "showToolbar", true);
 
 FormsRequestHelper formsRequestHelper = new FormsRequestHelper(request);
 
 DDMDisplay ddmDisplay = formsRequestHelper.getDDMDisplay();
 
-String scopeAvailableFields = ddmDisplay.getAvailableFields();
-String scopeStorageType = ddmDisplay.getStorageType();
-String scopeTemplateType = ddmDisplay.getTemplateType();
+WindowState windowState = liferayPortletRequest.getWindowState();
 %>
+
+<aui:script>
+	Liferay.namespace('Forms').portletNamespace = '<portlet:namespace />';
+</aui:script>

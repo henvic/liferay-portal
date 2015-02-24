@@ -33,14 +33,20 @@ long groupId = ParamUtil.getLong(request, "groupId", scopeGroupId);
 			</portlet:renderURL>
 
 			<portlet:renderURL var="addStructureURL">
-				<portlet:param name="struts_action" value="/dynamic_data_mapping/edit_structure" />
-				<portlet:param name="redirect" value="<%= viewStructuresURL %>" />
+				<portlet:param name="mvcPath" value="/edit_form.jsp" />
 				<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
+				<portlet:param name="redirect" value="<%= PortalUtil.getCurrentURL(request) %>" />
 			</portlet:renderURL>
 
 			<aui:nav-item href="<%= addStructureURL %>" iconCssClass="icon-plus" label="add" selected='<%= toolbarItem.equals("add") %>' />
 		</c:if>
 	</aui:nav>
 
-	<aui:nav-bar-search file="/html/portlet/dynamic_data_mapping/structure_search.jsp" searchContainer="<%= searchContainer %>" />
+	<aui:nav-bar-search searchContainer="<%= searchContainer %>">
+		<%
+		request.setAttribute(WebKeys.SEARCH_CONTAINER, searchContainer);
+		%>
+		
+		<liferay-util:include page="/form_search.jsp" servletContext="<%= application %>" />
+	</aui:nav-bar-search>
 </aui:nav-bar>

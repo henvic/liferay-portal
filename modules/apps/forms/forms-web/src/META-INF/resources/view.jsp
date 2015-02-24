@@ -14,6 +14,9 @@
  */
 --%>
 
+<%@page import="com.liferay.portlet.dynamicdatalists.search.RecordSetSearch"%>
+<%@ page import="com.liferay.portlet.dynamicdatalists.service.permission.DDLRecordSetPermission" %>
+
 <%@ include file="init.jsp" %>
 
 <%
@@ -24,52 +27,23 @@ long groupId = ParamUtil.getLong(request, "groupId", themeDisplay.getSiteGroupId
 PortletURL portletURL = formsRequestHelper.getViewPortletURL(renderResponse, groupId, tabs1);
 %>
 
-<liferay-ui:error exception="<%= RequiredStructureException.class %>">
-
-	<%
-	RequiredStructureException rse = (RequiredStructureException)errorException;
-	%>
-
-	<c:choose>
-		<c:when test="<%= rse.getType() == RequiredStructureException.REFERENCED_TEMPLATE %>">
-			<liferay-ui:message key="required-structures-could-not-be-deleted.-they-are-referenced-by-templates" />
-		</c:when>
-		<c:otherwise>
-			<liferay-ui:message key="required-structures-could-not-be-deleted" />
-		</c:otherwise>
-	</c:choose>
-</liferay-ui:error>
-
 <aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
 	<aui:input name="<%= Constants.CMD %>" type="hidden" />
 	<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 	<aui:input name="deleteStructureIds" type="hidden" />
 
-	<%
-	String orderByCol = formsRequestHelper.getOrderByCol();
-	String orderByType = formsRequestHelper.getOrderByType();
-
-	OrderByComparator<DDMStructure> orderByComparator = formsRequestHelper.getOrderByComparator();
-	%>
-
 	<liferay-ui:search-container
-		orderByCol="<%= orderByCol %>"
-		orderByComparator="<%= orderByComparator %>"
-		orderByType="<%= orderByType %>"
 		rowChecker="<%= new RowChecker(renderResponse) %>"
-		searchContainer="<%= new StructureSearch(renderRequest, portletURL) %>"
+		searchContainer="<%= new RecordSetSearch(renderRequest, portletURL) %>"
 	>
 
-		<c:if test="<%= showToolbar %>">
+		<%
+		request.setAttribute(WebKeys.SEARCH_CONTAINER, searchContainer);
+		%>
 
-			<%
-			request.setAttribute(WebKeys.SEARCH_CONTAINER, searchContainer);
-			%>
-
-			<liferay-util:include page="toolbar.jsp">
-				<liferay-util:param name="groupId" value="<%= String.valueOf(groupId) %>" />
-			</liferay-util:include>
-		</c:if>
+		<liferay-util:include page="/toolbar.jsp" servletContext="<%= application %>">
+			<liferay-util:param name="groupId" value="<%= String.valueOf(groupId) %>" />
+		</liferay-util:include>
 
 		<liferay-ui:search-container-results>
 
@@ -80,74 +54,55 @@ PortletURL portletURL = formsRequestHelper.getViewPortletURL(renderResponse, gro
 		</liferay-ui:search-container-results>
 
 		<liferay-ui:search-container-row
-			className="com.liferay.portlet.dynamicdatamapping.model.DDMStructure"
-			keyProperty="structureId"
-			modelVar="structure"
+			className="com.liferay.portlet.dynamicdatalists.model.DDLRecordSet"
+			escapedModel="<%= true %>"
+			keyProperty="recordSetId"
+			modelVar="recordSet"
 		>
+			<liferay-portlet:renderURL varImpl="rowURL">
+				<portlet:param name="mvcPath" value="/edit_form.jsp" />
+				<portlet:param name="redirect" value="<%= searchContainer.getIteratorURL().toString() %>" />
+				<portlet:param name="recordSetId" value="<%= String.valueOf(recordSet.getRecordSetId()) %>" />
+			</liferay-portlet:renderURL>
 
 			<%
-			PortletURL rowURL = formsRequestHelper.getDDMStructureRowURL(renderResponse, structure);
-
-			String rowHREF = rowURL.toString();
+			if (!DDLRecordSetPermission.contains(permissionChecker, recordSet, ActionKeys.VIEW)) {
+				rowURL = null;
+			}
 			%>
 
 			<liferay-ui:search-container-column-text
-				href="<%= rowHREF %>"
+				href="<%= rowURL %>"
 				name="id"
-				orderable="<%= true %>"
-				orderableProperty="id"
-				property="structureId"
+				orderable="<%= false %>"
+				property="recordSetId"
 			/>
 
 			<liferay-ui:search-container-column-text
-				href="<%= rowHREF %>"
+				href="<%= rowURL %>"
 				name="name"
-				value="<%= HtmlUtil.escape(structure.getName(locale)) %>"
+				orderable="<%= false %>"
+				value="<%= recordSet.getName(locale) %>"
 			/>
 
 			<liferay-ui:search-container-column-text
-				href="<%= rowHREF %>"
+				href="<%= rowURL %>"
 				name="description"
-				value="<%= HtmlUtil.escape(structure.getDescription(locale)) %>"
-			/>
-
-			<c:if test="<%= Validator.isNull(formsRequestHelper.getStorageTypeValue(scopeStorageType)) %>">
-				<liferay-ui:search-container-column-text
-					href="<%= rowHREF %>"
-					name="storage-type"
-					value="<%= LanguageUtil.get(request, structure.getStorageType()) %>"
-				/>
-			</c:if>
-
-			<c:if test="<%= formsRequestHelper.getScopeClassNameId() == 0 %>">
-				<liferay-ui:search-container-column-text
-					href="<%= rowHREF %>"
-					name="type"
-					value="<%= ResourceActionsUtil.getModelResource(locale, structure.getClassName()) %>"
-				/>
-			</c:if>
-
-			<%
-			Group group = GroupLocalServiceUtil.getGroup(structure.getGroupId());
-			%>
-
-			<liferay-ui:search-container-column-text
-				name="scope"
-				value="<%= LanguageUtil.get(request, group.getScopeLabel(themeDisplay)) %>"
+				orderable="<%= false %>"
+				value="<%= StringUtil.shorten(recordSet.getDescription(locale), 100) %>"
 			/>
 
 			<liferay-ui:search-container-column-date
-				href="<%= rowHREF %>"
+				href="<%= rowURL %>"
 				name="modified-date"
-				orderable="<%= true %>"
-				orderableProperty="modified-date"
-				value="<%= structure.getModifiedDate() %>"
+				orderable="<%= false %>"
+				value="<%= recordSet.getModifiedDate() %>"
 			/>
 
 			<liferay-ui:search-container-column-jsp
 				align="right"
 				cssClass="entry-action"
-				path="/html/portlet/dynamic_data_mapping/structure_action.jsp"
+				path="/form_action.jsp"
 			/>
 		</liferay-ui:search-container-row>
 

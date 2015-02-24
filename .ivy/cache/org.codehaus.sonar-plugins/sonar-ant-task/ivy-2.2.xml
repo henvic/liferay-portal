@@ -4,7 +4,7 @@
 		module="sonar-ant-task"
 		revision="2.2"
 		status="release"
-		publication="20140617012503"
+		publication="20140617052503"
 	>
 		<license name="GNU LGPL 3" url="http://www.gnu.org/licenses/lgpl.txt" />
 		<description homepage="http://docs.codehaus.org/display/SONAR/Sonar+Ant+Task" />

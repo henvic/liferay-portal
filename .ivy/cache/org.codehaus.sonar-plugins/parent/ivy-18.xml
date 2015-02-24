@@ -4,7 +4,7 @@
 		module="parent"
 		revision="18"
 		status="release"
-		publication="20140114050702"
+		publication="20140114100702"
 	>
 		<license name="GNU LGPL 3" url="http://www.gnu.org/licenses/lgpl.txt" />
 		<description homepage="http://sonar-plugins.codehaus.org" />

@@ -1,123 +1,110 @@
-package com.liferay.forms.web.portlet.display;
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
 
-import com.liferay.portal.kernel.dao.search.SearchContainer;
-import com.liferay.portal.kernel.display.context.util.BaseRequestHelper;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.Company;
-import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PortletKeys;
-import com.liferay.portlet.PortalPreferences;
-import com.liferay.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
-import com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants;
-import com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants;
-import com.liferay.portlet.dynamicdatamapping.search.StructureSearchTerms;
-import com.liferay.portlet.dynamicdatamapping.service.DDMStructureServiceUtil;
-import com.liferay.portlet.dynamicdatamapping.storage.StorageType;
-import com.liferay.portlet.dynamicdatamapping.util.DDMDisplay;
-import com.liferay.portlet.dynamicdatamapping.util.DDMDisplayRegistryUtil;
-import com.liferay.portlet.dynamicdatamapping.util.DDMUtil;
+package com.liferay.forms.web.portlet.display;
 
 import java.util.List;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderResponse;
-
 import javax.servlet.http.HttpServletRequest;
+
+import com.liferay.portal.kernel.dao.search.SearchContainer;
+import com.liferay.portal.kernel.display.context.util.BaseRequestHelper;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.model.Company;
+import com.liferay.portal.security.permission.ActionKeys;
+import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.PortletKeys;
+import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
+import com.liferay.portlet.dynamicdatalists.model.DDLRecordSetConstants;
+import com.liferay.portlet.dynamicdatalists.search.RecordSetSearchTerms;
+import com.liferay.portlet.dynamicdatalists.service.DDLRecordSetServiceUtil;
+import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
+import com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants;
+import com.liferay.portlet.dynamicdatamapping.service.permission.DDMPermission;
+import com.liferay.portlet.dynamicdatamapping.service.permission.DDMStructurePermission;
+import com.liferay.portlet.dynamicdatamapping.storage.StorageType;
+import com.liferay.portlet.dynamicdatamapping.util.DDMDisplay;
+import com.liferay.portlet.dynamicdatamapping.util.DDMDisplayRegistryUtil;
 public class FormsRequestHelper extends BaseRequestHelper {
 
 	public FormsRequestHelper(HttpServletRequest request) {
 		super(request);
 	}
 
-	public DDMDisplay getDDMDisplay() {
-		String refererPortletName = ParamUtil.getString(
-			getRequest(), "refererPortletName", getPortletName());
+	public boolean canCopyStructure() {
+		DDMDisplay ddmDisplay = getDDMDisplay();
 
-		return DDMDisplayRegistryUtil.getDDMDisplay(refererPortletName);
+		return DDMPermission.contains(getPermissionChecker(),
+				getScopeGroupId(), ddmDisplay.getResourceName(),
+				ddmDisplay.getAddStructureActionId());
 	}
 
-	public PortletURL getDDMStructureRowURL(
-		RenderResponse renderResponse, DDMStructure ddmStructure) {
+	public boolean canDeleteStructure(DDMStructure structure) {
+		return DDMStructurePermission.contains(getPermissionChecker(),
+			structure, PortletKeys.DYNAMIC_DATA_LISTS, ActionKeys.DELETE);
+	}
+
+	public boolean canEditStructure(DDMStructure structure) {
+		return DDMStructurePermission.contains(getPermissionChecker(),
+			structure, PortletKeys.DYNAMIC_DATA_LISTS, ActionKeys.UPDATE);
+	}
+
+	public boolean canViewManageTemplates(DDMStructure structure) {
+		return DDMStructurePermission.contains(
+			getPermissionChecker(), structure, PortletKeys.DYNAMIC_DATA_LISTS,
+			ActionKeys.VIEW) && isShowManageTemplates();
+	}
+
+	public DDMDisplay getDDMDisplay() {
+		return DDMDisplayRegistryUtil
+			.getDDMDisplay(PortletKeys.DYNAMIC_DATA_LISTS);
+	}
+
+	public PortletURL getDDMStructureRowURL(RenderResponse renderResponse,
+			DDMStructure ddmStructure) {
 
 		PortletURL rowURL = renderResponse.createRenderURL();
 
-		rowURL.setParameter(
-			"struts_action", "/dynamic_data_mapping/edit_structure");
+		rowURL.setParameter("mvcPath", "/edit_structure.jsp");
 		rowURL.setParameter("redirect", PortalUtil.getCurrentURL(getRequest()));
-		rowURL.setParameter(
-			"classNameId",
+		rowURL.setParameter("classNameId",
 			String.valueOf(PortalUtil.getClassNameId(DDMStructure.class)));
-		rowURL.setParameter(
-			"classPK", String.valueOf(ddmStructure.getStructureId()));
+		rowURL.setParameter("classPK",
+			String.valueOf(ddmStructure.getStructureId()));
 
 		return rowURL;
-	}
-
-	public String getOrderByCol() {
-		PortalPreferences portalPreferences =
-			PortletPreferencesFactoryUtil.getPortalPreferences(getRequest());
-
-		String orderByCol = ParamUtil.getString(getRequest(), "orderByCol");
-
-		if (Validator.isNotNull(orderByCol)) {
-			portalPreferences.setValue(
-				PortletKeys.DYNAMIC_DATA_MAPPING, "entries-order-by-col",
-				orderByCol);
-		}
-		else {
-			orderByCol = portalPreferences.getValue(
-				PortletKeys.DYNAMIC_DATA_MAPPING, "entries-order-by-col", "id");
-		}
-
-		return orderByCol;
-	}
-
-	public OrderByComparator<DDMStructure> getOrderByComparator() {
-		String orderByType = getOrderByType();
-		String orderByCol = getOrderByCol();
-
-		return DDMUtil.getStructureOrderByComparator(orderByCol, orderByType);
-	}
-
-	public String getOrderByType() {
-		PortalPreferences portalPreferences =
-			PortletPreferencesFactoryUtil.getPortalPreferences(getRequest());
-
-		String orderByType = ParamUtil.getString(getRequest(), "orderByType");
-
-		if (Validator.isNotNull(orderByType)) {
-			portalPreferences.setValue(
-				PortletKeys.DYNAMIC_DATA_MAPPING, "entries-order-by-type",
-				orderByType);
-		}
-		else {
-			orderByType = portalPreferences.getValue(
-				PortletKeys.DYNAMIC_DATA_MAPPING, "entries-order-by-type",
-				"asc");
-		}
-
-		return orderByType;
 	}
 
 	public long getScopeClassNameId() {
 		return PortalUtil.getClassNameId(getDDMDisplay().getStructureType());
 	}
 
-	public String getStorageTypeValue(String scopeStorageType) {
+	public String getStorageTypeValue() {
+		DDMDisplay ddmDisplay = getDDMDisplay();
+
+		String scopeStorageType = ddmDisplay.getStorageType();
 		String storageTypeValue = StringPool.BLANK;
 
 		if (scopeStorageType.equals("expando")) {
 			storageTypeValue = StorageType.EXPANDO.getValue();
-		}
-		else if (scopeStorageType.equals("json")) {
+		} else if (scopeStorageType.equals("json")) {
 			storageTypeValue = StorageType.JSON.getValue();
-		}
-		else if (scopeStorageType.equals("xml")) {
+		} else if (scopeStorageType.equals("xml")) {
 			storageTypeValue = StorageType.XML.getValue();
 		}
 
@@ -127,13 +114,12 @@ public class FormsRequestHelper extends BaseRequestHelper {
 	public String getTemplateTypeValue(String scopeTemplateType) {
 		String templateTypeValue = StringPool.BLANK;
 
-		if (scopeTemplateType.equals(
-				DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY)) {
+		if (scopeTemplateType
+				.equals(DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY)) {
 
 			templateTypeValue = DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY;
-		}
-		else if (scopeTemplateType.equals(
-					DDMTemplateConstants.TEMPLATE_TYPE_FORM)) {
+		} else if (scopeTemplateType
+				.equals(DDMTemplateConstants.TEMPLATE_TYPE_FORM)) {
 
 			templateTypeValue = DDMTemplateConstants.TEMPLATE_TYPE_FORM;
 		}
@@ -141,13 +127,13 @@ public class FormsRequestHelper extends BaseRequestHelper {
 		return templateTypeValue;
 	}
 
-	public PortletURL getViewPortletURL(
-		RenderResponse renderResponse, long groupId, String tabs1) {
+	public PortletURL getViewPortletURL(RenderResponse renderResponse,
+			long groupId, String tabs1) {
 
 		PortletURL viewPortletURL = renderResponse.createRenderURL();
 
-		viewPortletURL.setParameter(
-			"struts_action", "/dynamic_data_mapping/view");
+		viewPortletURL.setParameter("struts_action",
+			"/dynamic_data_mapping/view");
 		viewPortletURL.setParameter("groupId", String.valueOf(groupId));
 		viewPortletURL.setParameter("tabs1", tabs1);
 
@@ -159,61 +145,62 @@ public class FormsRequestHelper extends BaseRequestHelper {
 	}
 
 	public void populateSearchContainer(
-			SearchContainer<DDMStructure> searchContainer)
+			SearchContainer<DDLRecordSet> searchContainer)
 		throws PortalException {
 
 		Company company = getCompany();
 
-		StructureSearchTerms searchTerms =
-			(StructureSearchTerms)searchContainer.getSearchTerms();
+		RecordSetSearchTerms searchTerms = (RecordSetSearchTerms)searchContainer
+			.getSearchTerms();
 
-		long groupId = getScopeGroupId();
-
-		long[] groupIds = new long[] {groupId};
-
-		if (isShowAncestorScopes()) {
-			groupIds = PortalUtil.getCurrentAndAncestorSiteGroupIds(groupId);
-		}
-
-		List<DDMStructure> results = searchContainer.getResults();
+		List<DDLRecordSet> results = searchContainer.getResults();
 
 		int total = searchContainer.getTotal();
 
 		if (searchTerms.isAdvancedSearch()) {
-			total = DDMStructureServiceUtil.searchCount(
-				company.getCompanyId(), groupIds, searchTerms.getClassNameId(),
+			total = DDLRecordSetServiceUtil.searchCount(
+				company.getCompanyId(), getScopeGroupId(),
 				searchTerms.getName(), searchTerms.getDescription(),
-				searchTerms.getStorageType(),
-				DDMStructureConstants.TYPE_DEFAULT,
+				DDLRecordSetConstants.SCOPE_DYNAMIC_DATA_LISTS,
 				searchTerms.isAndOperator());
 
 			searchContainer.setTotal(total);
 
-			results = DDMStructureServiceUtil.search(
-				company.getCompanyId(), groupIds, searchTerms.getClassNameId(),
+			results = DDLRecordSetServiceUtil.search(
+				company.getCompanyId(), getScopeGroupId(),
 				searchTerms.getName(), searchTerms.getDescription(),
-				searchTerms.getStorageType(),
-				DDMStructureConstants.TYPE_DEFAULT, searchTerms.isAndOperator(),
-				searchContainer.getStart(), searchContainer.getEnd(),
+				DDLRecordSetConstants.SCOPE_DYNAMIC_DATA_LISTS,
+				searchTerms.isAndOperator(), searchContainer.getStart(),
+				searchContainer.getEnd(),
 				searchContainer.getOrderByComparator());
 		}
 		else {
-			long scopeClassNameId = getScopeClassNameId();
-
-			total = DDMStructureServiceUtil.searchCount(
-				company.getCompanyId(), groupIds, scopeClassNameId,
-				searchTerms.getKeywords());
+			total = DDLRecordSetServiceUtil.searchCount(
+				company.getCompanyId(), getScopeGroupId(),
+				searchTerms.getKeywords(),
+				DDLRecordSetConstants.SCOPE_DYNAMIC_DATA_LISTS);
 
 			searchContainer.setTotal(total);
 
-			results = DDMStructureServiceUtil.search(
-				company.getCompanyId(), groupIds, scopeClassNameId,
-				searchTerms.getKeywords(), searchContainer.getStart(),
-				searchContainer.getEnd(),
+			results = DDLRecordSetServiceUtil.search(
+				company.getCompanyId(), getScopeGroupId(),
+				searchTerms.getKeywords(),
+				DDLRecordSetConstants.SCOPE_DYNAMIC_DATA_LISTS,
+				searchContainer.getStart(), searchContainer.getEnd(),
 				searchContainer.getOrderByComparator());
 		}
 
 		searchContainer.setResults(results);
 	}
+
+	public boolean isShowManageTemplates() {
+		return ParamUtil.getBoolean(getRequest(), "showManageTemplates", true);
+	}
+	
+	public String[] getFormCategoryNames() {
+		return _FORM_CATEGORY_NAMES;
+	} 
+	
+	private static final String[] _FORM_CATEGORY_NAMES = { "basic_info", "form_builder" };
 
 }
