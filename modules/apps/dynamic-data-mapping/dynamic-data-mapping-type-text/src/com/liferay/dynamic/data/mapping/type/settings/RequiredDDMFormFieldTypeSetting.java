@@ -14,11 +14,9 @@
 
 package com.liferay.dynamic.data.mapping.type.settings;
 
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldTypeSetting;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldTypeSettingEditor;
-
-import java.util.Collections;
-import java.util.Map;
 
 /**
  * @author Marcellus Tavares
@@ -36,8 +34,8 @@ public class RequiredDDMFormFieldTypeSetting
 			}
 
 			@Override
-			public Map<String, String> getOptions() {
-				return Collections.emptyMap();
+			public JSONObject getOptions() {
+				return null;
 			}
 
 		};

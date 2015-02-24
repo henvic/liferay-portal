@@ -53,6 +53,8 @@ public class DDMFormFieldTypesHelper {
 			ddmFormFieldTypeJSONObject.put(
 				"basicSettings",
 				getSettings(ddmFormFieldType.getBasicSettings()));
+			ddmFormFieldTypeJSONObject.put(
+				"fieldClass", ddmFormFieldType.getFieldJavaScriptClass());
 			ddmFormFieldTypeJSONObject.put("icon", ddmFormFieldType.getIcon());
 			ddmFormFieldTypeJSONObject.put(
 				"label", ddmFormFieldType.getLabel());
@@ -64,30 +66,29 @@ public class DDMFormFieldTypesHelper {
 		return jsonArray;
 	}
 	
-	private static JSONObject getSettings(List<DDMFormFieldTypeSetting> settings) {
-		JSONObject settingsJSONObject = JSONFactoryUtil.createJSONObject();
+	private static JSONArray getSettings(List<DDMFormFieldTypeSetting> settings) {
+		JSONArray settingsJSONArray = JSONFactoryUtil.createJSONArray();
 
 		for (DDMFormFieldTypeSetting setting : settings) {
-			settingsJSONObject.put("attrName", setting.getName());
-
-			JSONObject optionsJSONObject = JSONFactoryUtil.createJSONObject();
+			JSONObject settingJSONObject = JSONFactoryUtil.createJSONObject();
+			
+			settingJSONObject.put("attrName", setting.getName());
 
 			DDMFormFieldTypeSettingEditor editor =
 				setting.getDDMFormFieldTypeSettingEditor();
-
-			Map<String, String> options = editor.getOptions();
-
-			Set<String> optionsKeys = options.keySet();
-
-			for (String key : optionsKeys) {
-				optionsJSONObject.put(key, options.get(key));
+			
+			JSONObject editorOptions = editor.getOptions();
+			
+			if (editorOptions != null) {
+				settingJSONObject.put("editorOptions", editor.getOptions());
 			}
 
-			settingsJSONObject.put("editorOptions", optionsJSONObject);
-			settingsJSONObject.put("editorType", editor.getEditorType());
+			settingJSONObject.put("editorType", editor.getEditorType());
+
+			settingsJSONArray.put(settingJSONObject);
 		}
 
-		return settingsJSONObject;
+		return settingsJSONArray;
 	}
 
 }

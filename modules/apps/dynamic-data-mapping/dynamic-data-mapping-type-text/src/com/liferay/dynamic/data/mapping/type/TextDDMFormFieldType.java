@@ -110,21 +110,18 @@ public class TextDDMFormFieldType implements DDMFormFieldType {
 	}
 
 	@Override
-	public String getFieldJavaScript() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getFieldJavaScriptClass() {
+		return "Liferay.Forms.FieldBase";
 	}
 
 	@Override
 	public String getIcon() {
-		// TODO Auto-generated method stub
-		return null;
+		return "my-icon";
 	}
 
 	@Override
 	public String getLabel() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Text";
 	}
 
 }

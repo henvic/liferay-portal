@@ -79,19 +79,16 @@ for (Locale availableLocale : LanguageUtil.getAvailableLocales(themeDisplay.getS
 }
 %>
 
-<aui:script use="aui-form-builder,aui-form-builder-field-choice,aui-form-builder-field-date,aui-form-builder-field-grid,aui-form-builder-field-text,aui-form-builder-field-time,aui-form-builder-field-scale,aui-form-builder-field-sentence,aui-form-builder-page-break-row,liferay-forms-layout">
-Liferay.Forms.Types = <%= DDMFormFieldTypesHelper.getFieldTypesJSONArray() %>;
-
-console.log(Liferay.Forms.Types);
-
+<aui:script use="aui-form-builder,aui-form-builder-field-choice,aui-form-builder-field-date,aui-form-builder-field-grid,aui-form-builder-field-text,aui-form-builder-field-time,aui-form-builder-field-scale,aui-form-builder-field-sentence,aui-form-builder-page-break-row,liferay-forms-layout,liferay-forms-form-builder">
+var fieldTypes = Liferay.Forms.FormBuilder.Util.getFieldTypes(<%= DDMFormFieldTypesHelper.getFieldTypesJSONArray() %>);
 var layout = new Liferay.Forms.Layout(<%= DDMFormLayoutJSONSerializerUtil.serialize(ddmFormLayout) %>);
+
+console.log(fieldTypes);
 
 new A.FormBuilder(
 	{
-		fieldTypes: Liferay.Forms.Types,
+		fieldTypes: fieldTypes,
 		//layout: layout
 	}
 ).render('#formBuilder');
-
-console.log(layout.serialize());
 </aui:script>

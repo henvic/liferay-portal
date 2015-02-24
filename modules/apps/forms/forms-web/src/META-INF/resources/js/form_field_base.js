@@ -28,7 +28,7 @@ AUI.add(
 
 						var advancedSettings = instance.get('advancedSettings');
 
-						Array.push.apply(instance._advancedSettings, instance._normalizeSetitngs(advancedSettings));
+						Array.prototype.push.apply(instance._advancedSettings, instance._normalizeSetitngs(advancedSettings));
 					},
 
 					_fillSettings: function() {
@@ -36,13 +36,15 @@ AUI.add(
 
 						var basicSettings = instance.get('basicSettings');
 
-						Array.push.apply(instance._settings, instance._normalizeSetitngs(basicSettings));
+						Array.prototype.push.apply(instance._settings, instance._normalizeSetitngs(basicSettings));
 					},
 
 					_getEditor: function(editorType, editorOptions) {
 						var instance = this;
 
-						return new A[Lang.String.capitalize(editorType) + 'DataEditor'](editorOptions);
+						console.log(editorType + 'DataEditor', A[editorType + 'DataEditor']);
+
+						return new A[editorType + 'DataEditor'](editorOptions);
 					},
 
 					_normalizeSetitngs: function(settings) {
@@ -56,7 +58,7 @@ AUI.add(
 								normalized.push(
 									{
 										attrName: item.attrName,
-										editor: instance._getEditor(item.editorType, item.editorOptions);
+										editor: instance._getEditor(item.editorType, item.editorOptions)
 									}
 								);
 							}
@@ -72,6 +74,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-form-builder-field-base']
+		requires: ['aui-form-builder-field-base', 'aui-form-field', 'aui-boolean-data-editor', 'aui-options-data-editor', 'aui-tabs-data-editor', 'aui-radio-group-data-editor']
 	}
 );
