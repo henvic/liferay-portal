@@ -12,10 +12,10 @@
  * details.
  */
 
-package com.liferay.portal.kernel.template;
+package com.liferay.portal.template;
 
-import com.liferay.portal.template.AbstractTemplate;
-import com.liferay.portal.template.TemplateContextHelper;
+import com.liferay.portal.kernel.template.TemplateException;
+import com.liferay.portal.kernel.template.TemplateResource;
 
 import java.util.Map;
 

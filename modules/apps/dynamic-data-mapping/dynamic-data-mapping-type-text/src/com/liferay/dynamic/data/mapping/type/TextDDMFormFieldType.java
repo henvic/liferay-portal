@@ -18,11 +18,10 @@ import com.liferay.dynamic.data.mapping.type.settings.HelpDDMFormFieldTypeSettin
 import com.liferay.dynamic.data.mapping.type.settings.NameDDMFormFieldTypeSetting;
 import com.liferay.dynamic.data.mapping.type.settings.RequiredDDMFormFieldTypeSetting;
 import com.liferay.dynamic.data.mapping.type.settings.TypeDDMFormFieldTypeSetting;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.template.HybridTemplate;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.template.HybridTemplate;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldRenderer;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldType;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldTypeSetting;
@@ -30,7 +29,6 @@ import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldValueAccessor
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldValueRendererAccessor;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
