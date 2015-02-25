@@ -18,6 +18,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
 import com.liferay.portlet.dynamicdatamapping.render.DDMFormFieldRenderingContext;
 
+import java.net.URL;
+
 /**
  * @author Pablo Carvalho
  */

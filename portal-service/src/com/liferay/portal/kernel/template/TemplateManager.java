@@ -51,7 +51,7 @@ public interface TemplateManager {
 	public void destroy(ClassLoader classLoader);
 
 	public String getName();
-
+	
 	public String[] getRestrictedVariables();
 
 	public Template getTemplate(

@@ -40,22 +40,26 @@ public class TextDDMFormFieldRenderer extends BaseDDMFormFieldRenderer {
 
 	@Activate
 	protected void activate(Map<String, Object> properties) {
-		String templatePath = MapUtil.getString(properties, "templatePath");
-
-		TemplateResource templateResource = getTemplateResource(templatePath);
+		_templatePath = MapUtil.getString(properties, "templatePath");
 
 		this.templateNamespace = "ddm.text";
-		this.templateResource = templateResource;
+		this.templateResource = getTemplateResource();
 	}
 
-	protected TemplateResource getTemplateResource(String templatePath) {
+	protected TemplateResource getTemplateResource() {
 		Class<?> clazz = getClass();
 
 		ClassLoader classLoader = clazz.getClassLoader();
 
-		URL templateURL = classLoader.getResource(templatePath);
+		URL templateURL = classLoader.getResource(_templatePath);
 
 		return new URLTemplateResource(templateURL.getPath(), templateURL);
 	}
+	
+	protected String getTemplatePath() {
+		return _templatePath;
+	}
+	
+	private String _templatePath;
 
 }

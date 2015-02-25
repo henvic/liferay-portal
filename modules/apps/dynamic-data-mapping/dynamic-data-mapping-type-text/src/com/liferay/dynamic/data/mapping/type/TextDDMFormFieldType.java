@@ -18,12 +18,20 @@ import com.liferay.dynamic.data.mapping.type.settings.HelpDDMFormFieldTypeSettin
 import com.liferay.dynamic.data.mapping.type.settings.NameDDMFormFieldTypeSetting;
 import com.liferay.dynamic.data.mapping.type.settings.RequiredDDMFormFieldTypeSetting;
 import com.liferay.dynamic.data.mapping.type.settings.TypeDDMFormFieldTypeSetting;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.template.HybridTemplate;
+import com.liferay.portal.kernel.template.TemplateConstants;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldRenderer;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldType;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldTypeSetting;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldValueAccessor;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldValueRendererAccessor;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -57,7 +65,7 @@ public class TextDDMFormFieldType implements DDMFormFieldType {
 
 	@Override
 	public DDMFormFieldRenderer getDDMFormFieldRenderer() {
-		return _ddmFormFieldRenderer;
+		return _textDDMFormFieldRenderer;
 	}
 
 	@Override
@@ -82,11 +90,25 @@ public class TextDDMFormFieldType implements DDMFormFieldType {
 
 	@Reference(service = TextDDMFormFieldRenderer.class, unbind = "-")
 	protected void setDDMFormFieldRenderer(
-		DDMFormFieldRenderer ddmFormFieldRenderer) {
+		TextDDMFormFieldRenderer textDDMFormFieldRenderer) {
 
-		_ddmFormFieldRenderer = ddmFormFieldRenderer;
+		_textDDMFormFieldRenderer = textDDMFormFieldRenderer;
 	}
 
-	private DDMFormFieldRenderer _ddmFormFieldRenderer;
+	private TextDDMFormFieldRenderer _textDDMFormFieldRenderer;
+
+	@Override
+	public URL getDDMFormFieldJavaScriptRenderer() throws Exception {
+		HybridTemplate hybridTemplate = (HybridTemplate)
+			TemplateManagerUtil.getTemplate(
+				TemplateConstants.LANG_TYPE_SOY,
+				_textDDMFormFieldRenderer.getTemplateResource(), false);
+		
+		File file = new File(_textDDMFormFieldRenderer.getTemplatePath() + ".js");
+				
+		FileUtil.write(file, hybridTemplate.getJavaScriptTemplate().getJavaScriptSources().get(0));
+		
+		return file.toURI().toURL();
+	}
 
 }

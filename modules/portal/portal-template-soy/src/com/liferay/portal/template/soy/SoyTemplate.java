@@ -18,32 +18,32 @@ import com.google.common.io.CharStreams;
 import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.SoyFileSet.Builder;
 import com.google.template.soy.data.SoyMapData;
+import com.google.template.soy.jssrc.SoyJsSrcOptions;
+import com.google.template.soy.jssrc.SoyJsSrcOptions.CodeStyle;
 import com.google.template.soy.tofu.SoyTofu;
 import com.google.template.soy.tofu.SoyTofu.Renderer;
-
+import com.liferay.portal.kernel.template.HybridTemplate;
+import com.liferay.portal.kernel.template.JavaScriptTemplate;
 import com.liferay.portal.kernel.template.StringTemplateResource;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.template.TemplateException;
 import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.template.AbstractTemplate;
 import com.liferay.portal.template.TemplateContextHelper;
 import com.liferay.portal.template.TemplateResourceThreadLocal;
 
 import java.io.Reader;
 import java.io.Writer;
-
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-
 import java.util.Map;
 
 /**
  * @author Bruno Basto
  */
-public class SoyTemplate extends AbstractTemplate {
+public class SoyTemplate extends HybridTemplate {
 
 	public SoyTemplate(
 		TemplateResource templateResource,
@@ -183,6 +183,26 @@ public class SoyTemplate extends AbstractTemplate {
 
 		private final TemplateResource _templateResource;
 
+	}
+	
+	@Override
+	public JavaScriptTemplate getJavaScriptTemplate() throws TemplateException {
+		try {
+			SoyFileSet soyFileSet = getSoyFileSet(templateResource);
+		
+			SoyJsSrcOptions soyJsSrcOptions = new SoyJsSrcOptions();
+			
+			soyJsSrcOptions.setCodeStyle(CodeStyle.STRINGBUILDER);
+			soyJsSrcOptions.setShouldProvideRequireSoyNamespaces(false);
+			soyJsSrcOptions.setShouldDeclareTopLevelNamespaces(true);
+			soyJsSrcOptions.setBidiGlobalDir(0);
+			
+			return new JavaScriptTemplate(
+				soyFileSet.compileToJsSrc(soyJsSrcOptions, null));
+		}
+		catch (Exception e) {
+			throw new TemplateException(e);
+		}
 	}
 
 }

@@ -104,7 +104,7 @@ public abstract class BaseDDMFormFieldRenderer implements DDMFormFieldRenderer {
 
 		return writer.toString();
 	}
-
+	
 	protected String templateNamespace;
 	protected TemplateResource templateResource;
 

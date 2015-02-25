@@ -12,33 +12,23 @@
  * details.
  */
 
-package com.liferay.portlet.dynamicdatamapping.registry;
+package com.liferay.portal.kernel.template;
 
-import com.liferay.portal.kernel.exception.PortalException;
-
-import java.net.URL;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * @author Marcellus Tavares
  */
-public interface DDMFormFieldType {
+public class JavaScriptTemplate {
 
-	public List<DDMFormFieldTypeSetting> getAdvancedSettings();
-
-	public List<DDMFormFieldTypeSetting> getBasicSettings();
+	public JavaScriptTemplate(List<String> javaScriptSources) {
+		_javaScriptSources = javaScriptSources;
+	}
 	
-	public DDMFormFieldRenderer getDDMFormFieldRenderer();
+	public List<String> getJavaScriptSources() {
+		return _javaScriptSources;
+	}
 	
-	public URL getDDMFormFieldJavaScriptRenderer() throws Exception;
-
-	public DDMFormFieldValueAccessor<?> getDDMFormFieldValueAccessor(
-		Locale locale);
-
-	public DDMFormFieldValueRendererAccessor
-		getDDMFormFieldValueRendererAccessor(Locale locale);
-
-	public String getName();
-
+	private List<String> _javaScriptSources;
+	
 }
