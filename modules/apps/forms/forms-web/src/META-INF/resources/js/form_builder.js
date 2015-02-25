@@ -2,14 +2,15 @@ AUI.add(
 	'liferay-forms-form-builder',
 	function(A) {
 		var AArray = A.Array;
-		var Lang = A.Lang;
 
 		var FormBuilder = A.Component.create(
 			{
 				ATTRS: {
 				},
 
-				EXTENDS: A.Layout,
+				CSS_PREFIX: 'form-builder',
+
+				EXTENDS: A.FormBuilder,
 
 				NAME: 'liferay-forms-form-builder',
 
@@ -21,29 +22,57 @@ AUI.add(
 		Liferay.namespace('Forms').FormBuilder = FormBuilder;
 
 		Liferay.namespace('Forms').FormBuilder.Util = {
-			getFieldTypes: function(fieldTypes) {
+			getFieldClass: function(advancedSettings, basicSettings) {
 				var instance = this;
 
-				var normalized = [];
+				var attrs = {};
 
 				AArray.each(
-					fieldTypes,
+					advancedSettings.concat(basicSettings),
 					function(item, index) {
-						normalized.push(
-							{
-								defaultConfig: {
-									advancedSettings: item.advancedSettings,
-									basicSettings: item.basicSettings
-								},
-								fieldClass: A.Object.getValue(window, item.fieldClass.split('.')),
-								icon: item.icon,
-								label: item.label,
-							}
-						);
+						var value = '';
+
+						if (item.editorType === 'RadioGroup') {
+							value = undefined;
+						}
+
+						attrs[item.attrName] = {
+							value: value
+						};
 					}
 				);
 
-				return normalized;
+				return A.Component.create(
+					{
+						ATTRS: attrs,
+
+						EXTENDS: Liferay.Forms.FieldBase,
+
+						NAME: 'liferay-form-field'
+					}
+				);
+			},
+
+			getFieldTypes: function(fieldTypes) {
+				var instance = this;
+
+				return AArray.map(
+					fieldTypes,
+					function(item, index) {
+						return {
+							defaultConfig: {
+								advancedSettings: item.advancedSettings,
+								basicSettings: item.basicSettings
+							},
+							fieldClass: instance.getFieldClass(
+								item.advancedSettings,
+								item.basicSettings
+							),
+							icon: item.icon,
+							label: item.label,
+						};
+					}
+				);
 			}
 		};
 	},

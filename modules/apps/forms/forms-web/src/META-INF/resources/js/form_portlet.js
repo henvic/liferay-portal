@@ -24,8 +24,6 @@ AUI.add(
 					bindUI: function() {
 						var instance = this;
 
-						console.log('attaching form event');
-
 						instance._eventHandlers = [
 							Liferay.after('form:registered', A.bind(instance._afterFormRegistered, instance)),
 							Liferay.on('destroyPortlet', A.bind(instance._onDestroyPortlet, instance))

@@ -8,15 +8,20 @@
 						'liferay-forms-field-base': {
 							path: 'form_field_base.js',
 							requires: [
+								'aui-boolean-data-editor',
 								'aui-form-builder-field-base',
-								'aui-form-field'
+								'aui-form-field',
+								'aui-options-data-editor',
+								'aui-radio-group-data-editor',
+								'aui-tabs-data-editor',
+								'aui-text-data-editor'
 							]
 						},
 						'liferay-forms-form-builder': {
 							path: 'form_builder.js',
 							requires: [
 								'aui-form-builder',
-								'liferay-form-field-base'
+								'liferay-forms-field-base'
 							]
 						},
 						'liferay-forms-layout': {

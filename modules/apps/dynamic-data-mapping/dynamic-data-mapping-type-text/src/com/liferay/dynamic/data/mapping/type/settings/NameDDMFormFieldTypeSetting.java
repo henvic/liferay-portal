@@ -37,7 +37,8 @@ public class NameDDMFormFieldTypeSetting implements DDMFormFieldTypeSetting {
 			public JSONObject getOptions() {
 				JSONObject options = JSONFactoryUtil.createJSONObject();
 
-				options.put("required", Boolean.TRUE.toString());
+				options.put("required", Boolean.TRUE);
+				options.put("label", "name");
 
 				return options;
 			}

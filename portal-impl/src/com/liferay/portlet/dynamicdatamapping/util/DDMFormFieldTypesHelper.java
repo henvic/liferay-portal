@@ -53,8 +53,6 @@ public class DDMFormFieldTypesHelper {
 			ddmFormFieldTypeJSONObject.put(
 				"basicSettings",
 				getSettings(ddmFormFieldType.getBasicSettings()));
-			ddmFormFieldTypeJSONObject.put(
-				"fieldClass", ddmFormFieldType.getFieldJavaScriptClass());
 			ddmFormFieldTypeJSONObject.put("icon", ddmFormFieldType.getIcon());
 			ddmFormFieldTypeJSONObject.put(
 				"label", ddmFormFieldType.getLabel());
@@ -65,20 +63,22 @@ public class DDMFormFieldTypesHelper {
 
 		return jsonArray;
 	}
-	
-	private static JSONArray getSettings(List<DDMFormFieldTypeSetting> settings) {
+
+	private static JSONArray getSettings(
+		List<DDMFormFieldTypeSetting> settings) {
+
 		JSONArray settingsJSONArray = JSONFactoryUtil.createJSONArray();
 
 		for (DDMFormFieldTypeSetting setting : settings) {
 			JSONObject settingJSONObject = JSONFactoryUtil.createJSONObject();
-			
+
 			settingJSONObject.put("attrName", setting.getName());
 
 			DDMFormFieldTypeSettingEditor editor =
 				setting.getDDMFormFieldTypeSettingEditor();
-			
+
 			JSONObject editorOptions = editor.getOptions();
-			
+
 			if (editorOptions != null) {
 				settingJSONObject.put("editorOptions", editor.getOptions());
 			}

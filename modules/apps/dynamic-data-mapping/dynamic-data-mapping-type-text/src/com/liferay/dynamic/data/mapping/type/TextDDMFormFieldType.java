@@ -111,7 +111,7 @@ public class TextDDMFormFieldType implements DDMFormFieldType {
 
 	@Override
 	public String getFieldJavaScriptClass() {
-		return "Liferay.Forms.FieldBase";
+		return "Liferay.Forms.FieldBase.getFieldClass()";
 	}
 
 	@Override

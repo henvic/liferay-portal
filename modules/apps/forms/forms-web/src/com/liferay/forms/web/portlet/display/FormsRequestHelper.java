@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.display.context.util.BaseRequestHelper;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.util.PortalUtil;
@@ -33,6 +34,7 @@ import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordSetConstants;
 import com.liferay.portlet.dynamicdatalists.search.RecordSetSearchTerms;
 import com.liferay.portlet.dynamicdatalists.service.DDLRecordSetServiceUtil;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants;
 import com.liferay.portlet.dynamicdatamapping.service.permission.DDMPermission;
@@ -199,7 +201,28 @@ public class FormsRequestHelper extends BaseRequestHelper {
 	
 	public String[] getFormCategoryNames() {
 		return _FORM_CATEGORY_NAMES;
-	} 
+	}
+	
+	public DDMFormLayout getDDMFormLayout(
+			DDMStructure ddmStructure, String script)
+		throws PortalException {
+
+		DDMFormLayout ddmFormLayout = null;
+
+		if (Validator.isNotNull(script)) {
+			if (ddmStructure != null) {
+				ddmFormLayout = ddmStructure.getDDMFormLayout();
+			}
+			else {
+				ddmFormLayout = new DDMFormLayout();
+			}
+		}
+		else {
+			ddmFormLayout = new DDMFormLayout();
+		}
+		
+		return ddmFormLayout;
+	}
 	
 	private static final String[] _FORM_CATEGORY_NAMES = { "basic_info", "form_builder" };
 

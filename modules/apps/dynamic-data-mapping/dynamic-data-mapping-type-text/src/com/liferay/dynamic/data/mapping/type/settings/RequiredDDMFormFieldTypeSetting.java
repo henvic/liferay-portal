@@ -14,7 +14,9 @@
 
 package com.liferay.dynamic.data.mapping.type.settings;
 
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldTypeSetting;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldTypeSettingEditor;
 
@@ -35,7 +37,11 @@ public class RequiredDDMFormFieldTypeSetting
 
 			@Override
 			public JSONObject getOptions() {
-				return null;
+				JSONObject options = JSONFactoryUtil.createJSONObject();
+
+				options.put("label", "required");
+				
+				return options;
 			}
 
 		};

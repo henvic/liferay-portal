@@ -20,72 +20,17 @@
 DDMStructure structure = (DDMStructure)request.getAttribute(WebKeys.DYNAMIC_DATA_MAPPING_STRUCTURE);
 
 String script = ParamUtil.getString(request, "script");
-
-String[] availableLanguageIds = LocalizationUtil.getAvailableLanguageIds(script);
-
-Locale[] availableLocales = new Locale[availableLanguageIds.length];
-
-for (int i = 0; i < availableLanguageIds.length; i++) {
-	availableLocales[i] = LocaleUtil.fromLanguageId(availableLanguageIds[i]);
-}
-
-JSONArray fieldsJSONArray = null;
-
-DDMFormLayout ddmFormLayout = null;
-
-if (Validator.isNotNull(script)) {
-	if (structure != null) {
-		try {
-			fieldsJSONArray = DDMXSDUtil.getJSONArray(structure, script);
-		}
-		catch (Exception e) {
-			fieldsJSONArray = DDMXSDUtil.getJSONArray(structure.getDefinition());
-		}
-
-		ddmFormLayout = structure.getDDMFormLayout();
-	}
-	else {
-		try {
-			fieldsJSONArray = DDMXSDUtil.getJSONArray(script);
-		}
-		catch (Exception e) {
-		}
-
-		ddmFormLayout = new DDMFormLayout();
-	}
-}
-else {
-	ddmFormLayout = new DDMFormLayout();
-}
 %>
 
 <div class="separator"><!-- --></div>
 
-<div class="alert alert-danger hide lfr-message-response" id="<portlet:namespace />messageContainer"></div>
-
 <div id="formBuilder"></div>
 
-<%
-JSONArray availableLocalesJSONArray = JSONFactoryUtil.createJSONArray();
-
-for (int i = 0; i < availableLocales.length; i++) {
-	availableLocalesJSONArray.put(LanguageUtil.getLanguageId(availableLocales[i]));
-}
-
-JSONObject localesMapJSONObject = JSONFactoryUtil.createJSONObject();
-
-for (Locale availableLocale : LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId())) {
-	localesMapJSONObject.put(LocaleUtil.toLanguageId(availableLocale), availableLocale.getDisplayName(locale));
-}
-%>
-
-<aui:script use="aui-form-builder,aui-form-builder-field-choice,aui-form-builder-field-date,aui-form-builder-field-grid,aui-form-builder-field-text,aui-form-builder-field-time,aui-form-builder-field-scale,aui-form-builder-field-sentence,aui-form-builder-page-break-row,liferay-forms-layout,liferay-forms-form-builder">
+<aui:script use="liferay-forms-form-builder,liferay-forms-layout">
 var fieldTypes = Liferay.Forms.FormBuilder.Util.getFieldTypes(<%= DDMFormFieldTypesHelper.getFieldTypesJSONArray() %>);
 var layout = new Liferay.Forms.Layout(<%= DDMFormLayoutJSONSerializerUtil.serialize(ddmFormLayout) %>);
 
-console.log(fieldTypes);
-
-new A.FormBuilder(
+new Liferay.Forms.FormBuilder(
 	{
 		fieldTypes: fieldTypes,
 		//layout: layout

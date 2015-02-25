@@ -2,7 +2,6 @@ AUI.add(
 	'liferay-forms-layout',
 	function(A) {
 		var AArray = A.Array;
-		var Lang = A.Lang;
 
 		var STR_BLANK = '';
 

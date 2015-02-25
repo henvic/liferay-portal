@@ -46,7 +46,7 @@ long groupId = ParamUtil.getLong(request, "groupId", scopeGroupId);
 		<%
 		request.setAttribute(WebKeys.SEARCH_CONTAINER, searchContainer);
 		%>
-		
+
 		<liferay-util:include page="/form_search.jsp" servletContext="<%= application %>" />
 	</aui:nav-bar-search>
 </aui:nav-bar>

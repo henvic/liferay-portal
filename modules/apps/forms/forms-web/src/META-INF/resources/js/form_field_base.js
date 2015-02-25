@@ -1,8 +1,7 @@
 AUI.add(
-	'liferay-form-field-base',
+	'liferay-forms-field-base',
 	function(A) {
 		var AArray = A.Array;
-		var Lang = A.Lang;
 
 		var FormsFieldBase = A.Component.create(
 			{
@@ -28,7 +27,7 @@ AUI.add(
 
 						var advancedSettings = instance.get('advancedSettings');
 
-						Array.prototype.push.apply(instance._advancedSettings, instance._normalizeSetitngs(advancedSettings));
+						instance._advancedSettings = instance._normalizeSetitngs(advancedSettings);
 					},
 
 					_fillSettings: function() {
@@ -36,13 +35,11 @@ AUI.add(
 
 						var basicSettings = instance.get('basicSettings');
 
-						Array.prototype.push.apply(instance._settings, instance._normalizeSetitngs(basicSettings));
+						instance._settings = instance._normalizeSetitngs(basicSettings);
 					},
 
 					_getEditor: function(editorType, editorOptions) {
 						var instance = this;
-
-						console.log(editorType + 'DataEditor', A[editorType + 'DataEditor']);
 
 						return new A[editorType + 'DataEditor'](editorOptions);
 					},
@@ -50,21 +47,15 @@ AUI.add(
 					_normalizeSetitngs: function(settings) {
 						var instance = this;
 
-						var normalized = [];
-
-						AArray.each(
+						return AArray.map(
 							settings,
 							function(item, index) {
-								normalized.push(
-									{
-										attrName: item.attrName,
-										editor: instance._getEditor(item.editorType, item.editorOptions)
-									}
-								);
+								return {
+									attrName: item.attrName,
+									editor: instance._getEditor(item.editorType, item.editorOptions || {})
+								};
 							}
 						);
-
-						return normalized;
 					}
 				}
 			}
@@ -74,6 +65,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-form-builder-field-base', 'aui-form-field', 'aui-boolean-data-editor', 'aui-options-data-editor', 'aui-tabs-data-editor', 'aui-radio-group-data-editor']
+		requires: ['aui-form-builder-field-base', 'aui-form-field', 'aui-boolean-data-editor', 'aui-options-data-editor', 'aui-tabs-data-editor', 'aui-radio-group-data-editor', 'aui-text-data-editor']
 	}
 );
