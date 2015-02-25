@@ -17,23 +17,27 @@
 <%@ include file="../init.jsp" %>
 
 <%
-DDMStructure structure = (DDMStructure)request.getAttribute(WebKeys.DYNAMIC_DATA_MAPPING_STRUCTURE);
+DDMStructure ddmStructure = (DDMStructure)request.getAttribute(WebKeys.DYNAMIC_DATA_MAPPING_STRUCTURE);
 
 String script = ParamUtil.getString(request, "script");
+
+DDMFormLayout ddmFormLayout = formsRequestHelper.getDDMFormLayout(ddmStructure, script);
 %>
 
-<div class="separator"><!-- --></div>
+<div id="<portlet:namespace />formBuilder"></div>
 
-<div id="formBuilder"></div>
-
-<aui:script use="liferay-forms-form-builder,liferay-forms-layout">
-var fieldTypes = Liferay.Forms.FormBuilder.Util.getFieldTypes(<%= DDMFormFieldTypesHelper.getFieldTypesJSONArray() %>);
-var layout = new Liferay.Forms.Layout(<%= DDMFormLayoutJSONSerializerUtil.serialize(ddmFormLayout) %>);
-
-new Liferay.Forms.FormBuilder(
-	{
-		fieldTypes: fieldTypes,
-		//layout: layout
+<aui:script use="liferay-forms-form-builder">
+Liferay.component(
+	'<portlet:namespace />FormBuilder',
+	function() {
+		return new Liferay.Forms.FormBuilder(
+			{
+				fieldTypes: <%= DDMFormFieldTypesHelper.getFieldTypesJSONArray() %>,
+				layout: <%= DDMFormLayoutJSONSerializerUtil.serialize(ddmFormLayout) %>
+			}
+		).render('#<portlet:namespace />formBuilder');
 	}
-).render('#formBuilder');
+);
+
+Liferay.component('<portlet:namespace />FormBuilder');
 </aui:script>

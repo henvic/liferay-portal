@@ -2,10 +2,14 @@ AUI.add(
 	'liferay-forms-portlet',
 	function(A) {
 		var Lang = A.Lang;
+		var LayoutSerializer = Liferay.Forms.LayoutSerializer;
 
 		var FormsPortlet = A.Component.create(
 			{
 				ATTRS: {
+					formName: {
+						setter: 'ns'
+					}
 				},
 
 				AUGMENTS: [Liferay.PortletBase],
@@ -39,7 +43,7 @@ AUI.add(
 					_afterFormRegistered: function(event) {
 						var instance = this;
 
-						var form = Liferay.Form.get(instance.ns('fm'));
+						var form = Liferay.Form.get(instance.get('formName'));;
 
 						if (form === event.form) {
 							Liferay.component(
@@ -56,6 +60,8 @@ AUI.add(
 							);
 
 							Liferay.component(instance.ns('FormSteps')).syncUI();
+
+							form.set('onSubmit', A.bind(instance._onSubmit, instance));
 						}
 					},
 
@@ -63,6 +69,22 @@ AUI.add(
 						var instance = this;
 
 						instance.destroy();
+					},
+
+					_onSubmit: function(event) {
+						var instance = this;
+
+						event.preventDefault();
+
+						var formBuilder = Liferay.component(instance.ns('FormBuilder'));
+
+						var layout = formBuilder.get('layout');
+
+						var layoutInput = instance.one('#layout');
+
+						layoutInput.val(A.JSON.stringify(LayoutSerializer.serialize(layout)));
+
+						console.log(layoutInput.val());
 					}
 				}
 			}
@@ -72,6 +94,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-base', 'liferay-forms-steps', 'liferay-portlet-base']
+		requires: ['aui-base', 'json', 'liferay-forms-layout-serializer', 'liferay-forms-steps', 'liferay-portlet-base']
 	}
 );

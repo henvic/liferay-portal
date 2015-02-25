@@ -21,11 +21,12 @@
 							path: 'form_builder.js',
 							requires: [
 								'aui-form-builder',
-								'liferay-forms-field-base'
+								'liferay-forms-field-base',
+								'liferay-forms-layout-serializer'
 							]
 						},
-						'liferay-forms-layout': {
-							path: 'form_layout.js',
+						'liferay-forms-layout-serializer': {
+							path: 'form_layout_serializer.js',
 							requires: [
 								'aui-form-builder-page-break-row',
 								'aui-form-builder-field-text',
@@ -37,6 +38,7 @@
 							path: 'form_portlet.js',
 							requires: [
 								'aui-base',
+								'liferay-forms-layout-serializer',
 								'liferay-forms-steps',
 								'liferay-portlet-base'
 							]

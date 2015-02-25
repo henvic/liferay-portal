@@ -35,11 +35,12 @@ String script = BeanParamUtil.getString(structure, request, "script");
 	<portlet:param name="mvcPath" value="/edit_form.jsp" />
 </portlet:actionURL>
 
-<aui:form action="<%= editFormURL %>" method="post" name="fm">
+<aui:form action="<%= editFormURL %>" method="post" name="editForm">
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= (structure != null) ? Constants.UPDATE : Constants.ADD %>" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="groupId" type="hidden" value="<%= groupId %>" />
 	<aui:input name="definition" type="hidden" />
+	<aui:input name="layout" type="hidden" />
 	<aui:input name="saveAndContinue" type="hidden" value="<%= false %>" />
 
 	<%
@@ -89,6 +90,7 @@ String script = BeanParamUtil.getString(structure, request, "script");
 	<aui:script use="liferay-forms-portlet">
 		new Liferay.Forms.Portlet(
 			{
+				formName: 'editForm',
 				namespace: '<portlet:namespace />'
 			}
 		);
