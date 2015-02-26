@@ -2,12 +2,13 @@ AUI.add(
 	'liferay-forms-portlet',
 	function(A) {
 		var Lang = A.Lang;
+		var DefinitionSerializer = Liferay.Forms.DefinitionSerializer;
 		var LayoutSerializer = Liferay.Forms.LayoutSerializer;
 
 		var FormsPortlet = A.Component.create(
 			{
 				ATTRS: {
-					formName: {
+					editFormName: {
 						setter: 'ns'
 					}
 				},
@@ -21,6 +22,9 @@ AUI.add(
 				prototype: {
 					initializer: function(config) {
 						var instance = this;
+
+						instance.definitionSerializer = new DefinitionSerializer();
+						instance.layoutSerializer = new LayoutSerializer();
 
 						instance.bindUI();
 					},
@@ -43,15 +47,15 @@ AUI.add(
 					_afterFormRegistered: function(event) {
 						var instance = this;
 
-						var form = Liferay.Form.get(instance.get('formName'));;
+						var editForm = Liferay.Form.get(instance.get('editFormName'));;
 
-						if (form === event.form) {
+						if (editForm === event.form) {
 							Liferay.component(
 								instance.ns('FormSteps'),
 								function() {
 									return new Liferay.Forms.Steps(
 										{
-											form: form,
+											form: editForm,
 											namespace: instance.get('namespace'),
 											tabView: Liferay.component(instance.ns('fmTabview'))
 										}
@@ -61,7 +65,7 @@ AUI.add(
 
 							Liferay.component(instance.ns('FormSteps')).syncUI();
 
-							form.set('onSubmit', A.bind(instance._onSubmit, instance));
+							editForm.set('onSubmit', A.bind(instance._onSubmitEditForm, instance));
 						}
 					},
 
@@ -71,7 +75,7 @@ AUI.add(
 						instance.destroy();
 					},
 
-					_onSubmit: function(event) {
+					_onSubmitEditForm: function(event) {
 						var instance = this;
 
 						event.preventDefault();
@@ -80,9 +84,19 @@ AUI.add(
 
 						var layout = formBuilder.get('layout');
 
+						var definitionInput = instance.one('#definition');
+
+						instance.definitionSerializer.set('layout', layout);
+
+						definitionInput.val(instance.definitionSerializer.serialize());
+
+						console.log(definitionInput.val());
+
 						var layoutInput = instance.one('#layout');
 
-						layoutInput.val(A.JSON.stringify(LayoutSerializer.serialize(layout)));
+						instance.layoutSerializer.set('layout', layout);
+
+						layoutInput.val(instance.layoutSerializer.serialize());
 
 						console.log(layoutInput.val());
 					}
@@ -94,6 +108,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-base', 'json', 'liferay-forms-layout-serializer', 'liferay-forms-steps', 'liferay-portlet-base']
+		requires: ['aui-base', 'liferay-forms-definition-serializer', 'liferay-forms-layout-serializer', 'liferay-forms-steps', 'liferay-portlet-base']
 	}
 );

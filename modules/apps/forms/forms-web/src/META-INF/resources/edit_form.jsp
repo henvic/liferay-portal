@@ -90,7 +90,7 @@ String script = BeanParamUtil.getString(structure, request, "script");
 	<aui:script use="liferay-forms-portlet">
 		new Liferay.Forms.Portlet(
 			{
-				formName: 'editForm',
+				editFormName: 'editForm',
 				namespace: '<portlet:namespace />'
 			}
 		);

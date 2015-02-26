@@ -5,6 +5,12 @@
 				forms: {
 					base: '/o/comliferayformsweb/js/',
 					modules: {
+						'liferay-forms-definition-serializer': {
+							path: 'form_definition_serializer.js',
+							requires: [
+								'liferay-forms-form-builder'
+							]
+						},
 						'liferay-forms-field-base': {
 							path: 'form_field_base.js',
 							requires: [

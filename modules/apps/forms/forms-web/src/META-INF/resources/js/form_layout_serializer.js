@@ -3,109 +3,54 @@ AUI.add(
 	function(A) {
 		var AArray = A.Array;
 
-		var LOCALIZABLE_FIELD_ATTRS = ['label', 'options', 'predefinedValue', 'style', 'tip'];
+		var LayoutSerializer = A.Component.create(
+			{
+				ATTRS: {
+					layout: {
+						validator: function(val) {
+							return A.instanceOf(val, A.Layout);
+						}
+					}
+				},
 
-		var UNLOCALIZABLE_FIELD_ATTRS = ['dataType', 'fieldNamespace', 'indexType', 'localizable', 'multiple', 'name', 'readOnly', 'repeatable', 'required', 'showLabel', 'type'];
+				EXTENDS: A.Base,
 
-		var LayoutSerializer = {
-			deserialize: function(layoutJSON, definitionJSON) {
-				var instance = this;
+				NAME: 'liferay-forms-layout-serializer',
 
-				var rows = [];
+				prototype: {
+					getRowType: function(row) {
+						var instance = this;
 
-				AArray.each(
-					layoutJSON.rows,
-					function(item, index) {
-						var row = new A[item.type](
+						var type;
+
+						if (A.instanceOf(row, A.FormBuilderPageBreakRow)) {
+							type = 'FormBuilderPageBreakRow';
+						}
+						else {
+							type = 'LayoutRow';
+						}
+
+						return type;
+					},
+
+					serialize: function(layout) {
+						var instance = this;
+
+						var layout = instance.get('layout');
+
+						return A.JSON.stringify(
 							{
-								cols: instance.deserializeColumns(item.columns, definitionJSON)
+								rows: instance.serializeRows(layout.get('rows'))
 							}
 						);
+					},
 
-						rows.push(row);
-					}
-				);
+					serializeColumn: function(column) {
+						var instance = this;
 
-				return { rows: rows };
-			},
-
-			deserializeColumns: function(columns, definition) {
-				var instance = this;
-
-				var cols = [];
-
-				AArray.each(
-					columns,
-					function(item, index) {
-						var col = new A.LayoutCol(
-							{
-								size: item.size,
-								value: instance.deserializeField(item.fieldName, definition)
-							}
-						);
-
-						cols.push(col);
-					}
-				);
-
-				return cols;
-			},
-
-			deserializeField: function(fieldName, definition) {
-				var instance = this;
-
-				var fieldInfo = Liferay.DDM.Form.Util.getFieldInfo(definition, 'name', fieldName);
-
-				var type = instance.getType(fieldInfo.type);
-
-				var array = type.fieldClass.split('.');
-
-				return new A[array[1]]({
-					name: fieldName
-				});
-			},
-
-			getRowType: function(row) {
-				var instance = this;
-
-				var type;
-
-				if (A.instanceOf(row, A.FormBuilderPageBreakRow)) {
-					type = 'FormBuilderPageBreakRow';
-				}
-				else {
-					type = 'LayoutRow';
-				}
-
-				return type;
-			},
-
-			getType: function(name) {
-				return AArray.filter(
-					Liferay.DDM.Types,
-					function(item, index, collection) {
-						return item.name === name;
-					}
-				)[0];
-			},
-
-			serialize: function(layout) {
-				var instance = this;
-
-				return {
-					rows: instance.serializeRows(layout.get('rows'))
-				};
-			},
-
-			serializeCols: function(columns) {
-				var instance = this;
-
-				return AArray.map(
-					columns,
-					function(item, index) {
 						var fieldName = '';
 
-						var value = item.get('value');
+						var value = column.get('value');
 
 						if (A.instanceOf(value, A.FormField)) {
 							fieldName = value.get('name');
@@ -113,36 +58,43 @@ AUI.add(
 
 						return {
 							fieldName: fieldName,
-							size: item.get('size')
+							size: column.get('size')
 						}
-					}
-				);
-			},
+					},
 
-			serializeRows: function(rows) {
-				var instance = this;
+					serializeColumns: function(columns) {
+						var instance = this;
 
-				return AArray.map(
-					rows,
-					function(item, index) {
-						var row = {
-							type: instance.getRowType(item)
+						return AArray.map(columns, A.bind(instance.serializeColumn, instance));
+					},
+
+					serializeRow: function(row) {
+						var instance = this;
+
+						var rowJSON = {
+							type: instance.getRowType(row)
 						};
 
-						if (row.type !== 'FormBuilderPageBreakRow') {
-							row.cols = instance.serializeCols(item.get('cols'));
+						if (rowJSON.type !== 'PageBreakRow') {
+							rowJSON.cols = instance.serializeColumns(row.get('cols'));
 						}
 
-						return row;
+						return rowJSON;
+					},
+
+					serializeRows: function(rows) {
+						var instance = this;
+
+						return AArray.map(rows, A.bind(instance.serializeRow, instance));
 					}
-				);
+				}
 			}
-		};
+		);
 
 		Liferay.namespace('Forms').LayoutSerializer = LayoutSerializer;
 	},
 	'',
 	{
-		requires: ['aui-form-builder-page-break-row', 'aui-form-builder-field-text', 'aui-layout', 'liferay-ddm-form']
+		requires: ['form-builder-page-break-row', 'aui-layout', 'json']
 	}
 );

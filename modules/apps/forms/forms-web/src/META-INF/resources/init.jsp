@@ -107,6 +107,7 @@ page import="javax.portlet.PortletURL" %>
 <%@ page import="com.liferay.portlet.dynamicdatamapping.io.DDMFormLayoutJSONSerializerUtil" %>
 <%@ page import="com.liferay.portlet.dynamicdatamapping.util.DDMFormFieldTypesHelper" %>
 
+<%@page import="sun.reflect.generics.tree.FieldTypeSignature"%>
 <%@page import="com.liferay.portal.kernel.dao.search.DisplayTerms"%>
 
 <liferay-theme:defineObjects />

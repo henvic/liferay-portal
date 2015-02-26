@@ -14,6 +14,9 @@
 
 package com.liferay.portlet.dynamicdatamapping.util;
 
+import java.util.List;
+import java.util.Set;
+
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -22,10 +25,6 @@ import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldType;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldTypeRegistryUtil;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldTypeSetting;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldTypeSettingEditor;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Bruno Basto

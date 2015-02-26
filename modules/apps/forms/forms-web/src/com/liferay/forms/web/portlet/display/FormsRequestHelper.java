@@ -15,6 +15,7 @@
 package com.liferay.forms.web.portlet.display;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderResponse;
@@ -23,6 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.display.context.util.BaseRequestHelper;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -37,6 +40,8 @@ import com.liferay.portlet.dynamicdatalists.service.DDLRecordSetServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants;
+import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldType;
+import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldTypeRegistryUtil;
 import com.liferay.portlet.dynamicdatamapping.service.permission.DDMPermission;
 import com.liferay.portlet.dynamicdatamapping.service.permission.DDMStructurePermission;
 import com.liferay.portlet.dynamicdatamapping.storage.StorageType;
