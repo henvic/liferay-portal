@@ -39,6 +39,9 @@ import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordSetConstants;
 import com.liferay.portlet.dynamicdatalists.search.RecordSetSearchTerms;
 import com.liferay.portlet.dynamicdatalists.service.DDLRecordSetServiceUtil;
+import com.liferay.portlet.dynamicdatamapping.io.DDMFormJSONSerializerUtil;
+import com.liferay.portlet.dynamicdatamapping.io.DDMFormLayoutJSONSerializer;
+import com.liferay.portlet.dynamicdatamapping.io.DDMFormLayoutJSONSerializerUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants;
@@ -49,6 +52,7 @@ import com.liferay.portlet.dynamicdatamapping.service.permission.DDMStructurePer
 import com.liferay.portlet.dynamicdatamapping.storage.StorageType;
 import com.liferay.portlet.dynamicdatamapping.util.DDMDisplay;
 import com.liferay.portlet.dynamicdatamapping.util.DDMDisplayRegistryUtil;
+import com.liferay.portlet.dynamicdatamapping.util.DDMLayoutHelper;
 public class FormsRequestHelper extends BaseRequestHelper {
 
 	public FormsRequestHelper(HttpServletRequest request) {
@@ -231,6 +235,10 @@ public class FormsRequestHelper extends BaseRequestHelper {
 		return ddmFormLayout;
 	}
 	
+	public String formSerializer(DDMFormLayout ddmFormLayout) {
+		return DDMFormLayoutJSONSerializerUtil.serialize(ddmFormLayout);
+	}
+
 	public URL getSoyURL() {
 		Class<?> clazz = getClass();
 
