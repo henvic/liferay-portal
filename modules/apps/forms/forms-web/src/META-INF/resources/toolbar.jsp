@@ -38,7 +38,12 @@ long groupId = ParamUtil.getLong(request, "groupId", scopeGroupId);
 				<portlet:param name="redirect" value="<%= PortalUtil.getCurrentURL(request) %>" />
 			</portlet:renderURL>
 
+			<portlet:renderURL var="testExampleLink">
+				<portlet:param name="mvcPath" value="/test.jsp" />
+			</portlet:renderURL>
+
 			<aui:nav-item href="<%= addStructureURL %>" iconCssClass="icon-plus" label="add" selected='<%= toolbarItem.equals("add") %>' />
+			<aui:nav-item href="<%= testExampleLink %>" label="Test example" />
 		</c:if>
 	</aui:nav>
 
