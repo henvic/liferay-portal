@@ -14,6 +14,7 @@
 
 package com.liferay.forms.web.portlet.display;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
@@ -26,6 +27,7 @@ import com.liferay.portal.kernel.display.context.util.BaseRequestHelper;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.template.URLTemplateResource;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -227,6 +229,14 @@ public class FormsRequestHelper extends BaseRequestHelper {
 		}
 		
 		return ddmFormLayout;
+	}
+	
+	public URL getSoyURL() {
+		Class<?> clazz = getClass();
+
+		ClassLoader classLoader = clazz.getClassLoader();
+
+		return classLoader.getResource("/META-INF/resources/test.soy");
 	}
 	
 	private static final String[] _FORM_CATEGORY_NAMES = { "basic_info", "form_builder" };
