@@ -1,0 +1,26 @@
+{namespace ddm}
+
+/**
+ * Prints the DDM form alloyEditor field.
+ *
+ * @param childElementsHTML
+ * @param label
+ * @param name
+ * @param required
+ * @param value
+ * @param visible
+ */
+{template .alloyEditor}
+	<div class="form-group{$visible ? '' : ' hide'}" data-fieldname="{$name}">
+		<label class="control-label" for="{$name}">
+			{$label}
+
+			{if $required}
+				<b>*</b>
+			{/if}
+		</label>
+		<div class="field form-control"  id="{$name}" name="{$name}">{$value}</div>
+
+		{$childElementsHTML|noAutoescape}
+	</div>
+{/template}
