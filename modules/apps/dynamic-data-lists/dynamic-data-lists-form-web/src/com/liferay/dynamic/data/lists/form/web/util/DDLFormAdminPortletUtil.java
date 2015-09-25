@@ -60,16 +60,6 @@ public class DDLFormAdminPortletUtil {
 		Process process = processBuilder.start();
 
 		process.waitFor();
-
-//		ImageBag imageBag  = ImageToolUtil.read(
-//			FileUtil.getBytes(new File(thumbPath)));
-//
-//		RenderedImage renderedImage = ImageToolUtil.scale(
-	imageBag.getRenderedImage(), 500, 400);
-//
-//		byte[] bytes = ImageToolUtil.getBytes(renderedImage, "image/png");
-//
-//		FileUtil.write(thumbPath, bytes);
 	}
 
 }
