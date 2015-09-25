@@ -73,6 +73,7 @@ public class TextDDMFormFieldRenderer extends BaseDDMFormFieldRenderer {
 		LocalizedValue placeholder = (LocalizedValue)ddmFormField.getProperty(
 			"placeholder");
 
+		template.put("displayStyle", ddmFormField.getProperty("displayStyle"));
 		template.put(
 			"placeholder",
 			placeholder.getString(ddmFormFieldRenderingContext.getLocale()));

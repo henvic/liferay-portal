@@ -14,6 +14,7 @@
 
 package com.liferay.dynamic.data.lists.form.web.util;
 
+import com.liferay.dynamic.data.lists.form.web.configuration.DDLFormWebConfigurationUtil;
 import com.liferay.dynamic.data.lists.model.DDLRecord;
 import com.liferay.dynamic.data.lists.util.comparator.DDLRecordIdComparator;
 import com.liferay.dynamic.data.lists.util.comparator.DDLRecordModifiedDateComparator;
@@ -43,6 +44,32 @@ public class DDLFormAdminPortletUtil {
 		}
 
 		return orderByComparator;
+	}
+
+	public static void saveThumbnail(long recordSetId) throws Exception {
+		String url =
+			"http://localhost:8080/o/ddm-form-renderer-servlet?recordSetId=" + recordSetId;
+
+		String thumbPath = DDLFormWebConfigurationUtil.get(
+			"thumb.path") + recordSetId + ".png";
+
+		ProcessBuilder processBuilder = new ProcessBuilder(
+			DDLFormWebConfigurationUtil.get("wkhtmltoimage.path"), "-f", "png",
+			"--height", "900", url, thumbPath);
+
+		Process process = processBuilder.start();
+
+		process.waitFor();
+
+//		ImageBag imageBag  = ImageToolUtil.read(
+//			FileUtil.getBytes(new File(thumbPath)));
+//
+//		RenderedImage renderedImage = ImageToolUtil.scale(
+	imageBag.getRenderedImage(), 500, 400);
+//
+//		byte[] bytes = ImageToolUtil.getBytes(renderedImage, "image/png");
+//
+//		FileUtil.write(thumbPath, bytes);
 	}
 
 }
