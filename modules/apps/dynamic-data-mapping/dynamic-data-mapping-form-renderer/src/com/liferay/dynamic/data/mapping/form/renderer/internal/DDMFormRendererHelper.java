@@ -89,6 +89,22 @@ public class DDMFormRendererHelper {
 		return ddmFormFieldRenderingContext;
 	}
 
+	protected Map<String, DDMFormFieldEvaluationResult> evaluateDDMForm(
+			Locale locale)
+		throws DDMFormRenderingException {
+
+		try {
+			DDMFormEvaluationResult ddmFormEvaluationResult =
+				_ddmFormEvaluator.evaluate(_ddmForm, _ddmFormValues, locale);
+
+			return ddmFormEvaluationResult.
+				getDDMFormFieldEvaluationResultsMap();
+		}
+		catch (DDMFormEvaluationException ddmfee) {
+			throw new DDMFormRenderingException(ddmfee);
+		}
+	}
+
 	protected String getAffixedDDMFormFieldParameterName(
 		String ddmFormFieldParameterName) {
 
@@ -221,13 +237,6 @@ public class DDMFormRendererHelper {
 		return renderDDMFormField(ddmFormField, ddmFormFieldRenderingContext);
 	}
 
-	protected void setDDMFormFieldRenderingContextRequired(
-		boolean required, 
-		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
-
-		ddmFormFieldRenderingContext.setRequired(required);
-	}
-
 	protected String renderDDMFormFieldValue(
 			DDMFormFieldValue ddmFormFieldValue,
 			DDMFormFieldRenderingContext ddmFormFieldRenderingContext)
@@ -303,6 +312,10 @@ public class DDMFormRendererHelper {
 		return sb.toString();
 	}
 
+	protected void setDDMFormEvaluator(DDMFormEvaluator ddmFormEvaluator) {
+		_ddmFormEvaluator = ddmFormEvaluator;
+	}
+
 	protected void setDDMFormFieldRenderingContextChildElementsHTML(
 		String childElementsHTML,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
@@ -334,6 +347,13 @@ public class DDMFormRendererHelper {
 		ddmFormFieldRenderingContext.setName(name);
 	}
 
+	protected void setDDMFormFieldRenderingContextRequired(
+		boolean required,
+		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
+
+		ddmFormFieldRenderingContext.setRequired(required);
+	}
+
 	protected void setDDMFormFieldRenderingContextValue(
 		Value value,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
@@ -348,51 +368,29 @@ public class DDMFormRendererHelper {
 
 	protected void setDDMFormFieldRenderingContextVisible(
 			String visibilityExpression, String fieldName,
-			DDMFormFieldRenderingContext ddmFormFieldRenderingContext) 
+			DDMFormFieldRenderingContext ddmFormFieldRenderingContext)
 		throws DDMFormRenderingException {
 
 		boolean visible = true;
 
 		if (Validator.isNotNull(visibilityExpression)) {
-			Map<String, DDMFormFieldEvaluationResult> 
-				ddmFormFieldEvaluationResultsMap = 
-					evaluateDDMForm(
-						ddmFormFieldRenderingContext.getLocale());
-			
-			DDMFormFieldEvaluationResult ddmFormFieldEvaluationResult = 
+			Map<String, DDMFormFieldEvaluationResult>
+				ddmFormFieldEvaluationResultsMap = evaluateDDMForm(
+					ddmFormFieldRenderingContext.getLocale());
+
+			DDMFormFieldEvaluationResult ddmFormFieldEvaluationResult =
 				ddmFormFieldEvaluationResultsMap.get(fieldName);
-			
+
 			visible = ddmFormFieldEvaluationResult.isVisible();
 		}
 
 		ddmFormFieldRenderingContext.setVisible(visible);
-	}
-	
-	protected Map<String, DDMFormFieldEvaluationResult> evaluateDDMForm(
-			Locale locale) 
-		throws DDMFormRenderingException {
-		
-		try {
-			DDMFormEvaluationResult ddmFormEvaluationResult =
-				_ddmFormEvaluator.evaluate(
-					_ddmForm, _ddmFormValues, locale);
-			
-			return ddmFormEvaluationResult.
-				getDDMFormFieldEvaluationResultsMap();
-		}
-		catch (DDMFormEvaluationException ddmfee) {
-			throw new DDMFormRenderingException(ddmfee);
-		}
 	}
 
 	protected void setDDMFormFieldTypeServicesTracker(
 		DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker) {
 
 		_ddmFormFieldTypeServicesTracker = ddmFormFieldTypeServicesTracker;
-	}
-
-	protected void setDDMFormEvaluator(DDMFormEvaluator ddmFormEvaluator) {
-		_ddmFormEvaluator = ddmFormEvaluator;
 	}
 
 	protected String wrapDDMFormFieldHTML(String ddmFormFieldHTML) {
@@ -407,10 +405,10 @@ public class DDMFormRendererHelper {
 	}
 
 	private final DDMForm _ddmForm;
+	private DDMFormEvaluator _ddmFormEvaluator;
 	private final Map<String, DDMFormField> _ddmFormFieldsMap;
 	private DDMFormFieldTypeServicesTracker _ddmFormFieldTypeServicesTracker;
 	private final DDMFormRenderingContext _ddmFormRenderingContext;
 	private final DDMFormValues _ddmFormValues;
-	private DDMFormEvaluator _ddmFormEvaluator;
 
 }

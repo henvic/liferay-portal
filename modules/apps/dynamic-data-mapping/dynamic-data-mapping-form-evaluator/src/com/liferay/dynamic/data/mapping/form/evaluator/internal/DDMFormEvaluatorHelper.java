@@ -47,37 +47,13 @@ public class DDMFormEvaluatorHelper {
 		DDMForm ddmForm, DDMFormValues ddmFormValues, Locale locale) {
 
 		_ddmFormFieldsMap = ddmForm.getDDMFormFieldsMap(true);
-		
+
 		if (ddmFormValues == null) {
 			ddmFormValues = createEmptyDDMFormValues(ddmForm);
 		}
-		
+
 		_rootDDMFormFieldValues = ddmFormValues.getDDMFormFieldValues();
 		_locale = locale;
-	}
-
-	protected DDMFormValues createEmptyDDMFormValues(DDMForm ddmForm) {
-		DDMFormValues ddmFormValues = new DDMFormValues(ddmForm);
-		
-		for (DDMFormField ddmFormField : ddmForm.getDDMFormFields()) {
-			DDMFormFieldValue ddmFormFieldValue = new DDMFormFieldValue();
-			
-			ddmFormFieldValue.setName(ddmFormField.getName());
-			
-			Value value = new UnlocalizedValue(StringPool.BLANK);
-			
-			if (ddmFormField.isLocalizable()) {
-				value = new LocalizedValue(_locale);
-				
-				value.addString(_locale, StringPool.BLANK);
-			}
-			
-			ddmFormFieldValue.setValue(value);
-			
-			ddmFormValues.addDDMFormFieldValue(ddmFormFieldValue);
-		}
-		
-		return ddmFormValues;
 	}
 
 	public DDMFormEvaluationResult evaluate() throws PortalException {
@@ -92,6 +68,30 @@ public class DDMFormEvaluatorHelper {
 			ddmFormFieldEvaluationResults);
 
 		return ddmFormEvaluationResult;
+	}
+
+	protected DDMFormValues createEmptyDDMFormValues(DDMForm ddmForm) {
+		DDMFormValues ddmFormValues = new DDMFormValues(ddmForm);
+
+		for (DDMFormField ddmFormField : ddmForm.getDDMFormFields()) {
+			DDMFormFieldValue ddmFormFieldValue = new DDMFormFieldValue();
+
+			ddmFormFieldValue.setName(ddmFormField.getName());
+
+			Value value = new UnlocalizedValue(StringPool.BLANK);
+
+			if (ddmFormField.isLocalizable()) {
+				value = new LocalizedValue(_locale);
+
+				value.addString(_locale, StringPool.BLANK);
+			}
+
+			ddmFormFieldValue.setValue(value);
+
+			ddmFormValues.addDDMFormFieldValue(ddmFormFieldValue);
+		}
+
+		return ddmFormValues;
 	}
 
 	protected boolean evaluateBooleanExpression(

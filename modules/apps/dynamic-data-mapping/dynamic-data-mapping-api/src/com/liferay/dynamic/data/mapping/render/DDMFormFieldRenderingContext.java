@@ -75,16 +75,16 @@ public class DDMFormFieldRenderingContext {
 		return _readOnly;
 	}
 
+	public boolean isRequired() {
+		return _required;
+	}
+
 	public boolean isShowEmptyFieldLabel() {
 		return _showEmptyFieldLabel;
 	}
 
 	public boolean isVisible() {
 		return _visible;
-	}
-	
-	public boolean isRequired() {
-		return _required;
 	}
 
 	public void setChildElementsHTML(String childElementsHTML) {
@@ -141,6 +141,10 @@ public class DDMFormFieldRenderingContext {
 		_readOnly = readOnly;
 	}
 
+	public void setRequired(boolean required) {
+		_required = required;
+	}
+
 	public void setShowEmptyFieldLabel(boolean showEmptyFieldLabel) {
 		_showEmptyFieldLabel = showEmptyFieldLabel;
 	}
@@ -151,9 +155,6 @@ public class DDMFormFieldRenderingContext {
 
 	public void setVisible(boolean visible) {
 		_visible = visible;
-	}
-	public void setRequired(boolean required) {
-		_required = required;
 	}
 
 	private String _childElementsHTML;
@@ -167,9 +168,9 @@ public class DDMFormFieldRenderingContext {
 	private String _namespace;
 	private String _portletNamespace;
 	private boolean _readOnly;
+	private boolean _required;
 	private boolean _showEmptyFieldLabel;
 	private String _value;
 	private boolean _visible;
-	private boolean _required;
 
 }

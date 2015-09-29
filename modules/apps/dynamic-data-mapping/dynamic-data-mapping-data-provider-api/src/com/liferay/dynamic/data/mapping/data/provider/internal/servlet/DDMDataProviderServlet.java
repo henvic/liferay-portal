@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,7 +112,7 @@ public class DDMDataProviderServlet extends HttpServlet {
 
 			Set<String> dataProviderKeys =
 				_ddmDataProviderServiceTrackerMap.keySet();
-			
+
 			for (String key : dataProviderKeys) {
 				DDMDataProviderSettings ddmDataProviderSettings =
 					_ddmDataProviderSettingsServiceTrackerMap.getService(key);
