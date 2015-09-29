@@ -82,6 +82,10 @@ public class DDMFormFieldRenderingContext {
 	public boolean isVisible() {
 		return _visible;
 	}
+	
+	public boolean isRequired() {
+		return _required;
+	}
 
 	public void setChildElementsHTML(String childElementsHTML) {
 		_childElementsHTML = childElementsHTML;
@@ -148,6 +152,9 @@ public class DDMFormFieldRenderingContext {
 	public void setVisible(boolean visible) {
 		_visible = visible;
 	}
+	public void setRequired(boolean required) {
+		_required = required;
+	}
 
 	private String _childElementsHTML;
 	private Fields _fields;
@@ -163,5 +170,6 @@ public class DDMFormFieldRenderingContext {
 	private boolean _showEmptyFieldLabel;
 	private String _value;
 	private boolean _visible;
+	private boolean _required;
 
 }

@@ -20,6 +20,7 @@ import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidation;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
+import com.liferay.dynamic.data.mapping.model.UnlocalizedValue;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
@@ -27,6 +28,7 @@ import com.liferay.portal.expression.Expression;
 import com.liferay.portal.expression.ExpressionFactory;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
@@ -45,8 +47,37 @@ public class DDMFormEvaluatorHelper {
 		DDMForm ddmForm, DDMFormValues ddmFormValues, Locale locale) {
 
 		_ddmFormFieldsMap = ddmForm.getDDMFormFieldsMap(true);
+		
+		if (ddmFormValues == null) {
+			ddmFormValues = createEmptyDDMFormValues(ddmForm);
+		}
+		
 		_rootDDMFormFieldValues = ddmFormValues.getDDMFormFieldValues();
 		_locale = locale;
+	}
+
+	protected DDMFormValues createEmptyDDMFormValues(DDMForm ddmForm) {
+		DDMFormValues ddmFormValues = new DDMFormValues(ddmForm);
+		
+		for (DDMFormField ddmFormField : ddmForm.getDDMFormFields()) {
+			DDMFormFieldValue ddmFormFieldValue = new DDMFormFieldValue();
+			
+			ddmFormFieldValue.setName(ddmFormField.getName());
+			
+			Value value = new UnlocalizedValue(StringPool.BLANK);
+			
+			if (ddmFormField.isLocalizable()) {
+				value = new LocalizedValue(_locale);
+				
+				value.addString(_locale, StringPool.BLANK);
+			}
+			
+			ddmFormFieldValue.setValue(value);
+			
+			ddmFormValues.addDDMFormFieldValue(ddmFormFieldValue);
+		}
+		
+		return ddmFormValues;
 	}
 
 	public DDMFormEvaluationResult evaluate() throws PortalException {

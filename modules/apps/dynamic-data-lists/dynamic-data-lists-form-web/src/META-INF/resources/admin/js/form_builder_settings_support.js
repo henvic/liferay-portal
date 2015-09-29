@@ -114,6 +114,10 @@ AUI.add(
 				);
 			},
 
+			syncVisibility: function() {},
+
+			validate: function() {},
+
 			validateSettings: function(callback) {
 				var instance = this;
 

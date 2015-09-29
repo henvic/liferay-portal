@@ -36,25 +36,29 @@ AUI.add(
 			processVisibility: function(result) {
 				var instance = this;
 
-				var instanceId = instance.get('instanceId');
+				var visibility;
 
-				var visibility = Util.getFieldByKey(result, instanceId, 'instanceId');
+				if (result && Lang.isObject(result)) {
+					var name = instance.get('name');
 
-				if (visibility !== undefined) {
-					instance.set('visible', visibility.visible);
+					visibility = Util.getFieldByKey(result, name, 'name');
 				}
+
+				return visibility;
 			},
 
 			processVisibilityEvaluation: function(result) {
 				var instance = this;
 
-				if (result && Lang.isObject(result)) {
-					instance.getRoot().eachField(
-						function(field) {
-							field.processVisibility(result);
+				instance.getRoot().eachField(
+					function(field) {
+						var visibility = field.processVisibility(result);
+
+						if (visibility) {
+							field.set('visible', visibility.visible);
 						}
-					);
-				}
+					}
+				);
 			},
 
 			syncVisibility: function() {
@@ -67,6 +71,12 @@ AUI.add(
 				evaluator.evaluate();
 			},
 
+			_afterValueChanged: function() {
+				var instance = this;
+
+				instance.syncVisibility();
+			},
+
 			_afterVisibilityEvaluationEnded: function(event) {
 				var instance = this;
 
@@ -77,22 +87,39 @@ AUI.add(
 				instance.processVisibilityEvaluation(result);
 			},
 
-			_afterValueChanged: function() {
-				var instance = this;
-
-				instance.syncVisibility();
-			},
-
 			_afterVisibleChange: function() {
 				var instance = this;
 
+				var value = instance.getValue();
+
 				instance.render();
+
+				instance.setValue(value);
 			},
 
 			_valueVisible: function() {
 				var instance = this;
 
-				return instance.get('visibilityExpression') !== 'false';
+				var form = instance.getRoot();
+
+				var visible = true;
+
+				if (form) {
+					var evaluation = form.get('evaluation');
+
+					if (evaluation) {
+						var visibility = instance.processVisibility(evaluation);
+
+						if (visibility) {
+							visible = visibility.visible;
+						}
+					}
+					else {
+						visible = instance.get('visibilityExpression') !== 'false';
+					}
+				}
+
+				return visible;
 			}
 		};
 

@@ -12,6 +12,10 @@ AUI.add(
 						value: '/o/ddm-data-provider'
 					},
 
+					datasources: {
+						value: {}
+					},
+
 					type: {
 						value: 'datasource'
 					}
@@ -22,10 +26,14 @@ AUI.add(
 				NAME: 'liferay-ddm-form-field-datasource',
 
 				prototype: {
-					destructor: function() {
+					initializer: function() {
 						var instance = this;
 
-						instance._destroyed = true;
+						instance._eventHandlers.push(
+							instance.after('datasourcesChange', instance.showDatasourcesList)
+						);
+
+						instance.loadDatasources();
 					},
 
 					getValue: function() {
@@ -61,6 +69,30 @@ AUI.add(
 						spinnerNode.hide();
 					},
 
+					loadDatasources: function() {
+						var instance = this;
+
+						if (!instance._loaded && !instance._loading) {
+							instance.showDatasourceLoader();
+
+							instance._loading = true;
+
+							instance._getJSON(
+								{
+									cmd: 'list'
+								},
+								function(datasources) {
+									instance.hideDatasourceLoader();
+
+									instance.set('datasources', datasources);
+
+									instance._loading = false;
+									instance._loaded = true;
+								}
+							);
+						}
+					},
+
 					render: function() {
 						var instance = this;
 
@@ -90,68 +122,54 @@ AUI.add(
 
 						var container = instance.get('container');
 
-						instance.showDatasourceLoader();
+						var datasources = instance.get('datasources');
 
-						instance._getJSON(
-							{
-								cmd: 'list'
-							},
-							function(datasources) {
-								instance.hideDatasourceLoader();
+						var options = [];
 
-								var options = [];
-
-								if (datasources && datasources.length) {
-									options = datasources.map(
-										function(datasource) {
-											return Lang.sub(
-												TPL_OPTION,
-												{
-													label: datasource,
-													value: datasource
-												}
-											);
-										}
+						if (datasources) {
+							A.each(
+								datasources,
+								function(datasource, name) {
+									options.push(
+										Lang.sub(
+											TPL_OPTION,
+											{
+												label: name,
+												value: name
+											}
+										)
 									);
 								}
+							);
+						}
 
-								var datasourcesSelectNode = container.one('.datasource-select');
+						var datasourcesSelectNode = container.one('.datasource-select');
 
-								datasourcesSelectNode.html(options.join(''));
+						datasourcesSelectNode.html(options.join(''));
 
-								instance.showSelectedDatasourceForm();
-							}
-						);
+						instance.showSelectedDatasourceForm(datasources);
 					},
 
-					showSelectedDatasourceForm: function() {
+					showSelectedDatasourceForm: function(datasources) {
 						var instance = this;
 
 						var container = instance.get('container');
 
 						var datasourcesSelectNode = container.one('.datasource-select');
 
-						instance.showDatasourceLoader();
+						var definition = datasources[datasourcesSelectNode.val()];
 
-						instance._getJSON(
-							{
-								cmd: 'getSettings',
-								name: datasourcesSelectNode.val()
-							},
-							function(definition) {
-								instance.hideDatasourceLoader();
-
-								instance.datasourceForm = new Liferay.DDM.Renderer.Form(
-									{
-										container: container.one('.datasource-form'),
-										definition: definition,
-										portletNamespace: instance.get('portletNamespace'),
-										templateNamespace: 'ddm.simple_form',
-										values: instance._getValue()
-									}
-								).render();
-							}
-						);
+						if (definition) {
+							instance.datasourceForm = new Liferay.DDM.Renderer.Form(
+								{
+									container: container.one('.datasource-form'),
+									definition: definition,
+									portletNamespace: instance.get('portletNamespace'),
+									templateNamespace: 'ddm.simple_form',
+									values: instance._getValue()
+								}
+							).render();
+						}
 					},
 
 					_getJSON: function(data, callback) {
@@ -165,14 +183,10 @@ AUI.add(
 								method: 'GET',
 								on: {
 									failure: function() {
-										if (!instance._destroyed) {
-											callback.call(instance, null);
-										}
+										callback.call(instance, null);
 									},
 									success: function() {
-										if (!instance._destroyed) {
-											callback.call(instance, this.get('responseData'));
-										}
+										callback.call(instance, this.get('responseData'));
 									}
 								}
 							}

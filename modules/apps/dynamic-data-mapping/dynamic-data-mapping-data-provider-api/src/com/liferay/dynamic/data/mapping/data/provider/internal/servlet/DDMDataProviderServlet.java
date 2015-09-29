@@ -25,10 +25,9 @@ import com.liferay.osgi.service.tracker.map.ServiceTrackerCustomizerFactory.Serv
 import com.liferay.osgi.service.tracker.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONSerializer;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.KeyValuePair;
@@ -37,7 +36,6 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.IOException;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,29 +102,35 @@ public class DDMDataProviderServlet extends HttpServlet {
 
 		String cmd = ParamUtil.getString(request, "cmd");
 
-		JSONSerializer jsonSerializer = _jsonFactory.createJSONSerializer();
-
 		response.setContentType(ContentTypes.APPLICATION_JSON);
 		response.setStatus(HttpServletResponse.SC_OK);
 
 		if (Validator.equals(cmd, "list")) {
+			JSONObject dataProvidersJSONObject =
+				JSONFactoryUtil.createJSONObject();
+
 			Set<String> dataProviderKeys =
 				_ddmDataProviderServiceTrackerMap.keySet();
+			
+			for (String key : dataProviderKeys) {
+				DDMDataProviderSettings ddmDataProviderSettings =
+					_ddmDataProviderSettingsServiceTrackerMap.getService(key);
+
+				DDMForm ddmForm = DDMFormFactory.create(
+					ddmDataProviderSettings.getSettings());
+
+				try {
+					dataProvidersJSONObject.put(
+						key,
+						JSONFactoryUtil.createJSONObject(
+							_ddmFormJSONSerializer.serialize(ddmForm)));
+				}
+				catch (JSONException e) {
+				}
+			}
 
 			ServletResponseUtil.write(
-				response, jsonSerializer.serializeDeep(dataProviderKeys));
-		}
-		else if (Validator.equals(cmd, "getSettings")) {
-			String name = ParamUtil.getString(request, "name");
-
-			DDMDataProviderSettings ddmDataProviderSettings =
-				_ddmDataProviderSettingsServiceTrackerMap.getService(name);
-
-			DDMForm ddmForm = DDMFormFactory.create(
-				ddmDataProviderSettings.getSettings());
-
-			ServletResponseUtil.write(
-				response, _ddmFormJSONSerializer.serialize(ddmForm));
+				response, dataProvidersJSONObject.toString());
 		}
 		else {
 			JSONArray optionsJSONArray = JSONFactoryUtil.createJSONArray();
@@ -192,11 +196,6 @@ public class DDMDataProviderServlet extends HttpServlet {
 		_ddmFormJSONSerializer = ddmFormJSONSerializer;
 	}
 
-	@Reference
-	protected void setJSONFactory(JSONFactory jsonFactory) {
-		_jsonFactory = jsonFactory;
-	}
-
 	private static final long serialVersionUID = 1L;
 
 	private ServiceTrackerMap<String, ServiceWrapper<DDMDataProvider>>
@@ -204,6 +203,5 @@ public class DDMDataProviderServlet extends HttpServlet {
 	private ServiceTrackerMap<String, DDMDataProviderSettings>
 		_ddmDataProviderSettingsServiceTrackerMap;
 	private DDMFormJSONSerializer _ddmFormJSONSerializer;
-	private JSONFactory _jsonFactory;
 
 }
