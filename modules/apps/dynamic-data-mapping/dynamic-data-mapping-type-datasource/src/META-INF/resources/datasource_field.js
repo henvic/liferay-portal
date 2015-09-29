@@ -162,6 +162,7 @@ AUI.add(
 						if (definition) {
 							instance.datasourceForm = new Liferay.DDM.Renderer.Form(
 								{
+									attachFormEvents: false,
 									container: container.one('.datasource-form'),
 									definition: definition,
 									portletNamespace: instance.get('portletNamespace'),

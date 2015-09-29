@@ -29,7 +29,9 @@ public interface SelectDDMFormFieldTypeSettings
 
 	@DDMFormField(
 		dataType = "string", label = "%datasource",
-		properties = {"setting.category=basic", "setting.weight=0"},
+		properties = {
+			"setting.category=basic", "setting.weight=0", "showLabel=false"
+		},
 		type = "datasource",
 		visibilityExpression = "datasourceType.equals(\"datasource\")"
 	)
@@ -55,7 +57,9 @@ public interface SelectDDMFormFieldTypeSettings
 
 	@DDMFormField(
 		dataType = "ddm-options", label = "%options",
-		properties = {"setting.category=basic", "setting.weight=0"},
+		properties = {
+			"setting.category=basic", "setting.weight=0", "showLabel=false"
+		},
 		type = "options",
 		visibilityExpression = "!datasourceType.equals(\"datasource\")"
 	)

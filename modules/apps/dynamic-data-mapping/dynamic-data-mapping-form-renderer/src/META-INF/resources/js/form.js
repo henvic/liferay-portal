@@ -9,6 +9,10 @@ AUI.add(
 		var Form = A.Component.create(
 			{
 				ATTRS: {
+					attachFormEvents: {
+						value: true
+					},
+
 					container: {
 						setter: A.one,
 						valueFn: '_valueContainer'
@@ -45,7 +49,7 @@ AUI.add(
 
 						var formNode = instance.getFormNode();
 
-						if (formNode) {
+						if (instance.get('attachFormEvents') && formNode) {
 							instance._eventHandlers.push(
 								formNode.on('submit', A.bind('_onDOMSubmitForm', instance)),
 								Liferay.on('submitForm', instance._onLiferaySubmitForm, instance)
@@ -76,9 +80,9 @@ AUI.add(
 
 						instance.validate(
 							function(hasErrors) {
-								if (!hasErrors) {
-									var formNode = instance.getFormNode();
+								var formNode = instance.getFormNode();
 
+								if (formNode && !hasErrors) {
 									formNode.submit();
 								}
 							}

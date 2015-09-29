@@ -24,6 +24,16 @@
 	.lfr-ddm-form-page-description {
 		font-size: 14px;
 	}
+
+	@include keyframes(spin) {
+		100% {
+			transform: rotate(359deg);
+		}
+	}
+
+	.icon-spinner {
+		@include animation(spin 1000ms infinite linear);
+	}
 }
 
 .portal-popup, .portlet-forms-admin {
@@ -146,16 +156,6 @@
 
 			.lfr-ddm-form-field-container {
 				position: relative;
-
-				@include keyframes(spin) {
-					100% {
-						transform: rotate(359deg);
-					}
-				}
-
-				.icon-spinner {
-					@include animation(spin 1000ms infinite linear);
-				}
 
 				.lfr-form-row {
 					border-width: 0;

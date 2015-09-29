@@ -102,6 +102,8 @@ AUI.add(
 					render: function() {
 						var instance = this;
 
+						SelectField.superclass.render.apply(instance, arguments);
+
 						var datasourceType = instance.get('datasourceType');
 
 						if (!instance._loaded && datasourceType === 'datasource') {
