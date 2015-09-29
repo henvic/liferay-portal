@@ -145,6 +145,18 @@
 			padding: 0 50px;
 
 			.lfr-ddm-form-field-container {
+				position: relative;
+
+				@include keyframes(spin) {
+					100% {
+						transform: rotate(359deg);
+					}
+				}
+
+				.icon-spinner {
+					@include animation(spin 1000ms infinite linear);
+				}
+
 				.lfr-form-row {
 					border-width: 0;
 					padding-bottom: 5px;
