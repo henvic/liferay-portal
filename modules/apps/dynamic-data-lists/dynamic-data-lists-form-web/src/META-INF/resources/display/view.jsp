@@ -25,42 +25,56 @@ DDLRecordSet recordSet = ddlFormDisplayContext.getRecordSet();
 %>
 
 <c:choose>
-	<c:when test="<%= (recordSet == null) %>">
-		<div class="alert alert-info">
-			<liferay-ui:message key="select-an-existing-form-or-add-a-form-to-be-displayed-in-this-application" />
-		</div>
+	<c:when test="<%= SessionErrors.isEmpty(request) %>">
+		<c:choose>
+			<c:when test="<%= (recordSet == null) %>">
+				<div class="alert alert-info">
+					<liferay-ui:message key="select-an-existing-form-or-add-a-form-to-be-displayed-in-this-application" />
+				</div>
+			</c:when>
+			<c:otherwise>
+				<portlet:actionURL name="addRecord" var="addRecordActionURL" />
+
+				<div class="portlet-forms">
+					<aui:form action="<%= addRecordActionURL %>" method="post" name="fm">
+						<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
+						<aui:input name="groupId" type="hidden" value="<%= themeDisplay.getScopeGroupId() %>" />
+						<aui:input name="recordSetId" type="hidden" value="<%= recordSet.getRecordSetId() %>" />
+						<aui:input name="availableLanguageId" type="hidden" value="<%= themeDisplay.getLanguageId() %>" />
+						<aui:input name="defaultLanguageId" type="hidden" value="<%= themeDisplay.getLanguageId() %>" />
+						<aui:input name="workflowAction" type="hidden" value="<%= WorkflowConstants.ACTION_PUBLISH %>" />
+
+						<div class="ddl-form-basic-info">
+							<div class="container-fluid-1280">
+								<h1 class="ddl-form-name"><%= recordSet.getName(locale) %></h1>
+
+								<%
+								String description = recordSet.getDescription(locale);
+								%>
+
+								<c:if test="<%= Validator.isNotNull(description) %>">
+									<h2 class="ddl-form-description"><%= description %></h2>
+								</c:if>
+							</div>
+						</div>
+
+						<div class="container-fluid-1280 ddl-form-builder-app">
+							<%= request.getAttribute(DDMWebKeys.DYNAMIC_DATA_MAPPING_FORM_HTML) %>
+						</div>
+					</aui:form>
+				</div>
+			</c:otherwise>
+		</c:choose>
 	</c:when>
 	<c:otherwise>
-		<portlet:actionURL name="addRecord" var="addRecordActionURL" />
+		<liferay-ui:error-header />
 
-		<div class="portlet-forms">
-			<aui:form action="<%= addRecordActionURL %>" method="post" name="fm">
-				<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
-				<aui:input name="groupId" type="hidden" value="<%= themeDisplay.getScopeGroupId() %>" />
-				<aui:input name="recordSetId" type="hidden" value="<%= recordSet.getRecordSetId() %>" />
-				<aui:input name="availableLanguageId" type="hidden" value="<%= themeDisplay.getLanguageId() %>" />
-				<aui:input name="defaultLanguageId" type="hidden" value="<%= themeDisplay.getLanguageId() %>" />
-				<aui:input name="workflowAction" type="hidden" value="<%= WorkflowConstants.ACTION_PUBLISH %>" />
+		<liferay-ui:error exception="<%= DDMFormRenderingException.class %>" message="unable-to-render-the-selected-form" />
+		<liferay-ui:error exception="<%= NoSuchRecordSetException.class %>" message="the-selected-form-no-longer-exists" />
+		<liferay-ui:error exception="<%= NoSuchStructureException.class %>" message="unable-to-retrieve-the-definition-of-the-selected-form" />
+		<liferay-ui:error exception="<%= NoSuchStructureLayoutException.class %>" message="unable-to-retrieve-the-layout-of-the-selected-form" />
 
-				<div class="ddl-form-basic-info">
-					<div class="container-fluid-1280">
-						<h1 class="ddl-form-name"><%= recordSet.getName(locale) %></h1>
-
-						<%
-						String description = recordSet.getDescription(locale);
-						%>
-
-						<c:if test="<%= Validator.isNotNull(description) %>">
-							<h2 class="ddl-form-description"><%= description %></h2>
-						</c:if>
-					</div>
-				</div>
-
-				<div class="container-fluid-1280 ddl-form-builder-app">
-					<%= request.getAttribute(DDMWebKeys.DYNAMIC_DATA_MAPPING_FORM_HTML) %>
-				</div>
-			</aui:form>
-		</div>
+		<liferay-ui:error-principal />
 	</c:otherwise>
 </c:choose>
 

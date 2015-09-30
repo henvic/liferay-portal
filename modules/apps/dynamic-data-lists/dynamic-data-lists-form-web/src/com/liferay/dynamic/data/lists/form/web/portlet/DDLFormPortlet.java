@@ -127,33 +127,6 @@ public class DDLFormPortlet extends MVCPortlet {
 		return ddmFormRenderingContext;
 	}
 
-	@Override
-	protected void doDispatch(
-			RenderRequest renderRequest, RenderResponse renderResponse)
-		throws IOException, PortletException {
-
-		if (SessionErrors.contains(
-				renderRequest, DDMFormRenderingException.class.getName()) ||
-			SessionErrors.contains(
-				renderRequest, NoSuchRecordSetException.class.getName()) ||
-			SessionErrors.contains(
-				renderRequest, NoSuchStructureException.class.getName()) ||
-			SessionErrors.contains(
-				renderRequest,
-				NoSuchStructureLayoutException.class.getName()) ||
-			SessionErrors.contains(
-				renderRequest,
-				PortletPreferencesException.MustBeStrict.class.getName()) ||
-			SessionErrors.contains(
-				renderRequest, PrincipalException.getNestedClasses())) {
-
-			include(templatePath + "error.jsp", renderRequest, renderResponse);
-		}
-		else {
-			super.doDispatch(renderRequest, renderResponse);
-		}
-	}
-
 	protected String getDDMFormHTML(
 			RenderRequest renderRequest, RenderResponse renderResponse,
 			DDMStructure ddmStructure)
