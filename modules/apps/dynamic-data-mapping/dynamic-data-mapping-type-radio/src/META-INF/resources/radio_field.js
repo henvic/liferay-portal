@@ -98,6 +98,24 @@ AUI.add(
 						);
 					},
 
+					getValue: function() {
+						var instance = this;
+
+						var container = instance.get('container');
+
+						var radiosNodeList = container.all(instance.getInputSelector());
+
+						var checkedNodeList = radiosNodeList.filter(':checked');
+
+						var value = '';
+
+						if (checkedNodeList.size()) {
+							value = checkedNodeList.item(0).val();
+						}
+
+						return value;
+					},
+
 					setValue: function(value) {
 						var instance = this;
 
