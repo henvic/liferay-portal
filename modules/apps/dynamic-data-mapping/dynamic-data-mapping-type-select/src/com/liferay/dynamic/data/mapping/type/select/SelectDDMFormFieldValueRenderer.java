@@ -62,8 +62,7 @@ public class SelectDDMFormFieldValueRenderer
 
 			if (Validator.equals(datasourceType, "manually")) {
 				LocalizedValue optionLabel =
-					ddmFormFieldOptions.getOptionLabels(
-						optionValue);
+					ddmFormFieldOptions.getOptionLabels(optionValue);
 
 				sb.append(optionLabel.getString(locale));
 			}
