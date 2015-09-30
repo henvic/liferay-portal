@@ -6,6 +6,10 @@ AUI.add(
 				ATTRS: {
 					type: {
 						value: 'options'
+					},
+
+					value: {
+						setter: '_setValue'
 					}
 				},
 
@@ -102,6 +106,16 @@ AUI.add(
 						}
 
 						return serializedData;
+					},
+
+					_setValue: function(value) {
+						var instance = this;
+
+						if (value._fromDatasource) {
+							value = [];
+						}
+
+						return value;
 					}
 				}
 			}

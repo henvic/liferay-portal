@@ -19,6 +19,7 @@ AUI.add(
 					},
 
 					options: {
+						getter: '_getOptions',
 						validator: Array.isArray,
 						value: []
 					},
@@ -38,6 +39,14 @@ AUI.add(
 				NAME: 'liferay-ddm-form-field-select',
 
 				prototype: {
+					initializer: function() {
+						var instance = this;
+
+						instance._eventHandlers.push(
+							instance.after('datasourceChange', instance._afterDatasourceChange)
+						);
+					},
+
 					getOptions: function() {
 						var instance = this;
 
@@ -91,7 +100,9 @@ AUI.add(
 									instance._loading = false;
 									instance._loaded = true;
 
-									instance.set('options', options);
+									options._fromDatasource = true;
+
+									instance._datasourceOptions = options;
 
 									instance.render();
 								}
@@ -113,6 +124,14 @@ AUI.add(
 						return instance;
 					},
 
+					_afterDatasourceChange: function() {
+						var instance = this;
+
+						instance._loaded = false;
+
+						instance.render();
+					},
+
 					_getJSON: function(data, callback) {
 						var instance = this;
 
@@ -132,6 +151,20 @@ AUI.add(
 								}
 							}
 						);
+					},
+
+					_getOptions: function(options) {
+						var instance = this;
+
+						var datasourceOptions = instance._datasourceOptions;
+
+						var datasourceType = instance.get('datasourceType');
+
+						if (datasourceOptions && datasourceType === 'datasource') {
+							options = datasourceOptions;
+						}
+
+						return options;
 					},
 
 					_getOptionStatus: function(option) {
