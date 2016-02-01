@@ -18,6 +18,11 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelWrapper;
+import com.liferay.portal.service.ServiceContext;
+
+import com.liferay.portlet.expando.model.ExpandoBridge;
+
+import java.io.Serializable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -53,6 +58,7 @@ public class TrashVersionWrapper implements TrashVersion,
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
 		attributes.put("versionId", getVersionId());
+		attributes.put("companyId", getCompanyId());
 		attributes.put("entryId", getEntryId());
 		attributes.put("classNameId", getClassNameId());
 		attributes.put("classPK", getClassPK());
@@ -68,6 +74,12 @@ public class TrashVersionWrapper implements TrashVersion,
 
 		if (versionId != null) {
 			setVersionId(versionId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
 		}
 
 		Long entryId = (Long)attributes.get("entryId");
@@ -143,6 +155,16 @@ public class TrashVersionWrapper implements TrashVersion,
 	}
 
 	/**
+	* Returns the company ID of this trash version.
+	*
+	* @return the company ID of this trash version
+	*/
+	@Override
+	public long getCompanyId() {
+		return _trashVersion.getCompanyId();
+	}
+
+	/**
 	* Returns the entry ID of this trash version.
 	*
 	* @return the entry ID of this trash version
@@ -153,7 +175,7 @@ public class TrashVersionWrapper implements TrashVersion,
 	}
 
 	@Override
-	public com.liferay.portlet.expando.model.ExpandoBridge getExpandoBridge() {
+	public ExpandoBridge getExpandoBridge() {
 		return _trashVersion.getExpandoBridge();
 	}
 
@@ -168,7 +190,7 @@ public class TrashVersionWrapper implements TrashVersion,
 	}
 
 	@Override
-	public java.io.Serializable getPrimaryKeyObj() {
+	public Serializable getPrimaryKeyObj() {
 		return _trashVersion.getPrimaryKeyObj();
 	}
 
@@ -274,6 +296,16 @@ public class TrashVersionWrapper implements TrashVersion,
 	}
 
 	/**
+	* Sets the company ID of this trash version.
+	*
+	* @param companyId the company ID of this trash version
+	*/
+	@Override
+	public void setCompanyId(long companyId) {
+		_trashVersion.setCompanyId(companyId);
+	}
+
+	/**
 	* Sets the entry ID of this trash version.
 	*
 	* @param entryId the entry ID of this trash version
@@ -290,14 +322,12 @@ public class TrashVersionWrapper implements TrashVersion,
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portlet.expando.model.ExpandoBridge expandoBridge) {
+	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
 		_trashVersion.setExpandoBridgeAttributes(expandoBridge);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.service.ServiceContext serviceContext) {
+	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
 		_trashVersion.setExpandoBridgeAttributes(serviceContext);
 	}
 
@@ -317,7 +347,7 @@ public class TrashVersionWrapper implements TrashVersion,
 	}
 
 	@Override
-	public void setPrimaryKeyObj(java.io.Serializable primaryKeyObj) {
+	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		_trashVersion.setPrimaryKeyObj(primaryKeyObj);
 	}
 
@@ -399,14 +429,6 @@ public class TrashVersionWrapper implements TrashVersion,
 		}
 
 		return false;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedModel}
-	 */
-	@Deprecated
-	public TrashVersion getWrappedTrashVersion() {
-		return _trashVersion;
 	}
 
 	@Override

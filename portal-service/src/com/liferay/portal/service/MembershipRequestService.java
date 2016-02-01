@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.model.MembershipRequest;
 
 /**
  * Provides the remote service interface for MembershipRequest. Methods of this
@@ -46,31 +47,24 @@ public interface MembershipRequestService extends BaseService {
 	 *
 	 * Never modify or reference this interface directly. Always use {@link MembershipRequestServiceUtil} to access the membership request remote service. Add custom service methods to {@link com.liferay.portal.service.impl.MembershipRequestServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public com.liferay.portal.model.MembershipRequest addMembershipRequest(
-		long groupId, java.lang.String comments,
+	public MembershipRequest addMembershipRequest(long groupId,
+		java.lang.String comments,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws PortalException;
 
 	public void deleteMembershipRequests(long groupId, long statusId)
 		throws PortalException;
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	public java.lang.String getBeanIdentifier();
-
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.MembershipRequest getMembershipRequest(
-		long membershipRequestId) throws PortalException;
+	public MembershipRequest getMembershipRequest(long membershipRequestId)
+		throws PortalException;
 
 	/**
-	* Sets the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @param beanIdentifier the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
-	public void setBeanIdentifier(java.lang.String beanIdentifier);
+	public java.lang.String getOSGiServiceIdentifier();
 
 	public void updateStatus(long membershipRequestId,
 		java.lang.String reviewComments, long statusId,

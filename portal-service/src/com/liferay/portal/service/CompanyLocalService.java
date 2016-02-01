@@ -16,12 +16,28 @@ package com.liferay.portal.service;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.model.Company;
+import com.liferay.portal.model.PersistedModel;
+
+import java.io.File;
+import java.io.InputStream;
+import java.io.Serializable;
+
+import java.util.List;
 
 /**
  * Provides the local service interface for Company. Methods of this
@@ -52,9 +68,8 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @param company the company
 	* @return the company that was added
 	*/
-	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.REINDEX)
-	public com.liferay.portal.model.Company addCompany(
-		com.liferay.portal.model.Company company);
+	@Indexable(type = IndexableType.REINDEX)
+	public Company addCompany(Company company);
 
 	/**
 	* Adds a company.
@@ -68,10 +83,8 @@ public interface CompanyLocalService extends BaseLocalService,
 	<code>0</code>)
 	* @param active whether the company is active
 	* @return the company
-	* @throws PortalException if the web domain, virtual host name, or mail
-	domain was invalid
 	*/
-	public com.liferay.portal.model.Company addCompany(java.lang.String webId,
+	public Company addCompany(java.lang.String webId,
 		java.lang.String virtualHostname, java.lang.String mx, boolean system,
 		int maxUsers, boolean active) throws PortalException;
 
@@ -83,9 +96,8 @@ public interface CompanyLocalService extends BaseLocalService,
 	*
 	* @param webId the company's web domain
 	* @return the company with the web domain
-	* @throws PortalException if a portal exception occurred
 	*/
-	public com.liferay.portal.model.Company checkCompany(java.lang.String webId)
+	public Company checkCompany(java.lang.String webId)
 		throws PortalException;
 
 	/**
@@ -98,18 +110,18 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @param webId the company's web domain
 	* @param mx the company's mail domain
 	* @return the company with the web domain and mail domain
-	* @throws PortalException if a portal exception occurred
 	*/
-	public com.liferay.portal.model.Company checkCompany(
-		java.lang.String webId, java.lang.String mx) throws PortalException;
+	@Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
+		com.liferay.portal.kernel.exception.PortalException.class, com.liferay.portal.kernel.exception.SystemException.class}
+	)
+	public Company checkCompany(java.lang.String webId, java.lang.String mx)
+		throws PortalException;
 
 	/**
 	* Checks if the company has an encryption key. It will create a key if one
 	* does not exist.
 	*
 	* @param companyId the primary key of the company
-	* @throws PortalException if a company with the primary key could not be
-	found
 	*/
 	public void checkCompanyKey(long companyId) throws PortalException;
 
@@ -119,7 +131,7 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @param companyId the primary key for the new company
 	* @return the new company
 	*/
-	public com.liferay.portal.model.Company createCompany(long companyId);
+	public Company createCompany(long companyId);
 
 	/**
 	* Deletes the company from the database. Also notifies the appropriate model listeners.
@@ -128,9 +140,8 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @return the company that was removed
 	* @throws PortalException
 	*/
-	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
-	public com.liferay.portal.model.Company deleteCompany(
-		com.liferay.portal.model.Company company) throws PortalException;
+	@Indexable(type = IndexableType.DELETE)
+	public Company deleteCompany(Company company) throws PortalException;
 
 	/**
 	* Deletes the company with the primary key from the database. Also notifies the appropriate model listeners.
@@ -139,30 +150,25 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @return the company that was removed
 	* @throws PortalException if a company with the primary key could not be found
 	*/
-	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
-	public com.liferay.portal.model.Company deleteCompany(long companyId)
-		throws PortalException;
+	@Indexable(type = IndexableType.DELETE)
+	public Company deleteCompany(long companyId) throws PortalException;
 
 	/**
 	* Deletes the company's logo.
 	*
 	* @param companyId the primary key of the company
 	* @return the deleted logo's company
-	* @throws PortalException if the company with the primary key could not be
-	found or if the company's logo could not be found
 	*/
-	public com.liferay.portal.model.Company deleteLogo(long companyId)
-		throws PortalException;
+	public Company deleteLogo(long companyId) throws PortalException;
 
 	/**
 	* @throws PortalException
 	*/
 	@Override
-	public com.liferay.portal.model.PersistedModel deletePersistedModel(
-		com.liferay.portal.model.PersistedModel persistedModel)
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException;
 
-	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
+	public DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -170,8 +176,7 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
 	*/
-	public <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery);
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery);
 
 	/**
 	* Performs a dynamic query on the database and returns a range of the matching rows.
@@ -185,8 +190,7 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
 	*/
-	public <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
 		int end);
 
 	/**
@@ -202,10 +206,8 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
 	*/
-	public <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end,
-		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator);
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
+		int end, OrderByComparator<T> orderByComparator);
 
 	/**
 	* Returns the number of rows matching the dynamic query.
@@ -213,8 +215,7 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows matching the dynamic query
 	*/
-	public long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery);
+	public long dynamicQueryCount(DynamicQuery dynamicQuery);
 
 	/**
 	* Returns the number of rows matching the dynamic query.
@@ -223,12 +224,11 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @param projection the projection to apply to the query
 	* @return the number of rows matching the dynamic query
 	*/
-	public long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection);
+	public long dynamicQueryCount(DynamicQuery dynamicQuery,
+		Projection projection);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.Company fetchCompany(long companyId);
+	public Company fetchCompany(long companyId);
 
 	/**
 	* Returns the company with the primary key.
@@ -238,7 +238,7 @@ public interface CompanyLocalService extends BaseLocalService,
 	with the primary key could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.Company fetchCompanyById(long companyId);
+	public Company fetchCompanyById(long companyId);
 
 	/**
 	* Returns the company with the virtual host name.
@@ -248,18 +248,10 @@ public interface CompanyLocalService extends BaseLocalService,
 	company with the virtual host could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.Company fetchCompanyByVirtualHost(
-		java.lang.String virtualHostname);
+	public Company fetchCompanyByVirtualHost(java.lang.String virtualHostname);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery();
-
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	public java.lang.String getBeanIdentifier();
+	public ActionableDynamicQuery getActionableDynamicQuery();
 
 	/**
 	* Returns all the companies.
@@ -267,7 +259,7 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @return the companies
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portal.model.Company> getCompanies();
+	public List<Company> getCompanies();
 
 	/**
 	* Returns a range of all the companies.
@@ -281,8 +273,7 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @return the range of companies
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portal.model.Company> getCompanies(
-		int start, int end);
+	public List<Company> getCompanies(int start, int end);
 
 	/**
 	* Returns all the companies used by WSRP.
@@ -292,12 +283,10 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @return the companies used by WSRP
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portal.model.Company> getCompanies(
-		boolean system);
+	public List<Company> getCompanies(boolean system);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portal.model.Company> getCompanies(
-		boolean system, int start, int end);
+	public List<Company> getCompanies(boolean system, int start, int end);
 
 	/**
 	* Returns the number of companies.
@@ -325,42 +314,34 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @throws PortalException if a company with the primary key could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.Company getCompany(long companyId)
-		throws PortalException;
+	public Company getCompany(long companyId) throws PortalException;
 
 	/**
 	* Returns the company with the primary key.
 	*
 	* @param companyId the primary key of the company
 	* @return the company with the primary key
-	* @throws PortalException if a company with the primary key could not be
-	found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.Company getCompanyById(long companyId)
-		throws PortalException;
+	public Company getCompanyById(long companyId) throws PortalException;
 
 	/**
 	* Returns the company with the logo.
 	*
 	* @param logoId the ID of the company's logo
 	* @return the company with the logo
-	* @throws PortalException if the company with the logo could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.Company getCompanyByLogoId(long logoId)
-		throws PortalException;
+	public Company getCompanyByLogoId(long logoId) throws PortalException;
 
 	/**
 	* Returns the company with the mail domain.
 	*
 	* @param mx the company's mail domain
 	* @return the company with the mail domain
-	* @throws PortalException if the company with the mail domain could not be
-	found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.Company getCompanyByMx(java.lang.String mx)
+	public Company getCompanyByMx(java.lang.String mx)
 		throws PortalException;
 
 	/**
@@ -368,25 +349,20 @@ public interface CompanyLocalService extends BaseLocalService,
 	*
 	* @param virtualHostname the company's virtual host name
 	* @return the company with the virtual host name
-	* @throws PortalException if the company with the virtual host name could
-	not be found or if the virtual host was not associated with a
-	company
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.Company getCompanyByVirtualHost(
-		java.lang.String virtualHostname) throws PortalException;
+	public Company getCompanyByVirtualHost(java.lang.String virtualHostname)
+		throws PortalException;
 
 	/**
 	* Returns the company with the web domain.
 	*
 	* @param webId the company's web domain
 	* @return the company with the web domain
-	* @throws PortalException if the company with the web domain could not be
-	found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.Company getCompanyByWebId(
-		java.lang.String webId) throws PortalException;
+	public Company getCompanyByWebId(java.lang.String webId)
+		throws PortalException;
 
 	/**
 	* Returns the user's company.
@@ -400,10 +376,20 @@ public interface CompanyLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long getCompanyIdByUserId(long userId) throws java.lang.Exception;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public java.lang.String getOSGiServiceIdentifier();
+
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj) throws PortalException;
+	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
+		throws PortalException;
 
 	/**
 	* Removes the values that match the keys of the company's preferences.
@@ -435,8 +421,8 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @return the matching assets in the company
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.kernel.search.Hits search(long companyId,
-		long userId, java.lang.String keywords, int start, int end);
+	public Hits search(long companyId, long userId, java.lang.String keywords,
+		int start, int end);
 
 	/**
 	* Returns an ordered range of all assets that match the keywords in the
@@ -457,16 +443,9 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @return the matching assets in the portlet within the company
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.kernel.search.Hits search(long companyId,
-		long userId, java.lang.String portletId, long groupId,
-		java.lang.String type, java.lang.String keywords, int start, int end);
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public void setBeanIdentifier(java.lang.String beanIdentifier);
+	public Hits search(long companyId, long userId, java.lang.String portletId,
+		long groupId, java.lang.String type, java.lang.String keywords,
+		int start, int end);
 
 	/**
 	* Updates the company in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
@@ -474,9 +453,8 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @param company the company
 	* @return the company that was updated
 	*/
-	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.REINDEX)
-	public com.liferay.portal.model.Company updateCompany(
-		com.liferay.portal.model.Company company);
+	@Indexable(type = IndexableType.REINDEX)
+	public Company updateCompany(Company company);
 
 	/**
 	* Update the company with additional account information.
@@ -503,10 +481,8 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @param type the company's account type (optionally <code>null</code>)
 	* @param size the company's account size (optionally <code>null</code>)
 	* @return the company with the primary key
-	* @throws PortalException if a company with the primary key could not be
-	found or if the new information was invalid
 	*/
-	public com.liferay.portal.model.Company updateCompany(long companyId,
+	public Company updateCompany(long companyId,
 		java.lang.String virtualHostname, java.lang.String mx,
 		java.lang.String homeURL, boolean logo, byte[] logoBytes,
 		java.lang.String name, java.lang.String legalName,
@@ -540,14 +516,12 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @param size the company's account size (optionally
 	<code>null</code>)
 	* @return the company with the primary key
-	* @throws PortalException if a company with the primary key could not
-	be found or if the new information was invalid
 	* @deprecated As of 7.0.0, replaced by {@link #updateCompany(long, String,
 	String, String, boolean, byte[], String, String, String,
 	String, String, String, String, String, String)}
 	*/
 	@java.lang.Deprecated
-	public com.liferay.portal.model.Company updateCompany(long companyId,
+	public Company updateCompany(long companyId,
 		java.lang.String virtualHostname, java.lang.String mx,
 		java.lang.String homeURL, java.lang.String name,
 		java.lang.String legalName, java.lang.String legalId,
@@ -565,10 +539,8 @@ public interface CompanyLocalService extends BaseLocalService,
 	<code>0</code>)
 	* @param active whether the company is active
 	* @return the company with the primary key
-	* @throws PortalException if a company with primary key could not be found
-	or if the new information was invalid
 	*/
-	public com.liferay.portal.model.Company updateCompany(long companyId,
+	public Company updateCompany(long companyId,
 		java.lang.String virtualHostname, java.lang.String mx, int maxUsers,
 		boolean active) throws PortalException;
 
@@ -578,7 +550,6 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @param companyId the primary key of the company
 	* @param languageId the ID of the company's default user's language
 	* @param timeZoneId the ID of the company's default user's time zone
-	* @throws PortalException if the company's default user could not be found
 	*/
 	public void updateDisplay(long companyId, java.lang.String languageId,
 		java.lang.String timeZoneId) throws PortalException;
@@ -589,11 +560,9 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @param companyId the primary key of the company
 	* @param bytes the bytes of the company's logo image
 	* @return the company with the primary key
-	* @throws PortalException if the company's logo ID could not be found or if
-	the logo's image was corrupted
 	*/
-	public com.liferay.portal.model.Company updateLogo(long companyId,
-		byte[] bytes) throws PortalException;
+	public Company updateLogo(long companyId, byte[] bytes)
+		throws PortalException;
 
 	/**
 	* Updates the company's logo.
@@ -601,11 +570,9 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @param companyId the primary key of the company
 	* @param file the file of the company's logo image
 	* @return the company with the primary key
-	* @throws PortalException the company's logo ID could not be found or if
-	the logo's image was corrupted
 	*/
-	public com.liferay.portal.model.Company updateLogo(long companyId,
-		java.io.File file) throws PortalException;
+	public Company updateLogo(long companyId, File file)
+		throws PortalException;
 
 	/**
 	* Update the company's logo.
@@ -613,24 +580,18 @@ public interface CompanyLocalService extends BaseLocalService,
 	* @param companyId the primary key of the company
 	* @param is the input stream of the company's logo image
 	* @return the company with the primary key
-	* @throws PortalException if the company's logo ID could not be found or if
-	the company's logo image was corrupted
 	*/
-	public com.liferay.portal.model.Company updateLogo(long companyId,
-		java.io.InputStream is) throws PortalException;
+	public Company updateLogo(long companyId, InputStream is)
+		throws PortalException;
 
 	/**
 	* Updates the company's preferences. The company's default properties are
 	* found in portal.properties.
 	*
 	* @param companyId the primary key of the company
-	* @param properties the company's properties. See {@link
-	UnicodeProperties}
-	* @throws PortalException if the properties contained new locales that were
-	not supported
+	* @param properties the company's properties. See {@link UnicodeProperties}
 	*/
-	public void updatePreferences(long companyId,
-		com.liferay.portal.kernel.util.UnicodeProperties properties)
+	public void updatePreferences(long companyId, UnicodeProperties properties)
 		throws PortalException;
 
 	/**

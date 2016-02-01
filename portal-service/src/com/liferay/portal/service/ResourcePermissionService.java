@@ -23,6 +23,8 @@ import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Transactional;
 
+import java.util.Map;
+
 /**
  * Provides the remote service interface for ResourcePermission. Methods of this
  * service are expected to have security checks based on the propagated JAAS
@@ -81,21 +83,17 @@ public interface ResourcePermissionService extends BaseService {
 	* @param primKey the primary key
 	* @param roleId the primary key of the role
 	* @param actionId the action ID
-	* @throws PortalException if the user did not have permission to add
-	resource permissions, or if scope was set to individual scope or
-	if a role with the primary key or a resource action with the name
-	and action ID could not be found
 	*/
 	public void addResourcePermission(long groupId, long companyId,
 		java.lang.String name, int scope, java.lang.String primKey,
 		long roleId, java.lang.String actionId) throws PortalException;
 
 	/**
-	* Returns the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @return the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
-	public java.lang.String getBeanIdentifier();
+	public java.lang.String getOSGiServiceIdentifier();
 
 	/**
 	* Revokes permission at the scope from the role to perform the action on
@@ -116,9 +114,6 @@ public interface ResourcePermissionService extends BaseService {
 	* @param primKey the primary key
 	* @param roleId the primary key of the role
 	* @param actionId the action ID
-	* @throws PortalException if the user did not have permission to remove
-	resource permissions, or if a role with the primary key or a
-	resource action with the name and action ID could not be found
 	*/
 	public void removeResourcePermission(long groupId, long companyId,
 		java.lang.String name, int scope, java.lang.String primKey,
@@ -137,20 +132,10 @@ public interface ResourcePermissionService extends BaseService {
 	* @param scope the scope
 	* @param roleId the primary key of the role
 	* @param actionId the action ID
-	* @throws PortalException if the user did not have permission to remove
-	resource permissions, or if a role with the primary key or a
-	resource action with the name and action ID could not be found
 	*/
 	public void removeResourcePermissions(long groupId, long companyId,
 		java.lang.String name, int scope, long roleId, java.lang.String actionId)
 		throws PortalException;
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public void setBeanIdentifier(java.lang.String beanIdentifier);
 
 	/**
 	* Updates the role's permissions at the scope, setting the actions that can
@@ -175,9 +160,6 @@ public interface ResourcePermissionService extends BaseService {
 	* @param primKey the primary key
 	* @param roleId the primary key of the role
 	* @param actionIds the action IDs of the actions
-	* @throws PortalException if the user did not have permission to set
-	resource permissions, or if a role with the primary key or a
-	resource action with the name and action ID could not be found
 	*/
 	public void setIndividualResourcePermissions(long groupId, long companyId,
 		java.lang.String name, java.lang.String primKey, long roleId,
@@ -205,12 +187,9 @@ public interface ResourcePermissionService extends BaseService {
 	portlet ID
 	* @param primKey the primary key
 	* @param roleIdsToActionIds a map of role IDs to action IDs of the actions
-	* @throws PortalException if the user did not have permission to set
-	resource permissions, or if a role with the primary key or a
-	resource action with the name and action ID could not be found
 	*/
 	public void setIndividualResourcePermissions(long groupId, long companyId,
 		java.lang.String name, java.lang.String primKey,
-		java.util.Map<java.lang.Long, java.lang.String[]> roleIdsToActionIds)
+		Map<java.lang.Long, java.lang.String[]> roleIdsToActionIds)
 		throws PortalException;
 }

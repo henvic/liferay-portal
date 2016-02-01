@@ -17,6 +17,11 @@ package com.liferay.portal.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.service.ServiceContext;
+
+import com.liferay.portlet.expando.model.ExpandoBridge;
+
+import java.io.Serializable;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -53,6 +58,7 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 
 		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("imageId", getImageId());
+		attributes.put("companyId", getCompanyId());
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("type", getType());
 		attributes.put("height", getHeight());
@@ -74,6 +80,12 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 
 		if (imageId != null) {
 			setImageId(imageId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
 		}
 
 		Date modifiedDate = (Date)attributes.get("modifiedDate");
@@ -117,8 +129,18 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 		return _image.compareTo(image);
 	}
 
+	/**
+	* Returns the company ID of this image.
+	*
+	* @return the company ID of this image
+	*/
 	@Override
-	public com.liferay.portlet.expando.model.ExpandoBridge getExpandoBridge() {
+	public long getCompanyId() {
+		return _image.getCompanyId();
+	}
+
+	@Override
+	public ExpandoBridge getExpandoBridge() {
 		return _image.getExpandoBridge();
 	}
 
@@ -173,7 +195,7 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 	}
 
 	@Override
-	public java.io.Serializable getPrimaryKeyObj() {
+	public Serializable getPrimaryKeyObj() {
 		return _image.getPrimaryKeyObj();
 	}
 
@@ -242,20 +264,28 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 		_image.setCachedModel(cachedModel);
 	}
 
+	/**
+	* Sets the company ID of this image.
+	*
+	* @param companyId the company ID of this image
+	*/
+	@Override
+	public void setCompanyId(long companyId) {
+		_image.setCompanyId(companyId);
+	}
+
 	@Override
 	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_image.setExpandoBridgeAttributes(baseModel);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portlet.expando.model.ExpandoBridge expandoBridge) {
+	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
 		_image.setExpandoBridgeAttributes(expandoBridge);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.service.ServiceContext serviceContext) {
+	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
 		_image.setExpandoBridgeAttributes(serviceContext);
 	}
 
@@ -315,7 +345,7 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 	}
 
 	@Override
-	public void setPrimaryKeyObj(java.io.Serializable primaryKeyObj) {
+	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		_image.setPrimaryKeyObj(primaryKeyObj);
 	}
 
@@ -396,14 +426,6 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 		}
 
 		return false;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedModel}
-	 */
-	@Deprecated
-	public Image getWrappedImage() {
-		return _image;
 	}
 
 	@Override

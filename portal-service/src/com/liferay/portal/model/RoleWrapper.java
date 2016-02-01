@@ -17,8 +17,12 @@ package com.liferay.portal.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.service.ServiceContext;
 
+import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.exportimport.lar.StagedModelType;
+
+import java.io.Serializable;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -68,7 +72,6 @@ public class RoleWrapper implements Role, ModelWrapper<Role> {
 		attributes.put("description", getDescription());
 		attributes.put("type", getType());
 		attributes.put("subtype", getSubtype());
-		attributes.put("lastPublishDate", getLastPublishDate());
 
 		return attributes;
 	}
@@ -163,12 +166,6 @@ public class RoleWrapper implements Role, ModelWrapper<Role> {
 
 		if (subtype != null) {
 			setSubtype(subtype);
-		}
-
-		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
-
-		if (lastPublishDate != null) {
-			setLastPublishDate(lastPublishDate);
 		}
 	}
 
@@ -327,18 +324,8 @@ public class RoleWrapper implements Role, ModelWrapper<Role> {
 	}
 
 	@Override
-	public com.liferay.portlet.expando.model.ExpandoBridge getExpandoBridge() {
+	public ExpandoBridge getExpandoBridge() {
 		return _role.getExpandoBridge();
-	}
-
-	/**
-	* Returns the last publish date of this role.
-	*
-	* @return the last publish date of this role
-	*/
-	@Override
-	public Date getLastPublishDate() {
-		return _role.getLastPublishDate();
 	}
 
 	/**
@@ -382,7 +369,7 @@ public class RoleWrapper implements Role, ModelWrapper<Role> {
 	}
 
 	@Override
-	public java.io.Serializable getPrimaryKeyObj() {
+	public Serializable getPrimaryKeyObj() {
 		return _role.getPrimaryKeyObj();
 	}
 
@@ -706,25 +693,13 @@ public class RoleWrapper implements Role, ModelWrapper<Role> {
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portlet.expando.model.ExpandoBridge expandoBridge) {
+	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
 		_role.setExpandoBridgeAttributes(expandoBridge);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.service.ServiceContext serviceContext) {
+	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
 		_role.setExpandoBridgeAttributes(serviceContext);
-	}
-
-	/**
-	* Sets the last publish date of this role.
-	*
-	* @param lastPublishDate the last publish date of this role
-	*/
-	@Override
-	public void setLastPublishDate(Date lastPublishDate) {
-		_role.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
@@ -773,7 +748,7 @@ public class RoleWrapper implements Role, ModelWrapper<Role> {
 	}
 
 	@Override
-	public void setPrimaryKeyObj(java.io.Serializable primaryKeyObj) {
+	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		_role.setPrimaryKeyObj(primaryKeyObj);
 	}
 
@@ -955,14 +930,6 @@ public class RoleWrapper implements Role, ModelWrapper<Role> {
 	@Override
 	public StagedModelType getStagedModelType() {
 		return _role.getStagedModelType();
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedModel}
-	 */
-	@Deprecated
-	public Role getWrappedRole() {
-		return _role;
 	}
 
 	@Override

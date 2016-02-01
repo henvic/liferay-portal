@@ -14,9 +14,13 @@
 
 package com.liferay.portal.service;
 
-import com.liferay.portal.NoSuchUserException;
-import com.liferay.portal.UserEmailAddressException;
+import com.liferay.portal.exception.NoSuchUserException;
+import com.liferay.portal.exception.UserEmailAddressException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -24,20 +28,24 @@ import com.liferay.portal.kernel.test.util.OrganizationTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.model.Contact;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.User;
-import com.liferay.portal.security.auth.PrincipalThreadLocal;
-import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
-import com.liferay.portal.security.permission.PermissionThreadLocal;
+import com.liferay.portal.model.UserGroupRole;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.test.rule.SynchronousMailTestRule;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.test.MailServiceTestUtil;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 import javax.portlet.PortletPreferences;
 
@@ -62,8 +70,7 @@ public class UserServiceTest {
 		@ClassRule
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
-			new AggregateTestRule(
-				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+			new LiferayIntegrationTestRule();
 
 		@Test(expected = UserEmailAddressException.MustNotUseCompanyMx.class)
 		public void shouldNotAddUser() throws Exception {
@@ -138,8 +145,7 @@ public class UserServiceTest {
 		@ClassRule
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
-			new AggregateTestRule(
-				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+			new LiferayIntegrationTestRule();
 
 		@Test(expected = NoSuchUserException.class)
 		public void shouldFailIfUserDeleted() throws Exception {
@@ -173,8 +179,7 @@ public class UserServiceTest {
 		@ClassRule
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
-			new AggregateTestRule(
-				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+			new LiferayIntegrationTestRule();
 
 		@Before
 		public void setUp() throws Exception {
@@ -279,8 +284,7 @@ public class UserServiceTest {
 		@ClassRule
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
-			new AggregateTestRule(
-				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+			new LiferayIntegrationTestRule();
 
 		@Before
 		public void setUp() throws Exception {
@@ -391,8 +395,7 @@ public class UserServiceTest {
 		@ClassRule
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
-			new AggregateTestRule(
-				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+			new LiferayIntegrationTestRule();
 
 		@Before
 		public void setUp() throws Exception {
@@ -456,8 +459,7 @@ public class UserServiceTest {
 		@ClassRule
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
-			new AggregateTestRule(
-				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+			new LiferayIntegrationTestRule();
 
 		@Before
 		public void setUp() throws Exception {
@@ -523,8 +525,7 @@ public class UserServiceTest {
 		@ClassRule
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
-			new AggregateTestRule(
-				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+			new LiferayIntegrationTestRule();
 
 		@Before
 		public void setUp() throws Exception {
@@ -591,8 +592,7 @@ public class UserServiceTest {
 		@ClassRule
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
-			new AggregateTestRule(
-				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+			new LiferayIntegrationTestRule();
 
 		@Before
 		public void setUp() throws Exception {
@@ -660,7 +660,7 @@ public class UserServiceTest {
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
 			new AggregateTestRule(
-				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
+				new LiferayIntegrationTestRule(),
 				SynchronousMailTestRule.INSTANCE);
 
 		@Before
@@ -864,6 +864,76 @@ public class UserServiceTest {
 		}
 
 		private User _user;
+
+	}
+
+	public static class WhenUpdatingUser {
+
+		@ClassRule
+		@Rule
+		public static final AggregateTestRule aggregateTestRule =
+			new LiferayIntegrationTestRule();
+
+		@Test
+		public void shouldNotRemoveChildGroupAssociation() throws Exception {
+			User user = UserTestUtil.addUser(true);
+
+			List<Group> groups = new ArrayList<>();
+
+			Group parentGroup = GroupTestUtil.addGroup();
+
+			groups.add(parentGroup);
+
+			Group childGroup = GroupTestUtil.addGroup(parentGroup.getGroupId());
+
+			childGroup.setMembershipRestriction(
+				GroupConstants.MEMBERSHIP_RESTRICTION_TO_PARENT_SITE_MEMBERS);
+
+			GroupLocalServiceUtil.updateGroup(childGroup);
+
+			groups.add(childGroup);
+
+			GroupLocalServiceUtil.addUserGroups(user.getUserId(), groups);
+
+			user = updateUser(user);
+
+			Assert.assertEquals(groups, user.getGroups());
+		}
+
+		private User updateUser(User user) throws Exception {
+			Contact contact = user.getContact();
+
+			Calendar birthdayCal = CalendarFactoryUtil.getCalendar();
+
+			birthdayCal.setTime(contact.getBirthday());
+
+			int birthdayMonth = birthdayCal.get(Calendar.MONTH);
+			int birthdayDay = birthdayCal.get(Calendar.DATE);
+			int birthdayYear = birthdayCal.get(Calendar.YEAR);
+
+			long[] groupIds = null;
+			long[] organizationIds = null;
+			long[] roleIds = null;
+			List<UserGroupRole> userGroupRoles = null;
+			long[] userGroupIds = null;
+			ServiceContext serviceContext = new ServiceContext();
+
+			return UserServiceUtil.updateUser(
+				user.getUserId(), user.getPassword(), StringPool.BLANK,
+				StringPool.BLANK, user.isPasswordReset(),
+				user.getReminderQueryQuestion(), user.getReminderQueryAnswer(),
+				user.getScreenName(), user.getEmailAddress(),
+				user.getFacebookId(), user.getOpenId(), user.getLanguageId(),
+				user.getTimeZoneId(), user.getGreeting(), user.getComments(),
+				contact.getFirstName(), contact.getMiddleName(),
+				contact.getLastName(), contact.getPrefixId(),
+				contact.getSuffixId(), contact.isMale(), birthdayMonth,
+				birthdayDay, birthdayYear, contact.getSmsSn(),
+				contact.getFacebookSn(), contact.getJabberSn(),
+				contact.getSkypeSn(), contact.getTwitterSn(),
+				contact.getJobTitle(), groupIds, organizationIds, roleIds,
+				userGroupRoles, userGroupIds, serviceContext);
+		}
 
 	}
 

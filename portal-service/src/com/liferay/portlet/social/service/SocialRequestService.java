@@ -23,6 +23,9 @@ import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.service.BaseService;
+import com.liferay.portal.theme.ThemeDisplay;
+
+import com.liferay.portlet.social.model.SocialRequest;
 
 /**
  * Provides the remote service interface for SocialRequest. Methods of this
@@ -48,21 +51,12 @@ public interface SocialRequestService extends BaseService {
 	 */
 
 	/**
-	* Returns the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @return the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
-	public java.lang.String getBeanIdentifier();
+	public java.lang.String getOSGiServiceIdentifier();
 
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public void setBeanIdentifier(java.lang.String beanIdentifier);
-
-	public com.liferay.portlet.social.model.SocialRequest updateRequest(
-		long requestId, int status,
-		com.liferay.portal.theme.ThemeDisplay themeDisplay)
-		throws PortalException;
+	public SocialRequest updateRequest(long requestId, int status,
+		ThemeDisplay themeDisplay) throws PortalException;
 }

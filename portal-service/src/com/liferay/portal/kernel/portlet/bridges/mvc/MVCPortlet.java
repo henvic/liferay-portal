@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PortalUtil;
@@ -45,6 +46,8 @@ import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.portlet.WindowState;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Brian Wing Shun Chan
@@ -256,6 +259,8 @@ public class MVCPortlet extends LiferayPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
+		invokeHideDefaultSuccessMessage(renderRequest);
+
 		String mvcRenderCommandName = ParamUtil.getString(
 			renderRequest, "mvcRenderCommandName", "/");
 
@@ -273,6 +278,12 @@ public class MVCPortlet extends LiferayPortlet {
 					renderRequest, renderResponse);
 			}
 
+			if (MVCRenderConstants.MVC_PATH_VALUE_SKIP_DISPATCH.equals(
+					mvcPath)) {
+
+				return;
+			}
+
 			renderRequest.setAttribute(
 				getMVCPathAttributeName(renderResponse.getNamespace()),
 				mvcPath);
@@ -285,6 +296,8 @@ public class MVCPortlet extends LiferayPortlet {
 	public void serveResource(
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws IOException, PortletException {
+
+		invokeHideDefaultSuccessMessage(resourceRequest);
 
 		String path = getPath(resourceRequest, resourceResponse);
 
@@ -317,8 +330,10 @@ public class MVCPortlet extends LiferayPortlet {
 			throw new PortletException(e);
 		}
 
-		String actionName = ParamUtil.getString(
+		String[] actionNames = ParamUtil.getParameterValues(
 			actionRequest, ActionRequest.ACTION_NAME);
+
+		String actionName = StringUtil.merge(actionNames);
 
 		if (!actionName.contains(StringPool.COMMA)) {
 			MVCActionCommand mvcActionCommand =
@@ -326,6 +341,17 @@ public class MVCPortlet extends LiferayPortlet {
 					actionName);
 
 			if (mvcActionCommand != MVCActionCommand.EMPTY) {
+				if (mvcActionCommand instanceof FormMVCActionCommand) {
+					FormMVCActionCommand formMVCActionCommand =
+						(FormMVCActionCommand)mvcActionCommand;
+
+					if (!formMVCActionCommand.validateForm(
+							actionRequest, actionResponse)) {
+
+						return false;
+					}
+				}
+
 				return mvcActionCommand.processAction(
 					actionRequest, actionResponse);
 			}
@@ -336,6 +362,22 @@ public class MVCPortlet extends LiferayPortlet {
 					actionName);
 
 			if (!mvcActionCommands.isEmpty()) {
+				boolean valid = true;
+
+				for (MVCActionCommand mvcActionCommand : mvcActionCommands) {
+					if (mvcActionCommand instanceof FormMVCActionCommand) {
+						FormMVCActionCommand formMVCActionCommand =
+							(FormMVCActionCommand)mvcActionCommand;
+
+						valid &= formMVCActionCommand.validateForm(
+							actionRequest, actionResponse);
+					}
+				}
+
+				if (!valid) {
+					return false;
+				}
+
 				for (MVCActionCommand mvcActionCommand : mvcActionCommands) {
 					if (!mvcActionCommand.processAction(
 							actionRequest, actionResponse)) {
@@ -443,7 +485,8 @@ public class MVCPortlet extends LiferayPortlet {
 	}
 
 	protected String getMVCPathAttributeName(String namespace) {
-		return namespace.concat(StringPool.PERIOD).concat(_MVC_PATH);
+		return namespace.concat(StringPool.PERIOD).concat(
+			MVCRenderConstants.MVC_PATH_REQUEST_ATTRIBUTE_NAME);
 	}
 
 	protected String getPath(
@@ -500,7 +543,18 @@ public class MVCPortlet extends LiferayPortlet {
 			PortletResponse portletResponse, String lifecycle)
 		throws IOException, PortletException {
 
-		PortletContext portletContext = getPortletContext();
+		HttpServletRequest httpServletRequest =
+			PortalUtil.getHttpServletRequest(portletRequest);
+
+		PortletContext portletContext =
+			(PortletContext)httpServletRequest.getAttribute(
+				MVCRenderConstants.
+					PORTLET_CONTEXT_OVERRIDE_REQUEST_ATTIBUTE_NAME_PREFIX +
+						path);
+
+		if (portletContext == null) {
+			portletContext = getPortletContext();
+		}
 
 		PortletRequestDispatcher portletRequestDispatcher =
 			portletContext.getRequestDispatcher(path);
@@ -541,6 +595,17 @@ public class MVCPortlet extends LiferayPortlet {
 			PortletRequest.RESOURCE_PHASE);
 	}
 
+	protected void invokeHideDefaultSuccessMessage(
+		PortletRequest portletRequest) {
+
+		boolean hideDefaultSuccessMessage = ParamUtil.getBoolean(
+			portletRequest, "hideDefaultSuccessMessage");
+
+		if (hideDefaultSuccessMessage) {
+			hideDefaultSuccessMessage(portletRequest);
+		}
+	}
+
 	protected String aboutTemplate;
 	protected boolean clearRequestParameters;
 	protected String configTemplate;
@@ -574,9 +639,6 @@ public class MVCPortlet extends LiferayPortlet {
 
 		return null;
 	}
-
-	private static final String _MVC_PATH =
-		MVCPortlet.class.getName() + "#MVC_PATH";
 
 	private static final Log _log = LogFactoryUtil.getLog(MVCPortlet.class);
 

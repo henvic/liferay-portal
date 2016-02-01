@@ -25,8 +25,6 @@ if (Validator.isBlank(tilesPortletContent)) {
 	tilesPortletContent = GetterUtil.getString(TilesAttributeUtil.getTilesAttribute(pageContext, "portlet_content"));
 }
 
-boolean tilesPortletDecorate = GetterUtil.getBoolean(TilesAttributeUtil.getTilesAttribute(pageContext, "portlet_decorate"), true);
-
 TilesAttributeUtil.removeComponentContext(pageContext);
 
 Portlet portlet = (Portlet)request.getAttribute(WebKeys.RENDER_PORTLET);
@@ -34,26 +32,6 @@ Portlet portlet = (Portlet)request.getAttribute(WebKeys.RENDER_PORTLET);
 PortletPreferences portletSetup = portletDisplay.getPortletSetup();
 
 RenderResponseImpl renderResponseImpl = (RenderResponseImpl)PortletResponseImpl.getPortletResponseImpl(renderResponse);
-
-// Portlet decorate
-
-boolean portletDecorateDefault = false;
-
-if (tilesPortletDecorate) {
-	portletDecorateDefault = GetterUtil.getBoolean(themeDisplay.getThemeSetting("portlet-setup-show-borders-default"), PropsValues.THEME_PORTLET_DECORATE_DEFAULT);
-}
-
-boolean portletDecorate = GetterUtil.getBoolean(portletSetup.getValue("portletSetupShowBorders", String.valueOf(portletDecorateDefault)));
-
-Boolean portletDecorateObj = (Boolean)renderRequest.getAttribute(WebKeys.PORTLET_DECORATE);
-
-if (portletDecorateObj != null) {
-	portletDecorate = portletDecorateObj.booleanValue();
-
-	request.removeAttribute(WebKeys.PORTLET_DECORATE);
-}
-
-portletDisplay.setPortletDecorate(portletDecorate);
 
 // Portlet title
 
@@ -71,9 +49,11 @@ portletDisplay.setTitle(portletTitle);
 
 // Portlet description
 
-String portletDescription = PortalUtil.getPortletDescription(portlet, application, locale);
+if (Validator.isNull(portletDisplay.getDescription())) {
+	String portletDescription = PortalUtil.getPortletDescription(portlet, application, locale);
 
-portletDisplay.setDescription(portletDescription);
+	portletDisplay.setDescription(portletDescription);
+}
 
 Group group = layout.getGroup();
 

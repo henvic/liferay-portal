@@ -17,8 +17,12 @@ package com.liferay.portal.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.service.ServiceContext;
 
+import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.exportimport.lar.StagedModelType;
+
+import java.io.Serializable;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -316,7 +320,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* the current layout.
 	*
 	* @return the ID of the topmost parent layout of the current layout
-	* @throws PortalException if a matching layout could not be found
 	*/
 	@Override
 	public long getAncestorLayoutId()
@@ -329,7 +332,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* of the current layout.
 	*
 	* @return the plid of the topmost parent layout of the current layout
-	* @throws PortalException if a matching layout could not be found
 	*/
 	@Override
 	public long getAncestorPlid()
@@ -343,7 +345,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* parent listed last.
 	*
 	* @return the current layout's list of parent layouts
-	* @throws PortalException if a matching layout could not be found
 	*/
 	@Override
 	public java.util.List<com.liferay.portal.model.Layout> getAncestors()
@@ -374,11 +375,10 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @param permissionChecker the user-specific context to check permissions
 	* @return the list of all child layouts that the user has permission to
 	access
-	* @throws PortalException if a portal exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portal.model.Layout> getChildren(
-		com.liferay.portal.security.permission.PermissionChecker permissionChecker)
+		com.liferay.portal.kernel.security.permission.PermissionChecker permissionChecker)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.getChildren(permissionChecker);
 	}
@@ -391,7 +391,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @return the color scheme that is configured for the current layout, or
 	the color scheme  of the layout set that contains the current
 	layout if no color scheme is configured
-	* @throws PortalException if a portal exception occurred
 	*/
 	@Override
 	public com.liferay.portal.model.ColorScheme getColorScheme()
@@ -450,7 +449,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	*
 	* @return the CSS text for the current layout, or for the layout set if no
 	CSS text is configured in the current layout
-	* @throws PortalException if a portal exception occurred
 	*/
 	@Override
 	public java.lang.String getCssText()
@@ -548,7 +546,18 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	}
 
 	@Override
-	public com.liferay.portlet.expando.model.ExpandoBridge getExpandoBridge() {
+	public java.util.List<com.liferay.portal.model.Portlet> getEmbeddedPortlets() {
+		return _layout.getEmbeddedPortlets();
+	}
+
+	@Override
+	public java.util.List<com.liferay.portal.model.Portlet> getEmbeddedPortlets(
+		long groupId) {
+		return _layout.getEmbeddedPortlets(groupId);
+	}
+
+	@Override
+	public ExpandoBridge getExpandoBridge() {
 		return _layout.getExpandoBridge();
 	}
 
@@ -596,8 +605,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* </p>
 	*
 	* @return the current layout's group
-	* @throws PortalException if a group with the primary key could not be
-	found
 	*/
 	@Override
 	public com.liferay.portal.model.Group getGroup()
@@ -797,7 +804,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* Returns the current layout's {@link LayoutSet}.
 	*
 	* @return the current layout's layout set
-	* @throws PortalException if a portal exception occurred
 	*/
 	@Override
 	public com.liferay.portal.model.LayoutSet getLayoutSet()
@@ -938,7 +944,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	*
 	* @return the current layout's parent plid, or <code>0</code> if the
 	current layout is the topmost parent layout
-	* @throws PortalException if a matching layout could not be found
 	*/
 	@Override
 	public long getParentPlid()
@@ -967,7 +972,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	}
 
 	@Override
-	public java.io.Serializable getPrimaryKeyObj() {
+	public Serializable getPrimaryKeyObj() {
 		return _layout.getPrimaryKeyObj();
 	}
 
@@ -1117,7 +1122,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	*
 	* @return the current layout's theme, or the layout set's theme if no
 	layout theme is configured
-	* @throws PortalException if a portal exception occurred
 	*/
 	@Override
 	public com.liferay.portal.model.Theme getTheme()
@@ -1341,8 +1345,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @return <code>true</code> if the given layout ID matches one of the
 	current layout's hierarchical parents; <code>false</code>
 	otherwise
-	* @throws PortalException if any one of the current layout's acestors could
-	not be retrieved
 	*/
 	@Override
 	public boolean hasAncestor(long layoutId)
@@ -1504,6 +1506,11 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 		return _layout.isNew();
 	}
 
+	@Override
+	public boolean isPortletEmbedded(java.lang.String portletId) {
+		return _layout.isPortletEmbedded(portletId);
+	}
+
 	/**
 	* Returns <code>true</code> if this layout is private layout.
 	*
@@ -1592,6 +1599,11 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	@Override
 	public boolean isTypePortlet() {
 		return _layout.isTypePortlet();
+	}
+
+	@Override
+	public boolean isTypeSharedPortlet() {
+		return _layout.isTypeSharedPortlet();
 	}
 
 	@Override
@@ -1738,14 +1750,12 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portlet.expando.model.ExpandoBridge expandoBridge) {
+	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
 		_layout.setExpandoBridgeAttributes(expandoBridge);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.service.ServiceContext serviceContext) {
+	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
 		_layout.setExpandoBridgeAttributes(serviceContext);
 	}
 
@@ -2015,7 +2025,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	}
 
 	@Override
-	public void setPrimaryKeyObj(java.io.Serializable primaryKeyObj) {
+	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		_layout.setPrimaryKeyObj(primaryKeyObj);
 	}
 
@@ -2316,14 +2326,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	@Override
 	public StagedModelType getStagedModelType() {
 		return _layout.getStagedModelType();
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedModel}
-	 */
-	@Deprecated
-	public Layout getWrappedLayout() {
-		return _layout;
 	}
 
 	@Override

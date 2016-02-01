@@ -16,14 +16,27 @@ package com.liferay.portlet.social.service;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.model.PersistedModel;
 import com.liferay.portal.service.BaseLocalService;
 import com.liferay.portal.service.PersistedModelLocalService;
+
+import com.liferay.portlet.social.model.SocialRelation;
+
+import java.io.Serializable;
+
+import java.util.List;
 
 /**
  * Provides the local service interface for SocialRelation. Methods of this
@@ -55,12 +68,9 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* @param userId2 the user at the other end of the relation
 	* @param type the type of the relation
 	* @return the social relation
-	* @throws PortalException if the users could not be found, if the users
-	were not from the same company, or if either of the users was the
-	default user
 	*/
-	public com.liferay.portlet.social.model.SocialRelation addRelation(
-		long userId1, long userId2, int type) throws PortalException;
+	public SocialRelation addRelation(long userId1, long userId2, int type)
+		throws PortalException;
 
 	/**
 	* Adds the social relation to the database. Also notifies the appropriate model listeners.
@@ -68,9 +78,8 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* @param socialRelation the social relation
 	* @return the social relation that was added
 	*/
-	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.REINDEX)
-	public com.liferay.portlet.social.model.SocialRelation addSocialRelation(
-		com.liferay.portlet.social.model.SocialRelation socialRelation);
+	@Indexable(type = IndexableType.REINDEX)
+	public SocialRelation addSocialRelation(SocialRelation socialRelation);
 
 	/**
 	* Creates a new social relation with the primary key. Does not add the social relation to the database.
@@ -78,15 +87,13 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* @param relationId the primary key for the new social relation
 	* @return the new social relation
 	*/
-	public com.liferay.portlet.social.model.SocialRelation createSocialRelation(
-		long relationId);
+	public SocialRelation createSocialRelation(long relationId);
 
 	/**
 	* @throws PortalException
 	*/
 	@Override
-	public com.liferay.portal.model.PersistedModel deletePersistedModel(
-		com.liferay.portal.model.PersistedModel persistedModel)
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException;
 
 	/**
@@ -94,11 +101,8 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* relation) from the database.
 	*
 	* @param relation the relation to be removed
-	* @throws PortalException if the relation is bidirectional and its inverse
-	relation could not be found
 	*/
-	public void deleteRelation(
-		com.liferay.portlet.social.model.SocialRelation relation)
+	public void deleteRelation(SocialRelation relation)
 		throws PortalException;
 
 	/**
@@ -106,7 +110,6 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* relation) from the database.
 	*
 	* @param relationId the primary key of the relation
-	* @throws PortalException if the relation could not be found
 	*/
 	public void deleteRelation(long relationId) throws PortalException;
 
@@ -117,8 +120,6 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* @param userId1 the user that is the subject of the relation
 	* @param userId2 the user at the other end of the relation
 	* @param type the relation's type
-	* @throws PortalException if the relation or its inverse relation (if
-	applicable) could not be found
 	*/
 	public void deleteRelation(long userId1, long userId2, int type)
 		throws PortalException;
@@ -135,7 +136,6 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	*
 	* @param userId1 the user that is the subject of the relation
 	* @param userId2 the user at the other end of the relation
-	* @throws PortalException if the inverse relation could not be found
 	*/
 	public void deleteRelations(long userId1, long userId2)
 		throws PortalException;
@@ -147,9 +147,9 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* @return the social relation that was removed
 	* @throws PortalException if a social relation with the primary key could not be found
 	*/
-	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
-	public com.liferay.portlet.social.model.SocialRelation deleteSocialRelation(
-		long relationId) throws PortalException;
+	@Indexable(type = IndexableType.DELETE)
+	public SocialRelation deleteSocialRelation(long relationId)
+		throws PortalException;
 
 	/**
 	* Deletes the social relation from the database. Also notifies the appropriate model listeners.
@@ -157,11 +157,10 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* @param socialRelation the social relation
 	* @return the social relation that was removed
 	*/
-	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
-	public com.liferay.portlet.social.model.SocialRelation deleteSocialRelation(
-		com.liferay.portlet.social.model.SocialRelation socialRelation);
+	@Indexable(type = IndexableType.DELETE)
+	public SocialRelation deleteSocialRelation(SocialRelation socialRelation);
 
-	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
+	public DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -169,8 +168,7 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
 	*/
-	public <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery);
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery);
 
 	/**
 	* Performs a dynamic query on the database and returns a range of the matching rows.
@@ -184,8 +182,7 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
 	*/
-	public <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
 		int end);
 
 	/**
@@ -201,10 +198,8 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
 	*/
-	public <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end,
-		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator);
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
+		int end, OrderByComparator<T> orderByComparator);
 
 	/**
 	* Returns the number of rows matching the dynamic query.
@@ -212,8 +207,7 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows matching the dynamic query
 	*/
-	public long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery);
+	public long dynamicQueryCount(DynamicQuery dynamicQuery);
 
 	/**
 	* Returns the number of rows matching the dynamic query.
@@ -222,13 +216,11 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* @param projection the projection to apply to the query
 	* @return the number of rows matching the dynamic query
 	*/
-	public long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection);
+	public long dynamicQueryCount(DynamicQuery dynamicQuery,
+		Projection projection);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portlet.social.model.SocialRelation fetchSocialRelation(
-		long relationId);
+	public SocialRelation fetchSocialRelation(long relationId);
 
 	/**
 	* Returns the social relation with the matching UUID and company.
@@ -238,18 +230,14 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* @return the matching social relation, or <code>null</code> if a matching social relation could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portlet.social.model.SocialRelation fetchSocialRelationByUuidAndCompanyId(
+	public SocialRelation fetchSocialRelationByUuidAndCompanyId(
 		java.lang.String uuid, long companyId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery();
+	public ActionableDynamicQuery getActionableDynamicQuery();
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	public java.lang.String getBeanIdentifier();
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
 
 	/**
 	* Returns a range of all the inverse relations of the given type for which
@@ -272,8 +260,8 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* @return the range of matching relations
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.social.model.SocialRelation> getInverseRelations(
-		long userId, int type, int start, int end);
+	public List<SocialRelation> getInverseRelations(long userId, int type,
+		int start, int end);
 
 	/**
 	* Returns the number of inverse relations of the given type for which the
@@ -286,21 +274,27 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getInverseRelationsCount(long userId, int type);
 
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public java.lang.String getOSGiServiceIdentifier();
+
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj) throws PortalException;
+	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
+		throws PortalException;
 
 	/**
 	* Returns the relation identified by its primary key.
 	*
 	* @param relationId the primary key of the relation
 	* @return Returns the relation
-	* @throws PortalException if the relation could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portlet.social.model.SocialRelation getRelation(
-		long relationId) throws PortalException;
+	public SocialRelation getRelation(long relationId)
+		throws PortalException;
 
 	/**
 	* Returns the relation of the given type between User1 and User2.
@@ -309,11 +303,10 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* @param userId2 the user at the other end of the relation
 	* @param type the relation's type
 	* @return Returns the relation
-	* @throws PortalException if the relation could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portlet.social.model.SocialRelation getRelation(
-		long userId1, long userId2, int type) throws PortalException;
+	public SocialRelation getRelation(long userId1, long userId2, int type)
+		throws PortalException;
 
 	/**
 	* Returns a range of all the relations of the given type where the user is
@@ -336,8 +329,8 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* @return the range of relations
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.social.model.SocialRelation> getRelations(
-		long userId, int type, int start, int end);
+	public List<SocialRelation> getRelations(long userId, int type, int start,
+		int end);
 
 	/**
 	* Returns a range of all the relations between User1 and User2.
@@ -359,8 +352,8 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* @return the range of relations
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.social.model.SocialRelation> getRelations(
-		long userId1, long userId2, int start, int end);
+	public List<SocialRelation> getRelations(long userId1, long userId2,
+		int start, int end);
 
 	/**
 	* Returns the number of relations of the given type where the user is the
@@ -391,8 +384,8 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* @throws PortalException if a social relation with the primary key could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portlet.social.model.SocialRelation getSocialRelation(
-		long relationId) throws PortalException;
+	public SocialRelation getSocialRelation(long relationId)
+		throws PortalException;
 
 	/**
 	* Returns the social relation with the matching UUID and company.
@@ -403,7 +396,7 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* @throws PortalException if a matching social relation could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portlet.social.model.SocialRelation getSocialRelationByUuidAndCompanyId(
+	public SocialRelation getSocialRelationByUuidAndCompanyId(
 		java.lang.String uuid, long companyId) throws PortalException;
 
 	/**
@@ -418,8 +411,7 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	* @return the range of social relations
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.social.model.SocialRelation> getSocialRelations(
-		int start, int end);
+	public List<SocialRelation> getSocialRelations(int start, int end);
 
 	/**
 	* Returns the number of social relations.
@@ -466,19 +458,11 @@ public interface SocialRelationLocalService extends BaseLocalService,
 	public boolean isRelatable(long userId1, long userId2, int type);
 
 	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public void setBeanIdentifier(java.lang.String beanIdentifier);
-
-	/**
 	* Updates the social relation in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	*
 	* @param socialRelation the social relation
 	* @return the social relation that was updated
 	*/
-	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.REINDEX)
-	public com.liferay.portlet.social.model.SocialRelation updateSocialRelation(
-		com.liferay.portlet.social.model.SocialRelation socialRelation);
+	@Indexable(type = IndexableType.REINDEX)
+	public SocialRelation updateSocialRelation(SocialRelation socialRelation);
 }

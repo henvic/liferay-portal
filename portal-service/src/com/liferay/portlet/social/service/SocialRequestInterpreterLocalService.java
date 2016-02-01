@@ -21,6 +21,11 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.service.BaseLocalService;
+import com.liferay.portal.theme.ThemeDisplay;
+
+import com.liferay.portlet.social.model.SocialRequest;
+import com.liferay.portlet.social.model.SocialRequestFeedEntry;
+import com.liferay.portlet.social.model.SocialRequestInterpreter;
 
 /**
  * Provides the local service interface for SocialRequestInterpreter. Methods of this
@@ -51,7 +56,7 @@ public interface SocialRequestInterpreterLocalService extends BaseLocalService {
 	* @param requestInterpreter the social request interpreter
 	*/
 	public void addRequestInterpreter(
-		com.liferay.portlet.social.model.SocialRequestInterpreter requestInterpreter);
+		SocialRequestInterpreter requestInterpreter);
 
 	/**
 	* Removes the social request interpreter from the list of available
@@ -60,14 +65,14 @@ public interface SocialRequestInterpreterLocalService extends BaseLocalService {
 	* @param requestInterpreter the social request interpreter
 	*/
 	public void deleteRequestInterpreter(
-		com.liferay.portlet.social.model.SocialRequestInterpreter requestInterpreter);
+		SocialRequestInterpreter requestInterpreter);
 
 	/**
-	* Returns the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @return the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
-	public java.lang.String getBeanIdentifier();
+	public java.lang.String getOSGiServiceIdentifier();
 
 	/**
 	* Creates a human readable request feed entry for the social request using
@@ -85,9 +90,8 @@ public interface SocialRequestInterpreterLocalService extends BaseLocalService {
 	links and get localized text fragments
 	* @return the social request feed entry
 	*/
-	public com.liferay.portlet.social.model.SocialRequestFeedEntry interpret(
-		com.liferay.portlet.social.model.SocialRequest request,
-		com.liferay.portal.theme.ThemeDisplay themeDisplay);
+	public SocialRequestFeedEntry interpret(SocialRequest request,
+		ThemeDisplay themeDisplay);
 
 	/**
 	* Processes the confirmation of the social request.
@@ -103,9 +107,8 @@ public interface SocialRequestInterpreterLocalService extends BaseLocalService {
 	* @param themeDisplay the theme display needed by interpreters to create
 	links and get localized text fragments
 	*/
-	public void processConfirmation(
-		com.liferay.portlet.social.model.SocialRequest request,
-		com.liferay.portal.theme.ThemeDisplay themeDisplay);
+	public void processConfirmation(SocialRequest request,
+		ThemeDisplay themeDisplay);
 
 	/**
 	* Processes the rejection of the social request.
@@ -122,14 +125,6 @@ public interface SocialRequestInterpreterLocalService extends BaseLocalService {
 	* @param themeDisplay the theme display needed by interpreters to create
 	links and get localized text fragments
 	*/
-	public void processRejection(
-		com.liferay.portlet.social.model.SocialRequest request,
-		com.liferay.portal.theme.ThemeDisplay themeDisplay);
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public void setBeanIdentifier(java.lang.String beanIdentifier);
+	public void processRejection(SocialRequest request,
+		ThemeDisplay themeDisplay);
 }

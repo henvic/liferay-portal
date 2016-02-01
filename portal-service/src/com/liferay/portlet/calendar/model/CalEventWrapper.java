@@ -18,6 +18,12 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelWrapper;
+import com.liferay.portal.service.ServiceContext;
+
+import com.liferay.portlet.expando.model.ExpandoBridge;
+import com.liferay.portlet.exportimport.lar.StagedModelType;
+
+import java.io.Serializable;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -313,7 +319,7 @@ public class CalEventWrapper implements CalEvent, ModelWrapper<CalEvent> {
 	}
 
 	@Override
-	public com.liferay.portlet.expando.model.ExpandoBridge getExpandoBridge() {
+	public ExpandoBridge getExpandoBridge() {
 		return _calEvent.getExpandoBridge();
 	}
 
@@ -368,7 +374,7 @@ public class CalEventWrapper implements CalEvent, ModelWrapper<CalEvent> {
 	}
 
 	@Override
-	public java.io.Serializable getPrimaryKeyObj() {
+	public Serializable getPrimaryKeyObj() {
 		return _calEvent.getPrimaryKeyObj();
 	}
 
@@ -644,14 +650,12 @@ public class CalEventWrapper implements CalEvent, ModelWrapper<CalEvent> {
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portlet.expando.model.ExpandoBridge expandoBridge) {
+	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
 		_calEvent.setExpandoBridgeAttributes(expandoBridge);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.service.ServiceContext serviceContext) {
+	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
 		_calEvent.setExpandoBridgeAttributes(serviceContext);
 	}
 
@@ -711,7 +715,7 @@ public class CalEventWrapper implements CalEvent, ModelWrapper<CalEvent> {
 	}
 
 	@Override
-	public void setPrimaryKeyObj(java.io.Serializable primaryKeyObj) {
+	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		_calEvent.setPrimaryKeyObj(primaryKeyObj);
 	}
 
@@ -885,12 +889,9 @@ public class CalEventWrapper implements CalEvent, ModelWrapper<CalEvent> {
 		return false;
 	}
 
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedModel}
-	 */
-	@Deprecated
-	public CalEvent getWrappedCalEvent() {
-		return _calEvent;
+	@Override
+	public StagedModelType getStagedModelType() {
+		return _calEvent.getStagedModelType();
 	}
 
 	@Override

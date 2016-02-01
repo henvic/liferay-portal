@@ -17,8 +17,12 @@ package com.liferay.portal.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.service.ServiceContext;
 
+import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.exportimport.lar.StagedModelType;
+
+import java.io.Serializable;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -66,7 +70,6 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 		attributes.put("description", getDescription());
 		attributes.put("settings", getSettings());
 		attributes.put("active", getActive());
-		attributes.put("lastPublishDate", getLastPublishDate());
 
 		return attributes;
 	}
@@ -143,12 +146,6 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 
 		if (active != null) {
 			setActive(active);
-		}
-
-		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
-
-		if (lastPublishDate != null) {
-			setLastPublishDate(lastPublishDate);
 		}
 	}
 
@@ -282,7 +279,7 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 	}
 
 	@Override
-	public com.liferay.portlet.expando.model.ExpandoBridge getExpandoBridge() {
+	public ExpandoBridge getExpandoBridge() {
 		return _layoutSetPrototype.getExpandoBridge();
 	}
 
@@ -296,16 +293,6 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 	public long getGroupId()
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layoutSetPrototype.getGroupId();
-	}
-
-	/**
-	* Returns the last publish date of this layout set prototype.
-	*
-	* @return the last publish date of this layout set prototype
-	*/
-	@Override
-	public Date getLastPublishDate() {
-		return _layoutSetPrototype.getLastPublishDate();
 	}
 
 	@Override
@@ -432,7 +419,7 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 	}
 
 	@Override
-	public java.io.Serializable getPrimaryKeyObj() {
+	public Serializable getPrimaryKeyObj() {
 		return _layoutSetPrototype.getPrimaryKeyObj();
 	}
 
@@ -654,25 +641,13 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portlet.expando.model.ExpandoBridge expandoBridge) {
+	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
 		_layoutSetPrototype.setExpandoBridgeAttributes(expandoBridge);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.service.ServiceContext serviceContext) {
+	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
 		_layoutSetPrototype.setExpandoBridgeAttributes(serviceContext);
-	}
-
-	/**
-	* Sets the last publish date of this layout set prototype.
-	*
-	* @param lastPublishDate the last publish date of this layout set prototype
-	*/
-	@Override
-	public void setLastPublishDate(Date lastPublishDate) {
-		_layoutSetPrototype.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
@@ -782,7 +757,7 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 	}
 
 	@Override
-	public void setPrimaryKeyObj(java.io.Serializable primaryKeyObj) {
+	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		_layoutSetPrototype.setPrimaryKeyObj(primaryKeyObj);
 	}
 
@@ -890,14 +865,6 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 	@Override
 	public StagedModelType getStagedModelType() {
 		return _layoutSetPrototype.getStagedModelType();
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedModel}
-	 */
-	@Deprecated
-	public LayoutSetPrototype getWrappedLayoutSetPrototype() {
-		return _layoutSetPrototype;
 	}
 
 	@Override

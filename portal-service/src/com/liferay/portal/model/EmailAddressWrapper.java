@@ -17,8 +17,12 @@ package com.liferay.portal.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.service.ServiceContext;
 
+import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.exportimport.lar.StagedModelType;
+
+import java.io.Serializable;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -67,7 +71,6 @@ public class EmailAddressWrapper implements EmailAddress,
 		attributes.put("address", getAddress());
 		attributes.put("typeId", getTypeId());
 		attributes.put("primary", getPrimary());
-		attributes.put("lastPublishDate", getLastPublishDate());
 
 		return attributes;
 	}
@@ -150,12 +153,6 @@ public class EmailAddressWrapper implements EmailAddress,
 
 		if (primary != null) {
 			setPrimary(primary);
-		}
-
-		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
-
-		if (lastPublishDate != null) {
-			setLastPublishDate(lastPublishDate);
 		}
 	}
 
@@ -240,18 +237,8 @@ public class EmailAddressWrapper implements EmailAddress,
 	}
 
 	@Override
-	public com.liferay.portlet.expando.model.ExpandoBridge getExpandoBridge() {
+	public ExpandoBridge getExpandoBridge() {
 		return _emailAddress.getExpandoBridge();
-	}
-
-	/**
-	* Returns the last publish date of this email address.
-	*
-	* @return the last publish date of this email address
-	*/
-	@Override
-	public Date getLastPublishDate() {
-		return _emailAddress.getLastPublishDate();
 	}
 
 	/**
@@ -295,7 +282,7 @@ public class EmailAddressWrapper implements EmailAddress,
 	}
 
 	@Override
-	public java.io.Serializable getPrimaryKeyObj() {
+	public Serializable getPrimaryKeyObj() {
 		return _emailAddress.getPrimaryKeyObj();
 	}
 
@@ -466,25 +453,13 @@ public class EmailAddressWrapper implements EmailAddress,
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portlet.expando.model.ExpandoBridge expandoBridge) {
+	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
 		_emailAddress.setExpandoBridgeAttributes(expandoBridge);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.service.ServiceContext serviceContext) {
+	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
 		_emailAddress.setExpandoBridgeAttributes(serviceContext);
-	}
-
-	/**
-	* Sets the last publish date of this email address.
-	*
-	* @param lastPublishDate the last publish date of this email address
-	*/
-	@Override
-	public void setLastPublishDate(Date lastPublishDate) {
-		_emailAddress.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
@@ -533,7 +508,7 @@ public class EmailAddressWrapper implements EmailAddress,
 	}
 
 	@Override
-	public void setPrimaryKeyObj(java.io.Serializable primaryKeyObj) {
+	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		_emailAddress.setPrimaryKeyObj(primaryKeyObj);
 	}
 
@@ -634,14 +609,6 @@ public class EmailAddressWrapper implements EmailAddress,
 	@Override
 	public StagedModelType getStagedModelType() {
 		return _emailAddress.getStagedModelType();
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedModel}
-	 */
-	@Deprecated
-	public EmailAddress getWrappedEmailAddress() {
-		return _emailAddress;
 	}
 
 	@Override

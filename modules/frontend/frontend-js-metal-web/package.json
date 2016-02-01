@@ -1,11 +1,7 @@
 {
-	"devDependencies": {
-		"gulp": "^3.8.11",
-		"gulp-metal": "^0.4.2",
-		"gulp-replace": "^0.5.4"
+	"dependencies": {
+		"crystal-components": "metal/crystal-components#c3510e28da760d92d414522723aebc26f6c7be41"
 	},
-	"engines": {
-		"node": ">=0.12.0"
-	},
-	"name": "liferay-frontend-js-metal"
+	"name": "frontend-js-metal-web",
+	"version": "1.0.0"
 }

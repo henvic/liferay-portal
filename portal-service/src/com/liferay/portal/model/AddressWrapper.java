@@ -17,8 +17,12 @@ package com.liferay.portal.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.service.ServiceContext;
 
+import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.exportimport.lar.StagedModelType;
+
+import java.io.Serializable;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -73,7 +77,6 @@ public class AddressWrapper implements Address, ModelWrapper<Address> {
 		attributes.put("typeId", getTypeId());
 		attributes.put("mailing", getMailing());
 		attributes.put("primary", getPrimary());
-		attributes.put("lastPublishDate", getLastPublishDate());
 
 		return attributes;
 	}
@@ -199,12 +202,6 @@ public class AddressWrapper implements Address, ModelWrapper<Address> {
 		if (primary != null) {
 			setPrimary(primary);
 		}
-
-		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
-
-		if (lastPublishDate != null) {
-			setLastPublishDate(lastPublishDate);
-		}
 	}
 
 	@Override
@@ -303,18 +300,8 @@ public class AddressWrapper implements Address, ModelWrapper<Address> {
 	}
 
 	@Override
-	public com.liferay.portlet.expando.model.ExpandoBridge getExpandoBridge() {
+	public ExpandoBridge getExpandoBridge() {
 		return _address.getExpandoBridge();
-	}
-
-	/**
-	* Returns the last publish date of this address.
-	*
-	* @return the last publish date of this address
-	*/
-	@Override
-	public Date getLastPublishDate() {
-		return _address.getLastPublishDate();
 	}
 
 	/**
@@ -368,7 +355,7 @@ public class AddressWrapper implements Address, ModelWrapper<Address> {
 	}
 
 	@Override
-	public java.io.Serializable getPrimaryKeyObj() {
+	public Serializable getPrimaryKeyObj() {
 		return _address.getPrimaryKeyObj();
 	}
 
@@ -613,25 +600,13 @@ public class AddressWrapper implements Address, ModelWrapper<Address> {
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portlet.expando.model.ExpandoBridge expandoBridge) {
+	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
 		_address.setExpandoBridgeAttributes(expandoBridge);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.service.ServiceContext serviceContext) {
+	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
 		_address.setExpandoBridgeAttributes(serviceContext);
-	}
-
-	/**
-	* Sets the last publish date of this address.
-	*
-	* @param lastPublishDate the last publish date of this address
-	*/
-	@Override
-	public void setLastPublishDate(Date lastPublishDate) {
-		_address.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
@@ -690,7 +665,7 @@ public class AddressWrapper implements Address, ModelWrapper<Address> {
 	}
 
 	@Override
-	public void setPrimaryKeyObj(java.io.Serializable primaryKeyObj) {
+	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		_address.setPrimaryKeyObj(primaryKeyObj);
 	}
 
@@ -841,14 +816,6 @@ public class AddressWrapper implements Address, ModelWrapper<Address> {
 	@Override
 	public StagedModelType getStagedModelType() {
 		return _address.getStagedModelType();
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedModel}
-	 */
-	@Deprecated
-	public Address getWrappedAddress() {
-		return _address;
 	}
 
 	@Override

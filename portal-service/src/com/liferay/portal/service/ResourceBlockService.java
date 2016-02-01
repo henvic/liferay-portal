@@ -23,6 +23,9 @@ import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Transactional;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Provides the remote service interface for ResourceBlock. Methods of this
  * service are expected to have security checks based on the propagated JAAS
@@ -58,11 +61,11 @@ public interface ResourceBlockService extends BaseService {
 		java.lang.String actionId) throws PortalException;
 
 	/**
-	* Returns the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @return the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
-	public java.lang.String getBeanIdentifier();
+	public java.lang.String getOSGiServiceIdentifier();
 
 	public void removeAllGroupScopePermissions(long scopeGroupId,
 		long companyId, java.lang.String name, long roleId,
@@ -80,27 +83,20 @@ public interface ResourceBlockService extends BaseService {
 		java.lang.String name, long primKey, long roleId,
 		java.lang.String actionId) throws PortalException;
 
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public void setBeanIdentifier(java.lang.String beanIdentifier);
-
 	public void setCompanyScopePermissions(long scopeGroupId, long companyId,
-		java.lang.String name, long roleId,
-		java.util.List<java.lang.String> actionIds) throws PortalException;
+		java.lang.String name, long roleId, List<java.lang.String> actionIds)
+		throws PortalException;
 
 	public void setGroupScopePermissions(long scopeGroupId, long companyId,
 		long groupId, java.lang.String name, long roleId,
-		java.util.List<java.lang.String> actionIds) throws PortalException;
+		List<java.lang.String> actionIds) throws PortalException;
 
 	public void setIndividualScopePermissions(long companyId, long groupId,
 		java.lang.String name, long primKey, long roleId,
-		java.util.List<java.lang.String> actionIds) throws PortalException;
+		List<java.lang.String> actionIds) throws PortalException;
 
 	public void setIndividualScopePermissions(long companyId, long groupId,
 		java.lang.String name, long primKey,
-		java.util.Map<java.lang.Long, java.lang.String[]> roleIdsToActionIds)
+		Map<java.lang.Long, java.lang.String[]> roleIdsToActionIds)
 		throws PortalException;
 }

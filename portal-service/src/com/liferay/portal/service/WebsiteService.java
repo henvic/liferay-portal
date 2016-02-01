@@ -23,6 +23,9 @@ import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.model.Website;
+
+import java.util.List;
 
 /**
  * Provides the remote service interface for Website. Methods of this
@@ -46,47 +49,27 @@ public interface WebsiteService extends BaseService {
 	 *
 	 * Never modify or reference this interface directly. Always use {@link WebsiteServiceUtil} to access the website remote service. Add custom service methods to {@link com.liferay.portal.service.impl.WebsiteServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-
-	/**
-	* @deprecated As of 6.2.0, replaced by {@link #addWebsite(String, long,
-	String, int, boolean, ServiceContext)}
-	*/
-	@java.lang.Deprecated
-	public com.liferay.portal.model.Website addWebsite(
-		java.lang.String className, long classPK, java.lang.String url,
-		long typeId, boolean primary) throws PortalException;
-
-	public com.liferay.portal.model.Website addWebsite(
-		java.lang.String className, long classPK, java.lang.String url,
-		long typeId, boolean primary,
+	public Website addWebsite(java.lang.String className, long classPK,
+		java.lang.String url, long typeId, boolean primary,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws PortalException;
 
 	public void deleteWebsite(long websiteId) throws PortalException;
 
 	/**
-	* Returns the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @return the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
-	public java.lang.String getBeanIdentifier();
+	public java.lang.String getOSGiServiceIdentifier();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.Website getWebsite(long websiteId)
-		throws PortalException;
+	public Website getWebsite(long websiteId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portal.model.Website> getWebsites(
-		java.lang.String className, long classPK) throws PortalException;
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public void setBeanIdentifier(java.lang.String beanIdentifier);
-
-	public com.liferay.portal.model.Website updateWebsite(long websiteId,
-		java.lang.String url, long typeId, boolean primary)
+	public List<Website> getWebsites(java.lang.String className, long classPK)
 		throws PortalException;
+
+	public Website updateWebsite(long websiteId, java.lang.String url,
+		long typeId, boolean primary) throws PortalException;
 }

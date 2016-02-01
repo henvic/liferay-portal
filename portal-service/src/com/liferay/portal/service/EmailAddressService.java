@@ -23,6 +23,9 @@ import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.model.EmailAddress;
+
+import java.util.List;
 
 /**
  * Provides the remote service interface for EmailAddress. Methods of this
@@ -46,19 +49,8 @@ public interface EmailAddressService extends BaseService {
 	 *
 	 * Never modify or reference this interface directly. Always use {@link EmailAddressServiceUtil} to access the email address remote service. Add custom service methods to {@link com.liferay.portal.service.impl.EmailAddressServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-
-	/**
-	* @deprecated As of 6.2.0, replaced by {@link #addEmailAddress(String,
-	long, String, int, boolean, ServiceContext)}
-	*/
-	@java.lang.Deprecated
-	public com.liferay.portal.model.EmailAddress addEmailAddress(
-		java.lang.String className, long classPK, java.lang.String address,
-		long typeId, boolean primary) throws PortalException;
-
-	public com.liferay.portal.model.EmailAddress addEmailAddress(
-		java.lang.String className, long classPK, java.lang.String address,
-		long typeId, boolean primary,
+	public EmailAddress addEmailAddress(java.lang.String className,
+		long classPK, java.lang.String address, long typeId, boolean primary,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws PortalException;
 
@@ -72,35 +64,27 @@ public interface EmailAddressService extends BaseService {
 	* @return the email address with the primary key, or <code>null</code> if
 	an email address with the primary key could not be found or if
 	the user did not have permission to view the email address
-	* @throws PortalException if a portal exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.EmailAddress fetchEmailAddress(
-		long emailAddressId) throws PortalException;
+	public EmailAddress fetchEmailAddress(long emailAddressId)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public EmailAddress getEmailAddress(long emailAddressId)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<EmailAddress> getEmailAddresses(java.lang.String className,
+		long classPK) throws PortalException;
 
 	/**
-	* Returns the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @return the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
-	public java.lang.String getBeanIdentifier();
+	public java.lang.String getOSGiServiceIdentifier();
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.EmailAddress getEmailAddress(
-		long emailAddressId) throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portal.model.EmailAddress> getEmailAddresses(
-		java.lang.String className, long classPK) throws PortalException;
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public void setBeanIdentifier(java.lang.String beanIdentifier);
-
-	public com.liferay.portal.model.EmailAddress updateEmailAddress(
-		long emailAddressId, java.lang.String address, long typeId,
-		boolean primary) throws PortalException;
+	public EmailAddress updateEmailAddress(long emailAddressId,
+		java.lang.String address, long typeId, boolean primary)
+		throws PortalException;
 }

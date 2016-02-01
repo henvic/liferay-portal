@@ -22,6 +22,10 @@ import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.model.LayoutSet;
+
+import java.io.File;
+import java.io.InputStream;
 
 /**
  * Provides the remote service interface for LayoutSet. Methods of this
@@ -47,18 +51,11 @@ public interface LayoutSetService extends BaseService {
 	 */
 
 	/**
-	* Returns the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @return the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
-	public java.lang.String getBeanIdentifier();
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public void setBeanIdentifier(java.lang.String beanIdentifier);
+	public java.lang.String getOSGiServiceIdentifier();
 
 	/**
 	* Updates the state of the layout set prototype link.
@@ -77,7 +74,6 @@ public interface LayoutSetService extends BaseService {
 	link enabled
 	* @param layoutSetPrototypeUuid the uuid of the layout set prototype to
 	link with
-	* @throws PortalException if a portal exception occurred
 	*/
 	public void updateLayoutSetPrototypeLinkEnabled(long groupId,
 		boolean privateLayout, boolean layoutSetPrototypeLinkEnabled,
@@ -87,25 +83,22 @@ public interface LayoutSetService extends BaseService {
 		byte[] bytes) throws PortalException;
 
 	public void updateLogo(long groupId, boolean privateLayout, boolean logo,
-		java.io.File file) throws PortalException;
+		File file) throws PortalException;
 
 	public void updateLogo(long groupId, boolean privateLayout, boolean logo,
-		java.io.InputStream inputStream) throws PortalException;
+		InputStream inputStream) throws PortalException;
 
 	public void updateLogo(long groupId, boolean privateLayout, boolean logo,
-		java.io.InputStream inputStream, boolean cleanUpStream)
+		InputStream inputStream, boolean cleanUpStream)
 		throws PortalException;
 
-	public com.liferay.portal.model.LayoutSet updateLookAndFeel(long groupId,
-		boolean privateLayout, java.lang.String themeId,
-		java.lang.String colorSchemeId, java.lang.String css, boolean wapTheme)
-		throws PortalException;
+	public LayoutSet updateLookAndFeel(long groupId, boolean privateLayout,
+		java.lang.String themeId, java.lang.String colorSchemeId,
+		java.lang.String css, boolean wapTheme) throws PortalException;
 
-	public com.liferay.portal.model.LayoutSet updateSettings(long groupId,
-		boolean privateLayout, java.lang.String settings)
-		throws PortalException;
+	public LayoutSet updateSettings(long groupId, boolean privateLayout,
+		java.lang.String settings) throws PortalException;
 
-	public com.liferay.portal.model.LayoutSet updateVirtualHost(long groupId,
-		boolean privateLayout, java.lang.String virtualHost)
-		throws PortalException;
+	public LayoutSet updateVirtualHost(long groupId, boolean privateLayout,
+		java.lang.String virtualHost) throws PortalException;
 }

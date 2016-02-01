@@ -16,15 +16,34 @@ package com.liferay.portlet.asset.service;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCachable;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
+import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.model.Group;
+import com.liferay.portal.model.PersistedModel;
 import com.liferay.portal.model.SystemEventConstants;
 import com.liferay.portal.service.BaseLocalService;
 import com.liferay.portal.service.PersistedModelLocalService;
+import com.liferay.portal.service.ServiceContext;
+
+import com.liferay.portlet.asset.model.AssetTag;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+
+import java.io.Serializable;
+
+import java.util.List;
 
 /**
  * Provides the local service interface for AssetTag. Methods of this
@@ -48,13 +67,11 @@ public interface AssetTagLocalService extends BaseLocalService,
 	 *
 	 * Never modify or reference this interface directly. Always use {@link AssetTagLocalServiceUtil} to access the asset tag local service. Add custom service methods to {@link com.liferay.portlet.asset.service.impl.AssetTagLocalServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public void addAssetEntryAssetTag(long entryId,
-		com.liferay.portlet.asset.model.AssetTag assetTag);
+	public void addAssetEntryAssetTag(long entryId, AssetTag assetTag);
 
 	public void addAssetEntryAssetTag(long entryId, long tagId);
 
-	public void addAssetEntryAssetTags(long entryId,
-		java.util.List<com.liferay.portlet.asset.model.AssetTag> AssetTags);
+	public void addAssetEntryAssetTags(long entryId, List<AssetTag> AssetTags);
 
 	public void addAssetEntryAssetTags(long entryId, long[] tagIds);
 
@@ -64,9 +81,8 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @param assetTag the asset tag
 	* @return the asset tag that was added
 	*/
-	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.REINDEX)
-	public com.liferay.portlet.asset.model.AssetTag addAssetTag(
-		com.liferay.portlet.asset.model.AssetTag assetTag);
+	@Indexable(type = IndexableType.REINDEX)
+	public AssetTag addAssetTag(AssetTag assetTag);
 
 	/**
 	* Adds an asset tag.
@@ -77,13 +93,9 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @param name the asset tag's name
 	* @param serviceContext the service context to be applied
 	* @return the asset tag that was added
-	* @throws PortalException if a user with the primary key could not be found
-	or if a portal exception occurred
 	*/
-	public com.liferay.portlet.asset.model.AssetTag addTag(long userId,
-		long groupId, java.lang.String name,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws PortalException;
+	public AssetTag addTag(long userId, long groupId, java.lang.String name,
+		ServiceContext serviceContext) throws PortalException;
 
 	/**
 	* Returns the asset tags matching the group and names, creating new asset
@@ -99,11 +111,8 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @param names the asset tag names
 	* @return the asset tags matching the group and names and new asset tags
 	matching the names that don't already exist in the group
-	* @throws PortalException if a matching group could not be found or if a
-	portal exception occurred
 	*/
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> checkTags(
-		long userId, com.liferay.portal.model.Group group,
+	public List<AssetTag> checkTags(long userId, Group group,
 		java.lang.String[] names) throws PortalException;
 
 	/**
@@ -116,12 +125,9 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @param names the asset tag names
 	* @return the asset tags matching the group and names and new asset tags
 	matching the names that don't already exist in the group
-	* @throws PortalException if a matching group could not be found or if a
-	portal exception occurred
 	*/
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> checkTags(
-		long userId, long groupId, java.lang.String[] names)
-		throws PortalException;
+	public List<AssetTag> checkTags(long userId, long groupId,
+		java.lang.String[] names) throws PortalException;
 
 	public void clearAssetEntryAssetTags(long entryId);
 
@@ -131,7 +137,7 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @param tagId the primary key for the new asset tag
 	* @return the new asset tag
 	*/
-	public com.liferay.portlet.asset.model.AssetTag createAssetTag(long tagId);
+	public AssetTag createAssetTag(long tagId);
 
 	/**
 	* Decrements the number of assets to which the asset tag has been applied.
@@ -140,19 +146,15 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @param classNameId the class name ID of the entity to which the asset
 	tag had been applied
 	* @return the asset tag
-	* @throws PortalException if an asset tag with the primary key could not be
-	found or if a portal exception occurred
 	*/
-	public com.liferay.portlet.asset.model.AssetTag decrementAssetCount(
-		long tagId, long classNameId) throws PortalException;
+	public AssetTag decrementAssetCount(long tagId, long classNameId)
+		throws PortalException;
 
-	public void deleteAssetEntryAssetTag(long entryId,
-		com.liferay.portlet.asset.model.AssetTag assetTag);
+	public void deleteAssetEntryAssetTag(long entryId, AssetTag assetTag);
 
 	public void deleteAssetEntryAssetTag(long entryId, long tagId);
 
-	public void deleteAssetEntryAssetTags(long entryId,
-		java.util.List<com.liferay.portlet.asset.model.AssetTag> AssetTags);
+	public void deleteAssetEntryAssetTags(long entryId, List<AssetTag> AssetTags);
 
 	public void deleteAssetEntryAssetTags(long entryId, long[] tagIds);
 
@@ -162,9 +164,8 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @param assetTag the asset tag
 	* @return the asset tag that was removed
 	*/
-	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
-	public com.liferay.portlet.asset.model.AssetTag deleteAssetTag(
-		com.liferay.portlet.asset.model.AssetTag assetTag);
+	@Indexable(type = IndexableType.DELETE)
+	public AssetTag deleteAssetTag(AssetTag assetTag);
 
 	/**
 	* Deletes the asset tag with the primary key from the database. Also notifies the appropriate model listeners.
@@ -173,16 +174,14 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @return the asset tag that was removed
 	* @throws PortalException if a asset tag with the primary key could not be found
 	*/
-	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
-	public com.liferay.portlet.asset.model.AssetTag deleteAssetTag(long tagId)
-		throws PortalException;
+	@Indexable(type = IndexableType.DELETE)
+	public AssetTag deleteAssetTag(long tagId) throws PortalException;
 
 	/**
 	* Deletes all asset tags in the group.
 	*
 	* @param groupId the primary key of the group in which to delete all asset
 	tags
-	* @throws PortalException if a portal exception occurred
 	*/
 	public void deleteGroupTags(long groupId) throws PortalException;
 
@@ -190,30 +189,25 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @throws PortalException
 	*/
 	@Override
-	public com.liferay.portal.model.PersistedModel deletePersistedModel(
-		com.liferay.portal.model.PersistedModel persistedModel)
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException;
 
 	/**
 	* Deletes the asset tag.
 	*
 	* @param tag the asset tag to be deleted
-	* @throws PortalException if a portal exception occurred
 	*/
-	@com.liferay.portal.kernel.systemevent.SystemEvent(type = SystemEventConstants.TYPE_DELETE)
-	public void deleteTag(com.liferay.portlet.asset.model.AssetTag tag)
-		throws PortalException;
+	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
+	public void deleteTag(AssetTag tag) throws PortalException;
 
 	/**
 	* Deletes the asset tag.
 	*
 	* @param tagId the primary key of the asset tag
-	* @throws PortalException if no asset tag could be found with the primary
-	key or if a portal exception occurred
 	*/
 	public void deleteTag(long tagId) throws PortalException;
 
-	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
+	public DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -221,8 +215,7 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
 	*/
-	public <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery);
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery);
 
 	/**
 	* Performs a dynamic query on the database and returns a range of the matching rows.
@@ -236,8 +229,7 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
 	*/
-	public <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
 		int end);
 
 	/**
@@ -253,10 +245,8 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
 	*/
-	public <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end,
-		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator);
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
+		int end, OrderByComparator<T> orderByComparator);
 
 	/**
 	* Returns the number of rows matching the dynamic query.
@@ -264,8 +254,7 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows matching the dynamic query
 	*/
-	public long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery);
+	public long dynamicQueryCount(DynamicQuery dynamicQuery);
 
 	/**
 	* Returns the number of rows matching the dynamic query.
@@ -274,12 +263,11 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @param projection the projection to apply to the query
 	* @return the number of rows matching the dynamic query
 	*/
-	public long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection);
+	public long dynamicQueryCount(DynamicQuery dynamicQuery,
+		Projection projection);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portlet.asset.model.AssetTag fetchAssetTag(long tagId);
+	public AssetTag fetchAssetTag(long tagId);
 
 	/**
 	* Returns the asset tag matching the UUID and group.
@@ -289,8 +277,8 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @return the matching asset tag, or <code>null</code> if a matching asset tag could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portlet.asset.model.AssetTag fetchAssetTagByUuidAndGroupId(
-		java.lang.String uuid, long groupId);
+	public AssetTag fetchAssetTagByUuidAndGroupId(java.lang.String uuid,
+		long groupId);
 
 	/**
 	* Returns the asset tag with the name in the group.
@@ -301,24 +289,21 @@ public interface AssetTagLocalService extends BaseLocalService,
 	it could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portlet.asset.model.AssetTag fetchTag(long groupId,
-		java.lang.String name);
+	public AssetTag fetchTag(long groupId, java.lang.String name);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery();
+	public ActionableDynamicQuery getActionableDynamicQuery();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getAssetEntryAssetTags(
-		long entryId);
+	public List<AssetTag> getAssetEntryAssetTags(long entryId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getAssetEntryAssetTags(
-		long entryId, int start, int end);
+	public List<AssetTag> getAssetEntryAssetTags(long entryId, int start,
+		int end);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getAssetEntryAssetTags(
-		long entryId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.asset.model.AssetTag> orderByComparator);
+	public List<AssetTag> getAssetEntryAssetTags(long entryId, int start,
+		int end, OrderByComparator<AssetTag> orderByComparator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getAssetEntryAssetTagsCount(long entryId);
@@ -340,8 +325,7 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @throws PortalException if a asset tag with the primary key could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portlet.asset.model.AssetTag getAssetTag(long tagId)
-		throws PortalException;
+	public AssetTag getAssetTag(long tagId) throws PortalException;
 
 	/**
 	* Returns the asset tag matching the UUID and group.
@@ -352,8 +336,8 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @throws PortalException if a matching asset tag could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portlet.asset.model.AssetTag getAssetTagByUuidAndGroupId(
-		java.lang.String uuid, long groupId) throws PortalException;
+	public AssetTag getAssetTagByUuidAndGroupId(java.lang.String uuid,
+		long groupId) throws PortalException;
 
 	/**
 	* Returns a range of all the asset tags.
@@ -367,8 +351,7 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @return the range of asset tags
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getAssetTags(
-		int start, int end);
+	public List<AssetTag> getAssetTags(int start, int end);
 
 	/**
 	* Returns all the asset tags matching the UUID and company.
@@ -378,7 +361,7 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @return the matching asset tags, or an empty list if no matches were found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getAssetTagsByUuidAndCompanyId(
+	public List<AssetTag> getAssetTagsByUuidAndCompanyId(
 		java.lang.String uuid, long companyId);
 
 	/**
@@ -392,9 +375,9 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @return the range of matching asset tags, or an empty list if no matches were found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getAssetTagsByUuidAndCompanyId(
+	public List<AssetTag> getAssetTagsByUuidAndCompanyId(
 		java.lang.String uuid, long companyId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.asset.model.AssetTag> orderByComparator);
+		OrderByComparator<AssetTag> orderByComparator);
 
 	/**
 	* Returns the number of asset tags.
@@ -405,25 +388,17 @@ public interface AssetTagLocalService extends BaseLocalService,
 	public int getAssetTagsCount();
 
 	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	public java.lang.String getBeanIdentifier();
-
-	/**
 	* Returns the asset tags of the asset entry.
 	*
 	* @param entryId the primary key of the asset entry
 	* @return the asset tags of the asset entry
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getEntryTags(
-		long entryId);
+	public List<AssetTag> getEntryTags(long entryId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext);
+	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		PortletDataContext portletDataContext);
 
 	/**
 	* Returns the asset tags in the group.
@@ -432,8 +407,7 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @return the asset tags in the group
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getGroupTags(
-		long groupId);
+	public List<AssetTag> getGroupTags(long groupId);
 
 	/**
 	* Returns a range of all the asset tags in the group.
@@ -444,8 +418,7 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @return the range of matching asset tags
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getGroupTags(
-		long groupId, int start, int end);
+	public List<AssetTag> getGroupTags(long groupId, int start, int end);
 
 	/**
 	* Returns the number of asset tags in the group.
@@ -463,23 +436,32 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @return the asset tags in the groups
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getGroupsTags(
-		long[] groupIds);
+	public List<AssetTag> getGroupsTags(long[] groupIds);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public java.lang.String getOSGiServiceIdentifier();
 
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj) throws PortalException;
+	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
+		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getSocialActivityCounterOffsetTags(
-		long groupId, java.lang.String socialActivityCounterName,
-		int startOffset, int endOffset);
+	public List<AssetTag> getSocialActivityCounterOffsetTags(long groupId,
+		java.lang.String socialActivityCounterName, int startOffset,
+		int endOffset);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getSocialActivityCounterPeriodTags(
-		long groupId, java.lang.String socialActivityCounterName,
-		int startPeriod, int endPeriod);
+	public List<AssetTag> getSocialActivityCounterPeriodTags(long groupId,
+		java.lang.String socialActivityCounterName, int startPeriod,
+		int endPeriod);
 
 	/**
 	* Returns the asset tag with the name in the group.
@@ -487,23 +469,19 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @param groupId the primary key of the group
 	* @param name the name of the asset tag
 	* @return the asset tag with the name in the group
-	* @throws PortalException if a matching asset tag could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portlet.asset.model.AssetTag getTag(long groupId,
-		java.lang.String name) throws PortalException;
+	public AssetTag getTag(long groupId, java.lang.String name)
+		throws PortalException;
 
 	/**
 	* Returns the asset tag with the primary key.
 	*
 	* @param tagId the primary key of the asset tag
 	* @return the asset tag with the primary key
-	* @throws PortalException if an asset tag with the primary key could not be
-	found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portlet.asset.model.AssetTag getTag(long tagId)
-		throws PortalException;
+	public AssetTag getTag(long tagId) throws PortalException;
 
 	/**
 	* Returns the primary keys of the asset tags with the names in the group.
@@ -570,7 +548,7 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @return the asset tags
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getTags();
+	public List<AssetTag> getTags();
 
 	/**
 	* Returns the asset tags of the entity.
@@ -579,10 +557,9 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @param classPK the primary key of the entity
 	* @return the asset tags of the entity
 	*/
-	@com.liferay.portal.kernel.cache.ThreadLocalCachable
+	@ThreadLocalCachable
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getTags(
-		java.lang.String className, long classPK);
+	public List<AssetTag> getTags(java.lang.String className, long classPK);
 
 	/**
 	* Returns the asset tags of the entity.
@@ -592,17 +569,15 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @return the asset tags of the entity
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getTags(
-		long classNameId, long classPK);
+	public List<AssetTag> getTags(long classNameId, long classPK);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getTags(
-		long groupId, long classNameId, java.lang.String name);
+	public List<AssetTag> getTags(long groupId, long classNameId,
+		java.lang.String name);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getTags(
-		long groupId, long classNameId, java.lang.String name, int start,
-		int end);
+	public List<AssetTag> getTags(long groupId, long classNameId,
+		java.lang.String name, int start, int end);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getTagsSize(long groupId, long classNameId, java.lang.String name);
@@ -632,11 +607,9 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @param classNameId the class name ID of the entity to which the asset
 	tag is being applied
 	* @return the asset tag
-	* @throws PortalException if a asset tag with the primary key could not be
-	found or if a portal exception occurred
 	*/
-	public com.liferay.portlet.asset.model.AssetTag incrementAssetCount(
-		long tagId, long classNameId) throws PortalException;
+	public AssetTag incrementAssetCount(long tagId, long classNameId)
+		throws PortalException;
 
 	/**
 	* Replaces all occurrences of the first asset tag with the second asset tag
@@ -645,7 +618,6 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @param fromTagId the primary key of the asset tag to be replaced
 	* @param toTagId the primary key of the asset tag to apply to the asset
 	entries of the other asset tag
-	* @throws PortalException if a portal exception occurred
 	*/
 	public void mergeTags(long fromTagId, long toTagId)
 		throws PortalException;
@@ -660,8 +632,8 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @return the asset tags in the group whose names match the pattern
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> search(
-		long groupId, java.lang.String name, int start, int end);
+	public List<AssetTag> search(long groupId, java.lang.String name,
+		int start, int end);
 
 	/**
 	* Returns the asset tags in the groups whose names match the pattern.
@@ -673,17 +645,10 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @return the asset tags in the groups whose names match the pattern
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> search(
-		long[] groupIds, java.lang.String name, int start, int end);
+	public List<AssetTag> search(long[] groupIds, java.lang.String name,
+		int start, int end);
 
 	public void setAssetEntryAssetTags(long entryId, long[] tagIds);
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public void setBeanIdentifier(java.lang.String beanIdentifier);
 
 	/**
 	* Updates the asset tag in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
@@ -691,12 +656,9 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @param assetTag the asset tag
 	* @return the asset tag that was updated
 	*/
-	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.REINDEX)
-	public com.liferay.portlet.asset.model.AssetTag updateAssetTag(
-		com.liferay.portlet.asset.model.AssetTag assetTag);
+	@Indexable(type = IndexableType.REINDEX)
+	public AssetTag updateAssetTag(AssetTag assetTag);
 
-	public com.liferay.portlet.asset.model.AssetTag updateTag(long userId,
-		long tagId, java.lang.String name,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws PortalException;
+	public AssetTag updateTag(long userId, long tagId, java.lang.String name,
+		ServiceContext serviceContext) throws PortalException;
 }

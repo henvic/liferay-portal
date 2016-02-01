@@ -17,8 +17,12 @@ package com.liferay.portal.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.service.ServiceContext;
 
+import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.exportimport.lar.StagedModelType;
+
+import java.io.Serializable;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -67,7 +71,6 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 		attributes.put("extension", getExtension());
 		attributes.put("typeId", getTypeId());
 		attributes.put("primary", getPrimary());
-		attributes.put("lastPublishDate", getLastPublishDate());
 
 		return attributes;
 	}
@@ -157,12 +160,6 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 		if (primary != null) {
 			setPrimary(primary);
 		}
-
-		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
-
-		if (lastPublishDate != null) {
-			setLastPublishDate(lastPublishDate);
-		}
 	}
 
 	@Override
@@ -226,7 +223,7 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 	}
 
 	@Override
-	public com.liferay.portlet.expando.model.ExpandoBridge getExpandoBridge() {
+	public ExpandoBridge getExpandoBridge() {
 		return _phone.getExpandoBridge();
 	}
 
@@ -238,16 +235,6 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 	@Override
 	public java.lang.String getExtension() {
 		return _phone.getExtension();
-	}
-
-	/**
-	* Returns the last publish date of this phone.
-	*
-	* @return the last publish date of this phone
-	*/
-	@Override
-	public Date getLastPublishDate() {
-		return _phone.getLastPublishDate();
 	}
 
 	/**
@@ -311,7 +298,7 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 	}
 
 	@Override
-	public java.io.Serializable getPrimaryKeyObj() {
+	public Serializable getPrimaryKeyObj() {
 		return _phone.getPrimaryKeyObj();
 	}
 
@@ -462,14 +449,12 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portlet.expando.model.ExpandoBridge expandoBridge) {
+	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
 		_phone.setExpandoBridgeAttributes(expandoBridge);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.service.ServiceContext serviceContext) {
+	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
 		_phone.setExpandoBridgeAttributes(serviceContext);
 	}
 
@@ -481,16 +466,6 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 	@Override
 	public void setExtension(java.lang.String extension) {
 		_phone.setExtension(extension);
-	}
-
-	/**
-	* Sets the last publish date of this phone.
-	*
-	* @param lastPublishDate the last publish date of this phone
-	*/
-	@Override
-	public void setLastPublishDate(Date lastPublishDate) {
-		_phone.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
@@ -559,7 +534,7 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 	}
 
 	@Override
-	public void setPrimaryKeyObj(java.io.Serializable primaryKeyObj) {
+	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		_phone.setPrimaryKeyObj(primaryKeyObj);
 	}
 
@@ -660,14 +635,6 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 	@Override
 	public StagedModelType getStagedModelType() {
 		return _phone.getStagedModelType();
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedModel}
-	 */
-	@Deprecated
-	public Phone getWrappedPhone() {
-		return _phone;
 	}
 
 	@Override

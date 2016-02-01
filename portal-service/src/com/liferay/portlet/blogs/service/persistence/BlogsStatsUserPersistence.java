@@ -20,6 +20,8 @@ import com.liferay.portal.service.persistence.BasePersistence;
 
 import com.liferay.portlet.blogs.model.BlogsStatsUser;
 
+import java.util.Date;
+
 /**
  * The persistence interface for the blogs stats user service.
  *
@@ -109,7 +111,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	*/
 	public BlogsStatsUser findByGroupId_First(long groupId,
 		com.liferay.portal.kernel.util.OrderByComparator<BlogsStatsUser> orderByComparator)
-		throws com.liferay.portlet.blogs.NoSuchStatsUserException;
+		throws com.liferay.portlet.blogs.exception.NoSuchStatsUserException;
 
 	/**
 	* Returns the first blogs stats user in the ordered set where groupId = &#63;.
@@ -131,7 +133,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	*/
 	public BlogsStatsUser findByGroupId_Last(long groupId,
 		com.liferay.portal.kernel.util.OrderByComparator<BlogsStatsUser> orderByComparator)
-		throws com.liferay.portlet.blogs.NoSuchStatsUserException;
+		throws com.liferay.portlet.blogs.exception.NoSuchStatsUserException;
 
 	/**
 	* Returns the last blogs stats user in the ordered set where groupId = &#63;.
@@ -155,7 +157,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	public BlogsStatsUser[] findByGroupId_PrevAndNext(long statsUserId,
 		long groupId,
 		com.liferay.portal.kernel.util.OrderByComparator<BlogsStatsUser> orderByComparator)
-		throws com.liferay.portlet.blogs.NoSuchStatsUserException;
+		throws com.liferay.portlet.blogs.exception.NoSuchStatsUserException;
 
 	/**
 	* Removes all the blogs stats users where groupId = &#63; from the database.
@@ -241,7 +243,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	*/
 	public BlogsStatsUser findByUserId_First(long userId,
 		com.liferay.portal.kernel.util.OrderByComparator<BlogsStatsUser> orderByComparator)
-		throws com.liferay.portlet.blogs.NoSuchStatsUserException;
+		throws com.liferay.portlet.blogs.exception.NoSuchStatsUserException;
 
 	/**
 	* Returns the first blogs stats user in the ordered set where userId = &#63;.
@@ -263,7 +265,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	*/
 	public BlogsStatsUser findByUserId_Last(long userId,
 		com.liferay.portal.kernel.util.OrderByComparator<BlogsStatsUser> orderByComparator)
-		throws com.liferay.portlet.blogs.NoSuchStatsUserException;
+		throws com.liferay.portlet.blogs.exception.NoSuchStatsUserException;
 
 	/**
 	* Returns the last blogs stats user in the ordered set where userId = &#63;.
@@ -287,7 +289,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	public BlogsStatsUser[] findByUserId_PrevAndNext(long statsUserId,
 		long userId,
 		com.liferay.portal.kernel.util.OrderByComparator<BlogsStatsUser> orderByComparator)
-		throws com.liferay.portlet.blogs.NoSuchStatsUserException;
+		throws com.liferay.portlet.blogs.exception.NoSuchStatsUserException;
 
 	/**
 	* Removes all the blogs stats users where userId = &#63; from the database.
@@ -313,7 +315,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	* @throws NoSuchStatsUserException if a matching blogs stats user could not be found
 	*/
 	public BlogsStatsUser findByG_U(long groupId, long userId)
-		throws com.liferay.portlet.blogs.NoSuchStatsUserException;
+		throws com.liferay.portlet.blogs.exception.NoSuchStatsUserException;
 
 	/**
 	* Returns the blogs stats user where groupId = &#63; and userId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
@@ -343,7 +345,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	* @return the blogs stats user that was removed
 	*/
 	public BlogsStatsUser removeByG_U(long groupId, long userId)
-		throws com.liferay.portlet.blogs.NoSuchStatsUserException;
+		throws com.liferay.portlet.blogs.exception.NoSuchStatsUserException;
 
 	/**
 	* Returns the number of blogs stats users where groupId = &#63; and userId = &#63;.
@@ -429,7 +431,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	*/
 	public BlogsStatsUser findByG_NotE_First(long groupId, int entryCount,
 		com.liferay.portal.kernel.util.OrderByComparator<BlogsStatsUser> orderByComparator)
-		throws com.liferay.portlet.blogs.NoSuchStatsUserException;
+		throws com.liferay.portlet.blogs.exception.NoSuchStatsUserException;
 
 	/**
 	* Returns the first blogs stats user in the ordered set where groupId = &#63; and entryCount &ne; &#63;.
@@ -453,7 +455,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	*/
 	public BlogsStatsUser findByG_NotE_Last(long groupId, int entryCount,
 		com.liferay.portal.kernel.util.OrderByComparator<BlogsStatsUser> orderByComparator)
-		throws com.liferay.portlet.blogs.NoSuchStatsUserException;
+		throws com.liferay.portlet.blogs.exception.NoSuchStatsUserException;
 
 	/**
 	* Returns the last blogs stats user in the ordered set where groupId = &#63; and entryCount &ne; &#63;.
@@ -479,7 +481,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	public BlogsStatsUser[] findByG_NotE_PrevAndNext(long statsUserId,
 		long groupId, int entryCount,
 		com.liferay.portal.kernel.util.OrderByComparator<BlogsStatsUser> orderByComparator)
-		throws com.liferay.portlet.blogs.NoSuchStatsUserException;
+		throws com.liferay.portlet.blogs.exception.NoSuchStatsUserException;
 
 	/**
 	* Removes all the blogs stats users where groupId = &#63; and entryCount &ne; &#63; from the database.
@@ -573,7 +575,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	*/
 	public BlogsStatsUser findByC_NotE_First(long companyId, int entryCount,
 		com.liferay.portal.kernel.util.OrderByComparator<BlogsStatsUser> orderByComparator)
-		throws com.liferay.portlet.blogs.NoSuchStatsUserException;
+		throws com.liferay.portlet.blogs.exception.NoSuchStatsUserException;
 
 	/**
 	* Returns the first blogs stats user in the ordered set where companyId = &#63; and entryCount &ne; &#63;.
@@ -597,7 +599,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	*/
 	public BlogsStatsUser findByC_NotE_Last(long companyId, int entryCount,
 		com.liferay.portal.kernel.util.OrderByComparator<BlogsStatsUser> orderByComparator)
-		throws com.liferay.portlet.blogs.NoSuchStatsUserException;
+		throws com.liferay.portlet.blogs.exception.NoSuchStatsUserException;
 
 	/**
 	* Returns the last blogs stats user in the ordered set where companyId = &#63; and entryCount &ne; &#63;.
@@ -623,7 +625,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	public BlogsStatsUser[] findByC_NotE_PrevAndNext(long statsUserId,
 		long companyId, int entryCount,
 		com.liferay.portal.kernel.util.OrderByComparator<BlogsStatsUser> orderByComparator)
-		throws com.liferay.portlet.blogs.NoSuchStatsUserException;
+		throws com.liferay.portlet.blogs.exception.NoSuchStatsUserException;
 
 	/**
 	* Removes all the blogs stats users where companyId = &#63; and entryCount &ne; &#63; from the database.
@@ -650,7 +652,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	* @return the matching blogs stats users
 	*/
 	public java.util.List<BlogsStatsUser> findByU_L(long userId,
-		java.util.Date lastPostDate);
+		Date lastPostDate);
 
 	/**
 	* Returns a range of all the blogs stats users where userId = &#63; and lastPostDate = &#63;.
@@ -666,7 +668,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	* @return the range of matching blogs stats users
 	*/
 	public java.util.List<BlogsStatsUser> findByU_L(long userId,
-		java.util.Date lastPostDate, int start, int end);
+		Date lastPostDate, int start, int end);
 
 	/**
 	* Returns an ordered range of all the blogs stats users where userId = &#63; and lastPostDate = &#63;.
@@ -683,7 +685,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	* @return the ordered range of matching blogs stats users
 	*/
 	public java.util.List<BlogsStatsUser> findByU_L(long userId,
-		java.util.Date lastPostDate, int start, int end,
+		Date lastPostDate, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<BlogsStatsUser> orderByComparator);
 
 	/**
@@ -702,7 +704,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	* @return the ordered range of matching blogs stats users
 	*/
 	public java.util.List<BlogsStatsUser> findByU_L(long userId,
-		java.util.Date lastPostDate, int start, int end,
+		Date lastPostDate, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<BlogsStatsUser> orderByComparator,
 		boolean retrieveFromCache);
 
@@ -715,10 +717,9 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	* @return the first matching blogs stats user
 	* @throws NoSuchStatsUserException if a matching blogs stats user could not be found
 	*/
-	public BlogsStatsUser findByU_L_First(long userId,
-		java.util.Date lastPostDate,
+	public BlogsStatsUser findByU_L_First(long userId, Date lastPostDate,
 		com.liferay.portal.kernel.util.OrderByComparator<BlogsStatsUser> orderByComparator)
-		throws com.liferay.portlet.blogs.NoSuchStatsUserException;
+		throws com.liferay.portlet.blogs.exception.NoSuchStatsUserException;
 
 	/**
 	* Returns the first blogs stats user in the ordered set where userId = &#63; and lastPostDate = &#63;.
@@ -728,8 +729,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching blogs stats user, or <code>null</code> if a matching blogs stats user could not be found
 	*/
-	public BlogsStatsUser fetchByU_L_First(long userId,
-		java.util.Date lastPostDate,
+	public BlogsStatsUser fetchByU_L_First(long userId, Date lastPostDate,
 		com.liferay.portal.kernel.util.OrderByComparator<BlogsStatsUser> orderByComparator);
 
 	/**
@@ -741,10 +741,9 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	* @return the last matching blogs stats user
 	* @throws NoSuchStatsUserException if a matching blogs stats user could not be found
 	*/
-	public BlogsStatsUser findByU_L_Last(long userId,
-		java.util.Date lastPostDate,
+	public BlogsStatsUser findByU_L_Last(long userId, Date lastPostDate,
 		com.liferay.portal.kernel.util.OrderByComparator<BlogsStatsUser> orderByComparator)
-		throws com.liferay.portlet.blogs.NoSuchStatsUserException;
+		throws com.liferay.portlet.blogs.exception.NoSuchStatsUserException;
 
 	/**
 	* Returns the last blogs stats user in the ordered set where userId = &#63; and lastPostDate = &#63;.
@@ -754,8 +753,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching blogs stats user, or <code>null</code> if a matching blogs stats user could not be found
 	*/
-	public BlogsStatsUser fetchByU_L_Last(long userId,
-		java.util.Date lastPostDate,
+	public BlogsStatsUser fetchByU_L_Last(long userId, Date lastPostDate,
 		com.liferay.portal.kernel.util.OrderByComparator<BlogsStatsUser> orderByComparator);
 
 	/**
@@ -769,9 +767,9 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	* @throws NoSuchStatsUserException if a blogs stats user with the primary key could not be found
 	*/
 	public BlogsStatsUser[] findByU_L_PrevAndNext(long statsUserId,
-		long userId, java.util.Date lastPostDate,
+		long userId, Date lastPostDate,
 		com.liferay.portal.kernel.util.OrderByComparator<BlogsStatsUser> orderByComparator)
-		throws com.liferay.portlet.blogs.NoSuchStatsUserException;
+		throws com.liferay.portlet.blogs.exception.NoSuchStatsUserException;
 
 	/**
 	* Removes all the blogs stats users where userId = &#63; and lastPostDate = &#63; from the database.
@@ -779,7 +777,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	* @param userId the user ID
 	* @param lastPostDate the last post date
 	*/
-	public void removeByU_L(long userId, java.util.Date lastPostDate);
+	public void removeByU_L(long userId, Date lastPostDate);
 
 	/**
 	* Returns the number of blogs stats users where userId = &#63; and lastPostDate = &#63;.
@@ -788,7 +786,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	* @param lastPostDate the last post date
 	* @return the number of matching blogs stats users
 	*/
-	public int countByU_L(long userId, java.util.Date lastPostDate);
+	public int countByU_L(long userId, Date lastPostDate);
 
 	/**
 	* Caches the blogs stats user in the entity cache if it is enabled.
@@ -820,7 +818,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	* @throws NoSuchStatsUserException if a blogs stats user with the primary key could not be found
 	*/
 	public BlogsStatsUser remove(long statsUserId)
-		throws com.liferay.portlet.blogs.NoSuchStatsUserException;
+		throws com.liferay.portlet.blogs.exception.NoSuchStatsUserException;
 
 	public BlogsStatsUser updateImpl(BlogsStatsUser blogsStatsUser);
 
@@ -832,7 +830,7 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	* @throws NoSuchStatsUserException if a blogs stats user with the primary key could not be found
 	*/
 	public BlogsStatsUser findByPrimaryKey(long statsUserId)
-		throws com.liferay.portlet.blogs.NoSuchStatsUserException;
+		throws com.liferay.portlet.blogs.exception.NoSuchStatsUserException;
 
 	/**
 	* Returns the blogs stats user with the primary key or returns <code>null</code> if it could not be found.

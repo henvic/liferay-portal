@@ -17,8 +17,12 @@ package com.liferay.portal.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.service.ServiceContext;
 
+import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.exportimport.lar.StagedModelType;
+
+import java.io.Serializable;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -89,7 +93,6 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 		attributes.put("requireUnlock", getRequireUnlock());
 		attributes.put("resetFailureCount", getResetFailureCount());
 		attributes.put("resetTicketMaxAge", getResetTicketMaxAge());
-		attributes.put("lastPublishDate", getLastPublishDate());
 
 		return attributes;
 	}
@@ -306,12 +309,6 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 		if (resetTicketMaxAge != null) {
 			setResetTicketMaxAge(resetTicketMaxAge);
 		}
-
-		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
-
-		if (lastPublishDate != null) {
-			setLastPublishDate(lastPublishDate);
-		}
 	}
 
 	@Override
@@ -405,7 +402,7 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 	}
 
 	@Override
-	public com.liferay.portlet.expando.model.ExpandoBridge getExpandoBridge() {
+	public ExpandoBridge getExpandoBridge() {
 		return _passwordPolicy.getExpandoBridge();
 	}
 
@@ -447,16 +444,6 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 	@Override
 	public int getHistoryCount() {
 		return _passwordPolicy.getHistoryCount();
-	}
-
-	/**
-	* Returns the last publish date of this password policy.
-	*
-	* @return the last publish date of this password policy
-	*/
-	@Override
-	public Date getLastPublishDate() {
-		return _passwordPolicy.getLastPublishDate();
 	}
 
 	/**
@@ -620,7 +607,7 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 	}
 
 	@Override
-	public java.io.Serializable getPrimaryKeyObj() {
+	public Serializable getPrimaryKeyObj() {
 		return _passwordPolicy.getPrimaryKeyObj();
 	}
 
@@ -920,14 +907,12 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portlet.expando.model.ExpandoBridge expandoBridge) {
+	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
 		_passwordPolicy.setExpandoBridgeAttributes(expandoBridge);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.service.ServiceContext serviceContext) {
+	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
 		_passwordPolicy.setExpandoBridgeAttributes(serviceContext);
 	}
 
@@ -969,16 +954,6 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 	@Override
 	public void setHistoryCount(int historyCount) {
 		_passwordPolicy.setHistoryCount(historyCount);
-	}
-
-	/**
-	* Sets the last publish date of this password policy.
-	*
-	* @param lastPublishDate the last publish date of this password policy
-	*/
-	@Override
-	public void setLastPublishDate(Date lastPublishDate) {
-		_passwordPolicy.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
@@ -1147,7 +1122,7 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 	}
 
 	@Override
-	public void setPrimaryKeyObj(java.io.Serializable primaryKeyObj) {
+	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		_passwordPolicy.setPrimaryKeyObj(primaryKeyObj);
 	}
 
@@ -1289,14 +1264,6 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 	@Override
 	public StagedModelType getStagedModelType() {
 		return _passwordPolicy.getStagedModelType();
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedModel}
-	 */
-	@Deprecated
-	public PasswordPolicy getWrappedPasswordPolicy() {
-		return _passwordPolicy;
 	}
 
 	@Override
